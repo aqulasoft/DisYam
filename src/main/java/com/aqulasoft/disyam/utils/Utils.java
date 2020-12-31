@@ -1,9 +1,11 @@
 package com.aqulasoft.disyam.utils;
 
+import com.aqulasoft.disyam.DisYamBot;
 import com.aqulasoft.disyam.models.DownloadInfo;
 import kong.unirest.GetRequest;
 import kong.unirest.MultipartBody;
 import kong.unirest.Unirest;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,8 +19,11 @@ import static com.aqulasoft.disyam.utils.Consts.*;
 import static com.aqulasoft.disyam.utils.Consts.CLIENT_SECRET;
 
 public class Utils {
+    static Logger log = Logger.getLogger(Utils.class);
 
     public static String getTrackDownloadLink(String token, long songId) {
+        log.info(token);
+        log.info(String.format("%s/tracks/%s/download-info", baseUrl, songId));
         GetRequest request = Unirest.get(String.format("%s/tracks/%s/download-info", baseUrl, songId)).header("Authorization", "OAuth " + token);
         String res = request.asJson().getBody().getObject().getJSONArray("result").getJSONObject(0).getString("downloadInfoUrl");
         byte[] body = Unirest.get(res).header("Authorization", "OAuth " + token).asBytes().getBody();
