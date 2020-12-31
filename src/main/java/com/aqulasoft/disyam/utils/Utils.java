@@ -2,15 +2,19 @@ package com.aqulasoft.disyam.utils;
 
 import com.aqulasoft.disyam.models.DownloadInfo;
 import kong.unirest.GetRequest;
+import kong.unirest.MultipartBody;
 import kong.unirest.Unirest;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import static com.aqulasoft.disyam.utils.Consts.baseUrl;
+import static com.aqulasoft.disyam.utils.Consts.*;
+import static com.aqulasoft.disyam.utils.Consts.CLIENT_SECRET;
 
 public class Utils {
 
@@ -37,5 +41,38 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    public static MultipartBody getAuthRequest(String username, String password) {
+        return Unirest.post(authUrl + "/token")
+                .field("grant_type", "password")
+                .field("client_id", CLIENT_ID)
+                .field("client_secret", CLIENT_SECRET)
+                .field("username", username)
+                .field("password", password);
+    }
+
+    public static int enterCaptcha(String captchaKey, String username, String password) {
+        String answer = "";
+        try (InputStreamReader is = new InputStreamReader(System.in)) {
+            try (BufferedReader reader = new BufferedReader(is)) {
+                System.out.println("Input captcha answer");
+                answer = reader.readLine();
+            }
+            MultipartBody request = getAuthRequest(username, password);
+            request.field("x_captcha_answer", answer);
+            request.field("x_captcha_key", captchaKey);
+            return request.asString().getStatus();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public static byte[] downloadSong(String token, long songId) {
+        String link = getTrackDownloadLink(token, songId);
+
+        return Unirest.get(link).header("Authorization", "OAuth " + token).asBytes().getBody();
     }
 }

@@ -1,126 +1,199 @@
 package com.aqulasoft.disyam;
 
+import com.aqulasoft.disyam.models.TrackScheduler;
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
+import com.sedmelluq.lava.common.tools.DaemonThreadFactory;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.VoiceState;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.TextChannel;
+import discord4j.core.object.entity.channel.VoiceChannel;
+import discord4j.voice.AudioProvider;
 import kong.unirest.*;
 import reactor.core.publisher.Mono;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.List;
+import java.util.concurrent.Executors;
 
-import static com.aqulasoft.disyam.utils.Consts.*;
-import static com.aqulasoft.disyam.utils.Utils.getTrackDownloadLink;
+import static com.aqulasoft.disyam.utils.Consts.baseUrl;
+import static com.aqulasoft.disyam.utils.Utils.*;
 
 public class DisYamBot {
+    private GatewayDiscordClient gateway;
+    private DiscordClient client;
+    private AudioPlayerManager playerManager;
+    private AudioPlayer player;
+    private TrackScheduler trackScheduler;
+    private AudioProvider provider;
+    private String YaToken;
+    private String botToken;
 
+    public DisYamBot(String botToken, String username, String password) {
+        this.botToken = botToken;
+        MultipartBody request = getAuthRequest(username, password);
+        HttpResponse<JsonNode> res = request.asJson();
+        if (res.getStatus() == 200) {
+            YaToken = res.getBody().getObject().getString("access_token");
+        } else {
+            String capchaKey = res.getBody().getObject().getString("x_captcha_key");
+            if (capchaKey != null) {
+                enterCaptcha(capchaKey, username, password);
+                YaToken = res.getBody().getObject().getString("access_token");
+            }
+        }
 
-    public static void main(final String[] args) {
-        final String token = args[0];
-        final String username = args[1];
-        final String password = args[2];
-        final DiscordClient client = DiscordClient.create(token);
-        final GatewayDiscordClient gateway = client.login().block();
-        AtomicReference<String> Ytoken = new AtomicReference<>();
+    }
+
+    public void Start() {
+        playerManager = new DefaultAudioPlayerManager();
+        playerManager.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
+        playerManager.registerSourceManager(new HttpAudioSourceManager());
+
+        player = playerManager.createPlayer();
+        trackScheduler = new TrackScheduler(player);
+        player.addListener(trackScheduler);
+        provider = new LavaPlayerAudioProvider(player);
+
+        client = DiscordClient.create(botToken);
+        gateway = client.login().block();
+
         gateway.on(MessageCreateEvent.class).subscribe(event -> {
             final Message message = event.getMessage();
-            String msg = message.getContent();
-            if (msg.length() > 0 && !event.getMessage().getAuthor().get().isBot()) {
+            String msgText = message.getContent();
+            if (msgText.length() > 0 && !event.getMessage().getAuthor().get().isBot()) {
                 final MessageChannel channel = message.getChannel().block();
-
-                if (msg.equals("!auth")) {
-                    MultipartBody request = getAuthRequest(username, password);
-                    HttpResponse<JsonNode> res = request.asJson();
-                    System.out.println(res.getBody());
-                    if (res.getStatus() == 403) {
-                        String capchaKey = res.getBody().getObject().getString("x_captcha_key");
-                        channel.createMessage(enterCapcha(capchaKey, username, password)).block();
-                    }
-                    Ytoken.set(res.getBody().getObject().getString("access_token"));
-                    channel.createMessage(res.getBody().toPrettyString()).block();
+                if (msgText.contains("!search")) {
+                    onSongSearch(event);
                 }
-
-                if (msg.contains("!song")) {
-                    try {
-                        System.out.println(msg.substring(5));
-                        byte[] song = downloadSong(Ytoken.get(), Long.parseLong(msg.substring(5).trim()));
-
-                        if (song != null) {
-
-                            Mono<TextChannel> textChannel = getTextChannel(gateway, channel.getId());
-                            textChannel
-                                    .flatMap(c -> c.createMessage(a -> a.addFile("song.mp3", new ByteArrayInputStream(song)))).block();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-
+                if (msgText.contains("!play")) {
+                    onSongPlay(event);
                 }
-                if (msg.contains("!search")) {
-                    channel.createMessage(search(msg)).block();
+                if (msgText.contains("!download")) {
+                    onSongDownload(event);
                 }
-
+                if (msgText.contains("!stop")) {
+                    player.stopTrack();
+                }
+                if (msgText.contains("!info")) {
+                    channel.createMessage(player.getPlayingTrack().getInfo().toString()).block();
+                }
             }
-
         });
-
         gateway.onDisconnect().block();
     }
 
-    private static Mono<TextChannel> getTextChannel(GatewayDiscordClient discordClient, Snowflake channel) {
-        return discordClient.getChannelById(channel)
-                .map(TextChannel.class::cast);
-    }
 
-    private static byte[] downloadSong(String token, long songId) {
-        String link = getTrackDownloadLink(token, songId);
+    private void onSongDownload(MessageCreateEvent event) {
+        try {
+            byte[] song = downloadSong(YaToken, Long.parseLong(event.getMessage().getContent().substring(9).trim()));
 
-        return Unirest.get(link).header("Authorization", "OAuth " + token).asBytes().getBody();
-    }
+            if (song != null) {
 
-    private static MultipartBody getAuthRequest(String username, String password) {
-        return Unirest.post(authUrl + "/token")
-                .field("grant_type", "password")
-                .field("client_id", CLIENT_ID)
-                .field("client_secret", CLIENT_SECRET)
-                .field("username", username)
-                .field("password", password);
-    }
-
-    private static String enterCapcha(String captchaKey, String username, String password) {
-        String answer = "";
-        try (InputStreamReader is = new InputStreamReader(System.in)) {
-            try (BufferedReader reader = new BufferedReader(is)) {
-                System.out.println("Input capcha answer");
-                answer = reader.readLine();
+                Mono<TextChannel> textChannel = getTextChannel(gateway, event.getMessage().getChannelId());
+                textChannel
+                        .flatMap(c -> c.createMessage(a -> a.addFile("song.mp3", new ByteArrayInputStream(song)))).block();
             }
-            MultipartBody request = getAuthRequest(username, password);
-            request.field("x_captcha_answer", answer);
-            request.field("x_captcha_key", captchaKey);
-            String res = request.asString().getBody();
-            System.out.println(res);
-            return res;
         } catch (Exception e) {
-            System.out.println("ERRRO");
+            e.printStackTrace();
         }
-        return answer;
     }
 
-    private static String search(String searchStr) {
+    private String onSongSearch(MessageCreateEvent event) {
         String searchUrl = baseUrl + "/search";
         GetRequest request = Unirest.get(searchUrl)
-                .queryString("text", searchStr.substring(8))
+                .queryString("text", event.getMessage().getContent().substring(8))
                 .queryString("type", "track")
                 .queryString("nocorrect", false)
                 .queryString("page", 0);
 
         return request.asJson().getBody().toPrettyString().substring(0, 1500) + "....";
+    }
+
+    private void onSongPlay(MessageCreateEvent event) {
+        final Member member = event.getMember().orElse(null);
+        if (member != null) {
+            final VoiceState voiceState = member.getVoiceState().block();
+            if (voiceState != null) {
+                final VoiceChannel voiceChannel = voiceState.getChannel().block();
+                if (voiceChannel != null) {
+                    voiceChannel.join(spec -> spec.setProvider(provider)).block();
+                }
+            }
+        }
+
+        try {
+            long songId = Long.parseLong(event.getMessage().getContent().substring(5).trim());
+            String link = getTrackDownloadLink(YaToken, songId);
+
+            System.out.println(link);
+            playSong(link);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void playSong(String url) {
+        final String trackUrl;
+
+        if (url.startsWith("<") && url.endsWith(">")) {
+            trackUrl = url.substring(1, url.length() - 1);
+        } else {
+            trackUrl = url;
+        }
+        playerManager.loadItemOrdered(playerManager, trackUrl, new AudioLoadResultHandler() {
+            @Override
+            public void trackLoaded(AudioTrack track) {
+
+                String msg = "";
+                if (player.getPlayingTrack() == null) {
+                    msg = "Adding **" + track.getInfo().title + "** to the queue and starting my player.";
+                } else {
+                    msg = "Adding **" + track.getInfo().title + "** to the queue.";
+                }
+                System.out.println(msg);
+
+                trackScheduler.queue(track);
+                player.startTrack(track, true);
+            }
+
+            @Override
+            public void playlistLoaded(AudioPlaylist playlist) {
+                if (url.contains("list")) {
+                    List<AudioTrack> tracks = playlist.getTracks();
+
+                    System.out.println("Adding **" + playlist.getTracks().size() + "** tracks to the queue from **" + playlist.getName() + "**");
+                    tracks.forEach(trackScheduler::queue);
+                }
+            }
+
+            @Override
+            public void noMatches() {
+                System.out.println("Invalid URL: " + trackUrl /*+ ". Please select one of the following tracks:"*/);
+            }
+
+            @Override
+            public void loadFailed(FriendlyException exception) {
+                System.out.println("Could not play: " + exception.getMessage());
+            }
+        });
+    }
+
+    private static Mono<TextChannel> getTextChannel(GatewayDiscordClient discordClient, Snowflake channel) {
+        return discordClient.getChannelById(channel)
+                .map(TextChannel.class::cast);
     }
 }
