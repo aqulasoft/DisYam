@@ -10,7 +10,6 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
-import com.sedmelluq.lava.common.tools.DaemonThreadFactory;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -23,11 +22,11 @@ import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.voice.AudioProvider;
 import kong.unirest.*;
+import org.apache.log4j.Logger;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import static com.aqulasoft.disyam.utils.Consts.baseUrl;
 import static com.aqulasoft.disyam.utils.Utils.*;
@@ -40,7 +39,9 @@ public class DisYamBot {
     private TrackScheduler trackScheduler;
     private AudioProvider provider;
     private String YaToken;
-    private String botToken;
+    private final String botToken;
+
+    static Logger log = Logger.getLogger(DisYamBot.class);
 
     public DisYamBot(String botToken, String username, String password) {
         this.botToken = botToken;
@@ -91,6 +92,10 @@ public class DisYamBot {
                 if (msgText.contains("!info")) {
                     channel.createMessage(player.getPlayingTrack().getInfo().toString()).block();
                 }
+                if (msgText.contains("!exit")) {
+                    channel.createMessage("Process finished with exit code 0").block();
+                    System.exit(0);
+                }
             }
         });
         gateway.onDisconnect().block();
@@ -108,7 +113,7 @@ public class DisYamBot {
                         .flatMap(c -> c.createMessage(a -> a.addFile("song.mp3", new ByteArrayInputStream(song)))).block();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e);
         }
     }
 
@@ -138,15 +143,14 @@ public class DisYamBot {
         try {
             long songId = Long.parseLong(event.getMessage().getContent().substring(5).trim());
             String link = getTrackDownloadLink(YaToken, songId);
-
-            System.out.println(link);
-            playSong(link);
+            final MessageChannel channel = event.getMessage().getChannel().block();
+            playSong(link, channel);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e);
         }
     }
 
-    private void playSong(String url) {
+    private void playSong(String url, MessageChannel channel) {
         final String trackUrl;
 
         if (url.startsWith("<") && url.endsWith(">")) {
@@ -161,11 +165,12 @@ public class DisYamBot {
                 String msg = "";
                 if (player.getPlayingTrack() == null) {
                     msg = "Adding **" + track.getInfo().title + "** to the queue and starting my player.";
+
                 } else {
                     msg = "Adding **" + track.getInfo().title + "** to the queue.";
                 }
-                System.out.println(msg);
-
+                channel.createMessage(msg).block();
+                log.info(msg);
                 trackScheduler.queue(track);
                 player.startTrack(track, true);
             }
@@ -175,19 +180,25 @@ public class DisYamBot {
                 if (url.contains("list")) {
                     List<AudioTrack> tracks = playlist.getTracks();
 
-                    System.out.println("Adding **" + playlist.getTracks().size() + "** tracks to the queue from **" + playlist.getName() + "**");
+                    String msg ="Adding **" + playlist.getTracks().size() + "** tracks to the queue from **" + playlist.getName() + "**";
+                    channel.createMessage(msg).block();
+                    log.info(msg);
                     tracks.forEach(trackScheduler::queue);
                 }
             }
 
             @Override
             public void noMatches() {
-                System.out.println("Invalid URL: " + trackUrl /*+ ". Please select one of the following tracks:"*/);
+                String msg ="Invalid URL: " + trackUrl /*+ ". Please select one of the following tracks:"*/;
+                channel.createMessage(msg).block();
+                log.info(msg);
             }
 
             @Override
             public void loadFailed(FriendlyException exception) {
-                System.out.println("Could not play: " + exception.getMessage());
+                String msg = "Could not play: " + exception.getMessage();
+                channel.createMessage(msg).block();
+                log.error(msg, exception);
             }
         });
     }
