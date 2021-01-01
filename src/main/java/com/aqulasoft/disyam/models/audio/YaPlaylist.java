@@ -33,7 +33,7 @@ public class YaPlaylist {
         playlist.trackCount = json.getInt("trackCount");
         playlist.author = json.getJSONObject("owner").getString("name");
         playlist.duration = json.getLong("duration");
-        playlist.modified = Date.from(Instant.parse(json.getString("modified")));
+//        playlist.modified = Date.from(Instant.parse(json.getString("modified")));
         playlist.tracks = new ArrayList<>(playlist.trackCount);
 
         JSONArray jsonTrackArray = json.getJSONArray("tracks");

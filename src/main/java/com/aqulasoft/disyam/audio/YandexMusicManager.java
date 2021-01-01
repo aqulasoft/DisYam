@@ -4,11 +4,13 @@ import com.aqulasoft.disyam.models.audio.DownloadInfo;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.utils.Utils;
 import kong.unirest.*;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
+import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -90,10 +92,12 @@ public class YandexMusicManager {
     }
 
     public static YaPlaylist getPlaylist(String username, String playlistId) {
+        Unirest.config().reset().enableCookieManagement(false);
         String url = String.format("https://music.yandex.ru/handlers/playlist.jsx?owner=%s&kinds=%s&light=true&madeFor=&lang=%s&external-domain=music.yandex.ru&overembed=false&ncrnd=0.9083773647705418", username, playlistId,"ru");
         GetRequest request = Unirest.get(url);
         HttpResponse<JsonNode> json = request.asJson();
         JsonNode body = json.getBody();
+        Unirest.config().reset().enableCookieManagement(true);
         return YaPlaylist.create(body.getObject().getJSONObject("playlist"));
     }
 
