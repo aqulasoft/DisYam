@@ -67,11 +67,11 @@ public class PlayCommand implements Command {
             return;
         }
 
-        String link = getTrackDownloadLink(SecretManager.get("YaToken"), Long.parseLong(args.get(0)));
+//        String link = getTrackDownloadLink(SecretManager.get("YaToken"), Long.parseLong(args.get(0)));
 
         PlayerManager playerManager = PlayerManager.getInstance();
 
-        playerManager.loadAndPlay(event.getChannel(), link);
+        playerManager.loadAndPlay(event.getChannel(), args.get(0));
     }
 
     private void handlePlaylist(GuildMessageReceivedEvent event, String username, String playlistId) {

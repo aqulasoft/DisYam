@@ -1,6 +1,5 @@
 package com.aqulasoft.disyam.audio;
 
-import com.aqulasoft.disyam.DisYamBot;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.service.SecretManager;
@@ -14,6 +13,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import org.apache.log4j.Logger;
 
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -25,7 +25,9 @@ public class TrackScheduler extends AudioEventAdapter {
     private AudioPlayerManager playerManager;
     private final BlockingQueue<AudioTrack> queue;
     private YaPlaylist playlist;
+    private boolean shuffleOn = false;
     private int position;
+    private Random rnd = new Random();
 
     /**
      * @param player The audio player this scheduler uses
@@ -58,7 +60,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void queue(YaPlaylist playlist) {
         this.playlist = playlist;
         position = 0;
-        loadNextFromPlaylist();
+        loadFromPlaylist(position);
     }
 
     public BlockingQueue<AudioTrack> getQueue() {
@@ -71,7 +73,9 @@ public class TrackScheduler extends AudioEventAdapter {
     public void nextTrack() {
         // Start the next track, regardless of if something is already playing or not. In case queue was empty, we are
         // giving null to startTrack, which is a valid argument and will simply stop the player.
-        player.startTrack(queue.poll(), false);
+        if (playlist != null) {
+            loadFromPlaylist(shuffleOn ? rnd.nextInt(playlist.getTracks().size()) : ++position);
+        } else player.startTrack(queue.poll(), false);
     }
 
     @Override
@@ -79,16 +83,12 @@ public class TrackScheduler extends AudioEventAdapter {
         // Only start the next track if the end reason is suitable for it (FINISHED or LOAD_FAILED)
         if (endReason.mayStartNext) {
             nextTrack();
-            if (playlist != null) {
-                loadNextFromPlaylist();
-            }
-
         }
     }
 
-    private void loadNextFromPlaylist(){
-        if (position > playlist.getTracks().size()) return;
-        YaTrack track = playlist.getTracks().get(position++);
+    private void loadFromPlaylist(int pos) {
+        if (pos < 0 || pos >= playlist.getTracks().size()) return;
+        YaTrack track = playlist.getTracks().get(pos);
         String url = YandexMusicManager.getTrackDownloadLink(SecretManager.get("YaToken"), track.getRealId());
         playerManager.loadItemOrdered(this, url, new AudioLoadResultHandler() {
             @Override
@@ -114,5 +114,25 @@ public class TrackScheduler extends AudioEventAdapter {
 //                channel.sendMessage("Could not play: " + exception.getMessage()).queue();
             }
         });
+    }
+
+    public void prevTrack() {
+        if (playlist != null) {
+            --position;
+            if (position < 0 ) {
+                position = 0;
+            }
+            loadFromPlaylist(position);
+        }
+    }
+
+    public void clear() {
+        queue.clear();
+        position = 0;
+        playlist = null;
+    }
+
+    public void shuffle() {
+        shuffleOn = !shuffleOn;
     }
 }

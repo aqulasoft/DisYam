@@ -18,6 +18,11 @@ public class CommandManager {
         addCommand(new PlayCommand());
         addCommand(new DownloadCommand());
         addCommand(new SearchCommand());
+        addCommand(new NextCommand());
+        addCommand(new PauseCommand());
+        addCommand(new ResumeCommand());
+        addCommand(new PrevCommand());
+        addCommand(new ShuffleCommand());
     }
 
     private void addCommand(Command command) {
