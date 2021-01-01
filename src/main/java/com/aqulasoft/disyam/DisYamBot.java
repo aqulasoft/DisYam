@@ -1,11 +1,11 @@
 package com.aqulasoft.disyam;
 
-import com.aqulasoft.disyam.commands.CommandManager;
+import com.aqulasoft.disyam.service.CommandManager;
+import com.aqulasoft.disyam.service.MessageListener;
 import com.aqulasoft.disyam.service.SecretManager;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.MultipartBody;
-import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import org.apache.log4j.Logger;
@@ -48,11 +48,10 @@ public class DisYamBot {
 
         try {
             log.info("Booting");
-            new JDABuilder(AccountType.BOT)
-                    .setToken(botToken)
-                    .addEventListeners(messageListener)
-                    .setActivity(Activity.playing("Yandex Music"))
-                    .build().awaitReady();
+            JDABuilder builder = JDABuilder.createDefault(botToken);
+            builder.addEventListeners(messageListener);
+            builder.setActivity(Activity.playing("Yandex Music"));
+            builder.build().awaitReady();
             log.info("Running");
         } catch (LoginException | InterruptedException e) {
             log.error(e);

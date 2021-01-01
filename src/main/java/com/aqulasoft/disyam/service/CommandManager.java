@@ -1,5 +1,6 @@
-package com.aqulasoft.disyam.commands;
+package com.aqulasoft.disyam.service;
 
+import com.aqulasoft.disyam.commands.*;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 

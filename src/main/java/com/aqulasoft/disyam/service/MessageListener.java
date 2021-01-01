@@ -1,8 +1,7 @@
-package com.aqulasoft.disyam;
+package com.aqulasoft.disyam.service;
 
 import com.aqulasoft.disyam.audio.GuildMusicManager;
 import com.aqulasoft.disyam.audio.PlayerManager;
-import com.aqulasoft.disyam.commands.CommandManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.dv8tion.jda.api.JDA;
@@ -22,12 +21,12 @@ import java.util.concurrent.BlockingQueue;
 
 import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
-class MessageListener extends ListenerAdapter {
+public class MessageListener extends ListenerAdapter {
 
     private final CommandManager manager;
     private final Logger log = LoggerFactory.getLogger(MessageListener.class);
 
-    MessageListener(CommandManager manager) {
+    public MessageListener(CommandManager manager) {
         this.manager = manager;
     }
 
@@ -56,6 +55,7 @@ class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReactionAdd(@Nonnull MessageReactionAddEvent event) {
+        log.info("REACTION");
         super.onMessageReactionAdd(event);
     }
 
@@ -69,7 +69,7 @@ class MessageListener extends ListenerAdapter {
             return;
         }
 
-        if (rw.equalsIgnoreCase("!song")) {
+        if (rw.equalsIgnoreCase("!queue")) {
             TextChannel channel = event.getChannel();
             PlayerManager playerManager = PlayerManager.getInstance();
             GuildMusicManager musicManager = playerManager.getGuildMusicManager(event.getGuild());
@@ -83,25 +83,13 @@ class MessageListener extends ListenerAdapter {
 
             int trackCount = Math.min(queue.size(), 20);
             List<AudioTrack> tracks = new ArrayList<>(queue);
-//            EmbedBuilder builder = EmbedUtils.defaultEmbed()
-//                    .setTitle("Current Queue (Total: " + queue.size() + ")");
-
             for (int i = 0; i < trackCount; i++) {
                 AudioTrack track = tracks.get(i);
                 AudioTrackInfo info = track.getInfo();
-
-//                builder.appendDescription(String.format(
-//                        "%s - %s\n",
-//                        info.title,
-//                        info.author
-//                ));
             }
 
             channel.sendMessage("builder.build()").queue();
         }
-
-
-//        String prefix = "!"; //Constants.PREFIXES.computeIfAbsent(event.getGuild().getIdLong(), (l) -> Constants.PREFIX);
 
         if (!event.getAuthor().isBot() && !event.getMessage().isWebhookMessage() && rw.startsWith(PREFIX)) {
             manager.handleCommand(event);

@@ -1,11 +1,9 @@
 package com.aqulasoft.disyam.audio;
 
-import com.aqulasoft.disyam.models.DownloadInfo;
+import com.aqulasoft.disyam.models.audio.DownloadInfo;
+import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.utils.Utils;
-import kong.unirest.GetRequest;
-import kong.unirest.JsonNode;
-import kong.unirest.MultipartBody;
-import kong.unirest.Unirest;
+import kong.unirest.*;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -90,4 +88,14 @@ public class YandexMusicManager {
         String link = getTrackDownloadLink(token, songId);
         return Unirest.get(link).header("Authorization", "OAuth " + token).asBytes().getBody();
     }
+
+    public static YaPlaylist getPlaylist(String username, String playlistId) {
+        String url = String.format("https://music.yandex.ru/handlers/playlist.jsx?owner=%s&kinds=%s&light=true&madeFor=&lang=%s&external-domain=music.yandex.ru&overembed=false&ncrnd=0.9083773647705418", username, playlistId,"ru");
+        GetRequest request = Unirest.get(url);
+        HttpResponse<JsonNode> json = request.asJson();
+        JsonNode body = json.getBody();
+        return YaPlaylist.create(body.getObject().getJSONObject("playlist"));
+    }
+
+
 }

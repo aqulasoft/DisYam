@@ -1,8 +1,10 @@
 package com.aqulasoft.disyam.audio;
 
-import com.aqulasoft.disyam.models.TrackScheduler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 /**
  * Holder for both the player and a track scheduler for one guild.
@@ -15,7 +17,8 @@ public class GuildMusicManager {
     /**
      * Track scheduler for the player.
      */
-    public final TrackScheduler scheduler;
+    public TrackScheduler scheduler;
+    private TextChannel textChannel;
 
     /**
      * Creates a player and a track scheduler.
@@ -23,7 +26,12 @@ public class GuildMusicManager {
      */
     public GuildMusicManager(AudioPlayerManager manager) {
         player = manager.createPlayer();
-        scheduler = new TrackScheduler(player);
+        scheduler = new TrackScheduler(player, manager) {
+            @Override
+            public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+                super.onTrackEnd(player, track, endReason);
+            }
+        };
         player.addListener(scheduler);
     }
 
@@ -32,5 +40,9 @@ public class GuildMusicManager {
      */
     public AudioPlayerSendHandler getSendHandler() {
         return new AudioPlayerSendHandler(player);
+    }
+
+    public void setTextChannel(TextChannel channel) {
+        this.textChannel = channel;
     }
 }

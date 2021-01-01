@@ -1,12 +1,15 @@
 package com.aqulasoft.disyam.audio;
 
+import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 
@@ -38,6 +41,12 @@ public class PlayerManager {
         guild.getAudioManager().setSendingHandler(musicManager.getSendHandler());
 
         return musicManager;
+    }
+
+    public void loadAndPlayPlaylist(TextChannel channel, YaPlaylist playlist) {
+        GuildMusicManager musicManager = getGuildMusicManager(channel.getGuild());
+        musicManager.setTextChannel(channel);
+        musicManager.scheduler.queue(playlist);
     }
 
     public void loadAndPlay(TextChannel channel, String trackUrl) {

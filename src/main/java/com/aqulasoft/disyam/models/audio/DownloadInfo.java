@@ -1,4 +1,4 @@
-package com.aqulasoft.disyam.models;
+package com.aqulasoft.disyam.models.audio;
 
 import lombok.Getter;
 import org.w3c.dom.Document;
