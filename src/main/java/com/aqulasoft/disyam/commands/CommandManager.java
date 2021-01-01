@@ -15,6 +15,8 @@ public class CommandManager {
     public CommandManager() {
         addCommand(new JoinCommand());
         addCommand(new PlayCommand());
+        addCommand(new DownloadCommand());
+        addCommand(new SearchCommand());
     }
 
     private void addCommand(Command command) {

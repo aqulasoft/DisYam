@@ -12,8 +12,9 @@ import org.apache.log4j.Logger;
 
 import javax.security.auth.login.LoginException;
 
-import static com.aqulasoft.disyam.utils.Utils.enterCaptcha;
-import static com.aqulasoft.disyam.utils.Utils.getAuthRequest;
+import static com.aqulasoft.disyam.audio.YandexMusicManager.enterCaptcha;
+import static com.aqulasoft.disyam.audio.YandexMusicManager.getAuthRequest;
+
 
 public class DisYamBot {
     private String YaToken;
@@ -50,7 +51,7 @@ public class DisYamBot {
             new JDABuilder(AccountType.BOT)
                     .setToken(botToken)
                     .addEventListeners(messageListener)
-                    .setActivity(Activity.playing("IntelliJ IDEA"))
+                    .setActivity(Activity.playing("Yandex Music"))
                     .build().awaitReady();
             log.info("Running");
         } catch (LoginException | InterruptedException e) {

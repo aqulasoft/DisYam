@@ -1,21 +1,19 @@
 package com.aqulasoft.disyam.commands;
 
-import com.aqulasoft.disyam.audio.PlayerManager;
+import com.aqulasoft.disyam.audio.YandexMusicManager;
 import com.aqulasoft.disyam.service.SecretManager;
 import com.aqulasoft.disyam.utils.Utils;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.utils.AttachmentOption;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
-import static com.aqulasoft.disyam.audio.YandexMusicManager.getTrackDownloadLink;
 import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
-public class PlayCommand implements Command {
+public class DownloadCommand implements Command {
 
-    public PlayCommand() {
+    public DownloadCommand() {
 
     }
 
@@ -28,32 +26,18 @@ public class PlayCommand implements Command {
             channel.sendMessage("Please provide some arguments").queue();
             return;
         }
-        String input = getTrackDownloadLink(SecretManager.get("YaToken"), Long.parseLong(args.get(0)));
-
-        PlayerManager manager = PlayerManager.getInstance();
-
-        manager.loadAndPlay(event.getChannel(), input);
+        byte[] song = YandexMusicManager.downloadSong(SecretManager.get("YaToken"), Long.parseLong(args.get(0)));
+        channel.sendMessage("Here you are").addFile(song, "song.mp3", new AttachmentOption[0]).queue();
     }
-
-    private boolean isUrl(String input) {
-        try {
-            new URL(input);
-
-            return true;
-        } catch (MalformedURLException ignored) {
-            return false;
-        }
-    }
-
 
     @Override
     public String getHelp() {
-        return "Plays a song\n" +
+        return "Download a song\n" +
                 "Usage: `" + PREFIX + getInvoke() + " <song url>`";
     }
 
     @Override
     public String getInvoke() {
-        return "play";
+        return "download";
     }
 }
