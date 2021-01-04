@@ -19,14 +19,12 @@ public class PlaylistState extends PlayerState implements BotState {
     private final YaPlaylist playlist;
     @Setter
     @Getter
-    private int position;
     private Message message;
     private List<YaTrack> shuffledTracks;
     private boolean isShuffleOn = false;
 
     public PlaylistState(YaPlaylist playlist, int position, Message message) {
         this.playlist = playlist;
-        this.position = position;
         this.message = message;
     }
 
@@ -49,7 +47,7 @@ public class PlaylistState extends PlayerState implements BotState {
         } else {
             shuffledTracks = null;
         }
-        return position;
+        return getPosition();
     }
 
     @Override
@@ -71,7 +69,7 @@ public class PlaylistState extends PlayerState implements BotState {
         } else {
             shuffledTracks = null;
         }
-        return position;
+        return getPosition();
     }
 
     @Override
@@ -93,7 +91,7 @@ public class PlaylistState extends PlayerState implements BotState {
     private MessageEmbed buildMessage(boolean addReactions) {
         EmbedBuilder builder = new EmbedBuilder();
 
-        YaTrack track = getTrack(position);
+        YaTrack track = getTrack(getPosition());
         String trackTitle = "\uD83C\uDFB5   " + track.getTitle() + "  \uD83C\uDFB5";
         String trackAuthor = track.getFormattedArtists();
         builder.setTitle(trackTitle);
@@ -115,6 +113,6 @@ public class PlaylistState extends PlayerState implements BotState {
     @Override
     String getFooter() {
         String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "") + (isShuffleOn ? "\uD83D\uDD00" : "");
-        return String.format("(%s/%s)   %s  ", position + 1, playlist.getTrackCount(), Utils.convertTimePeriod(getTrack(position).getDuration())) + additionalInfo;
+        return String.format("(%s/%s)   %s  ", getPosition() + 1, playlist.getTrackCount(), Utils.convertTimePeriod(getTrack(getPosition()).getDuration())) + additionalInfo;
     }
 }

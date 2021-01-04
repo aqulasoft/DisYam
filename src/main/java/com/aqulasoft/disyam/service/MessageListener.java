@@ -66,6 +66,7 @@ public class MessageListener extends ListenerAdapter {
     public void onMessageReactionAdd(@Nonnull MessageReactionAddEvent event) {
         super.onMessageReactionAdd(event);
         if (event.getMember().getUser().isBot()) return;
+        event.getReaction().removeReaction(event.getUser()).queue();
         PlayerManager playerManager = PlayerManager.getInstance();
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
         switch (event.getReactionEmote().getEmoji()) {
@@ -102,7 +103,6 @@ public class MessageListener extends ListenerAdapter {
                 break;
 
         }
-        event.getReaction().removeReaction(event.getUser()).queue();
     }
 
     @Override
