@@ -40,13 +40,19 @@ Discord Yandex Music Player
 
 Allows you to play Yandex Music playlists on your Discord server.
 
-#Launch as maven project
+### Launch as maven project
 ```
 mvn clean compile exec:java -Dexec.args="token username password"
 ```
 
-#Launch as docker container
+### Launch as docker container
 ```
 docker build -t disyam .
 docker run -d disyam token username password
 ```
+
+### Player
+
+ <a href="https://play.google.com/store/apps/developer?id=AqulaSoft">
+         <img src="https://github.com/aqulasoft/DisYam/blob/master/img/example.png" width="620" height="490"/>
+         </a>
