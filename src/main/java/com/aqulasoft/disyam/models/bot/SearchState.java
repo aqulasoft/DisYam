@@ -65,6 +65,7 @@ public class SearchState extends PlayerState implements BotState {
             message.addReaction("⏯️").queue();
             message.addReaction("⏭️").queue();
             message.addReaction("\uD83D\uDD02").queue();
+            message.addReaction("\uD83D\uDCE5").queue();
         }
         return builder.build();
     }

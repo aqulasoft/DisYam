@@ -2,10 +2,13 @@ package com.aqulasoft.disyam.service;
 
 import com.aqulasoft.disyam.audio.GuildMusicManager;
 import com.aqulasoft.disyam.audio.PlayerManager;
+import com.aqulasoft.disyam.audio.YandexMusicManager;
+import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.BotState;
 import com.aqulasoft.disyam.models.bot.PlayerState;
 import com.aqulasoft.disyam.models.bot.PlaylistState;
 import com.aqulasoft.disyam.utils.BotStateType;
+import com.aqulasoft.disyam.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
@@ -16,6 +19,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.utils.AttachmentOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +89,18 @@ public class MessageListener extends ListenerAdapter {
                     ((PlayerState) state).updateRepeatOne();
                 }
                 break;
+            case "\uD83D\uDCE5":
+                if (state != null && (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH)) {
+                    YaTrack track = ((PlayerState) state).getCurrentTrack();
+                    byte[] file = YandexMusicManager.downloadSong(track.getId());
+                    try {
+                        event.getTextChannel().sendMessage(String.format("%s by %s", track.getTitle(), track.getFormattedArtists())).addFile(file, String.format("%s.mp3", Utils.transliterate(track.getTitle())), new AttachmentOption[0]).queue();
+                    } catch (Exception e) {
+                        event.getTextChannel().sendMessage(String.format("File size: %d bytes. %s", file.length, e.getLocalizedMessage())).queue();
+                    }
+                }
+                break;
+
         }
         event.getReaction().removeReaction(event.getUser()).queue();
     }

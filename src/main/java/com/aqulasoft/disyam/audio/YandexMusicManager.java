@@ -3,6 +3,7 @@ package com.aqulasoft.disyam.audio;
 import com.aqulasoft.disyam.models.audio.DownloadInfo;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
+import com.aqulasoft.disyam.service.SecretManager;
 import com.aqulasoft.disyam.utils.Utils;
 import kong.unirest.*;
 import org.apache.log4j.Logger;
@@ -83,14 +84,15 @@ public class YandexMusicManager {
         return YaSearchResult.create(request.asJson().getBody().getObject().getJSONObject("result"));
     }
 
-    public static byte[] downloadSong(String token, long songId) {
+    public static byte[] downloadSong(long songId) {
+        String token = SecretManager.get("YaToken");
         String link = getTrackDownloadLink(token, songId);
         return Unirest.get(link).header("Authorization", "OAuth " + token).asBytes().getBody();
     }
 
     public static YaPlaylist getPlaylist(String username, String playlistId) {
         Unirest.config().reset().enableCookieManagement(false);
-        String url = String.format("https://music.yandex.ru/handlers/playlist.jsx?owner=%s&kinds=%s&light=true&madeFor=&lang=%s&external-domain=music.yandex.ru&overembed=false&ncrnd=0.9083773647705418", username, playlistId,"ru");
+        String url = String.format("https://music.yandex.ru/handlers/playlist.jsx?owner=%s&kinds=%s&light=true&madeFor=&lang=%s&external-domain=music.yandex.ru&overembed=false&ncrnd=0.9083773647705418", username, playlistId, "ru");
         GetRequest request = Unirest.get(url);
         HttpResponse<JsonNode> json = request.asJson();
         JsonNode body = json.getBody();

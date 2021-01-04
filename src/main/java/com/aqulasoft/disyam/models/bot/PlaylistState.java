@@ -107,6 +107,7 @@ public class PlaylistState extends PlayerState implements BotState {
             message.addReaction("⏭️").queue();
             message.addReaction("\uD83D\uDD00").queue();
             message.addReaction("\uD83D\uDD02").queue();
+            message.addReaction("\uD83D\uDCE5").queue();
         }
         return builder.build();
     }

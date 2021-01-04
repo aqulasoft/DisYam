@@ -5,7 +5,6 @@ import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.utils.Utils;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -48,14 +47,6 @@ abstract public class PlayerState {
         return position;
     }
 
-    public List<YaTrack> getTracks() {
-        return new ArrayList<>();
-    }
-
-    public YaTrack getTrack(int pos) {
-        return null;
-    }
-
     public int next() {
         if (isRepeatOneOn) return position;
         if (position + 1 < getTracks().size()) {
@@ -67,12 +58,19 @@ abstract public class PlayerState {
         return position;
     }
 
-    public void updateMessage(boolean addReactions) {
-
+    public YaTrack getCurrentTrack() {
+        return getTrack(position);
     }
+
+    public abstract void updateMessage(boolean addReactions);
+
+    public abstract List<YaTrack> getTracks();
+
+    public abstract YaTrack getTrack(int pos);
 
     String getFooter() {
         String additionalInfo = (isPaused ? "⏸ " : "▶️ ") + (isRepeatOneOn ? "\uD83D\uDD02 " : "");
         return String.format("(%s/%s)   %s  ", position + 1, getTracks().size(), Utils.convertTimePeriod(getTrack(position).getDuration())) + additionalInfo;
     }
+
 }
