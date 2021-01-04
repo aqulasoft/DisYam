@@ -69,6 +69,7 @@ public class MessageListener extends ListenerAdapter {
         event.getReaction().removeReaction(event.getUser()).queue();
         PlayerManager playerManager = PlayerManager.getInstance();
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
+        if(event.getMessageIdLong() != state.getLastMessage().getIdLong()) return;
         switch (event.getReactionEmote().getEmoji()) {
             case "⏮️":
                 playerManager.getGuildMusicManager(event.getGuild()).scheduler.prevTrack();
