@@ -76,10 +76,9 @@ public class MessageListener extends ListenerAdapter {
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
         if (event.getMessageIdLong() != state.getLastMessage().getIdLong()) return;
 
-        switch (state.getType()) {
-            case SEARCH_PLAYLIST:
-                handlePlaylistSelect((PlaylistSearchState) state, event);
-                return;
+        if (state.getType() == BotStateType.SEARCH_PLAYLIST) {
+            handlePlaylistSelect((PlaylistSearchState) state, event);
+            return;
         }
         switch (event.getReactionEmote().getEmoji()) {
             case "⏮️":
@@ -93,17 +92,17 @@ public class MessageListener extends ListenerAdapter {
                 playerManager.getGuildMusicManager(event.getGuild()).scheduler.nextTrack();
                 break;
             case "\uD83D\uDD00":
-                if (state != null && state.getType() == BotStateType.YA_PLAYLIST) {
+                if (state.getType() == BotStateType.YA_PLAYLIST) {
                     ((PlaylistState) state).updateShuffle();
                 }
                 break;
             case "\uD83D\uDD02":
-                if (state != null && (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH_TRACK)) {
+                if (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH_TRACK) {
                     ((PlayerState) state).updateRepeatOne();
                 }
                 break;
             case "\uD83D\uDCE5":
-                if (state != null && (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH_TRACK)) {
+                if (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH_TRACK) {
                     YaTrack track = ((PlayerState) state).getCurrentTrack();
                     byte[] file = YandexMusicManager.downloadSong(track.getId());
                     try {
@@ -117,7 +116,7 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private void handlePlaylistSelect(PlaylistSearchState state, MessageReactionAddEvent event) {
-        int num = Utils.getEmojiNum(event.getReactionEmote().getEmoji());
+        int num = Utils.getEmojiNum(event.getReactionEmote().getEmoji()) - 1;
         YaPlaylist playlist = state.getPlaylist(num);
         playlist = getPlaylist(playlist.getAuthorLogin(), String.valueOf(playlist.getId()));
         YaTrack track = playlist.getTrack(0);

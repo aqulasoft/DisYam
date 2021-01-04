@@ -6,11 +6,8 @@ import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.PlaylistState;
 import com.aqulasoft.disyam.service.BotStateManager;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.managers.AudioManager;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
@@ -62,7 +59,7 @@ public class PlayCommand implements Command {
             builder.setColor(Color.ORANGE);
             event.getChannel().sendMessage(builder.build()).queue(message -> {
                 PlaylistState state = new PlaylistState(playlist, 0, message);
-                BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, true);
+                BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);
                 state.updateMessage(true);
                 PlayerManager playerManager = PlayerManager.getInstance();
                 playerManager.loadAndPlayPlaylist(event.getChannel());

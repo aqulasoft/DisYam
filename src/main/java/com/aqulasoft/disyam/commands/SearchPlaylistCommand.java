@@ -1,11 +1,8 @@
 package com.aqulasoft.disyam.commands;
 
-import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicManager;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
-import com.aqulasoft.disyam.models.bot.PlayerState;
 import com.aqulasoft.disyam.models.bot.PlaylistSearchState;
-import com.aqulasoft.disyam.models.bot.TrackSearchState;
 import com.aqulasoft.disyam.service.BotStateManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -37,7 +34,7 @@ public class SearchPlaylistCommand implements Command {
         builder.setColor(Color.ORANGE);
         event.getChannel().sendMessage(builder.build()).queue(message -> {
             PlaylistSearchState state = new PlaylistSearchState(searchResult, message);
-            BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, true);
+            BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);
             state.updateMessage(true);
 //            PlayerManager playerManager = PlayerManager.getInstance();
 //            playerManager.loadAndPlaySearch(event.getChannel());
