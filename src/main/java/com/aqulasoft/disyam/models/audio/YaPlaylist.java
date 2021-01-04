@@ -4,7 +4,6 @@ import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import lombok.Getter;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,6 +41,12 @@ public class YaPlaylist {
             playlist.tracks.add(YaTrack.create(track));
         }
         return playlist;
+    }
 
+    public YaTrack getTrack(int pos) throws YaAudioException {
+        if (tracks.size() > 0 || pos >= 0) {
+            return tracks.get(pos);
+        }
+        throw new YaAudioException("Unable to get track by position");
     }
 }

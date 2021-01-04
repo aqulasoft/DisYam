@@ -2,18 +2,30 @@ package com.aqulasoft.disyam.service;
 
 import com.aqulasoft.disyam.models.bot.BotState;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BotStateManager {
-    private BotState botState;
+
+    private static BotStateManager INSTANCE;
+    private final Map<Long, BotState> botStates;
 
     public BotStateManager() {
-
+        botStates = new HashMap<>();
     }
 
-    public void setState(BotState botState) {
-        this.botState = botState;
+    public void setState(long guildId, BotState botState) {
+        botStates.put(guildId, botState);
     }
 
-    public BotState getBotState(BotState botState) {
-        return botState;
+    public BotState getState(long guildId) {
+        return botStates.get(guildId);
+    }
+
+    public static synchronized BotStateManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new BotStateManager();
+        }
+        return INSTANCE;
     }
 }

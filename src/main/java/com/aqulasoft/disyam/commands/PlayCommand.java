@@ -2,28 +2,29 @@ package com.aqulasoft.disyam.commands;
 
 import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
-import com.aqulasoft.disyam.service.SecretManager;
+import com.aqulasoft.disyam.models.audio.YaTrack;
+import com.aqulasoft.disyam.models.bot.PlaylistState;
+import com.aqulasoft.disyam.service.BotStateManager;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.apache.log4j.Logger;
 
+import java.awt.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.aqulasoft.disyam.audio.YandexMusicManager.getPlaylist;
-import static com.aqulasoft.disyam.audio.YandexMusicManager.getTrackDownloadLink;
 import static com.aqulasoft.disyam.utils.Consts.PLAYLIST_URL_REGEX;
 import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
 public class PlayCommand implements Command {
 
-    private final static Pattern pattern = Pattern.compile(PLAYLIST_URL_REGEX);
+    private final static Pattern playlistPattern = Pattern.compile(PLAYLIST_URL_REGEX);
     static Logger log = Logger.getLogger(PlayCommand.class);
 
     public PlayCommand() {
@@ -38,7 +39,7 @@ public class PlayCommand implements Command {
             channel.sendMessage("Please provide some arguments").queue();
             return;
         }
-        Matcher matcher = pattern.matcher(args.get(0));
+        Matcher playlistMatcher = playlistPattern.matcher(args.get(0));
 
         AudioManager audioManager = event.getGuild().getAudioManager();
 
@@ -60,14 +61,12 @@ public class PlayCommand implements Command {
             audioManager.openAudioConnection(voiceChannel);
         }
 
-        if (matcher.matches()) {
-            String username = matcher.group(1);
-            String playlistId = matcher.group(2);
+        if (playlistMatcher.matches()) {
+            String username = playlistMatcher.group(1);
+            String playlistId = playlistMatcher.group(2);
             handlePlaylist(event, username, playlistId);
             return;
         }
-
-//        String link = getTrackDownloadLink(SecretManager.get("YaToken"), Long.parseLong(args.get(0)));
 
         PlayerManager playerManager = PlayerManager.getInstance();
 
@@ -76,8 +75,23 @@ public class PlayCommand implements Command {
 
     private void handlePlaylist(GuildMessageReceivedEvent event, String username, String playlistId) {
         YaPlaylist playlist = getPlaylist(username, playlistId);
-        PlayerManager playerManager = PlayerManager.getInstance();
-        playerManager.loadAndPlayPlaylist(event.getChannel(),playlist);
+        YaTrack track = playlist.getTrack(0);
+        if (track != null) {
+            EmbedBuilder builder = new EmbedBuilder();
+            builder.setTitle("\uD83C\uDFB5   " + track.getTitle() + "  \uD83C\uDFB5");
+            builder.setDescription(track.getFormattedArtists());
+            builder.setColor(Color.ORANGE);
+            event.getChannel().sendMessage(builder.build()).queue(message -> {
+                message.addReaction("⏮️").queue();
+                message.addReaction("⏯️").queue();
+                message.addReaction("⏭️").queue();
+                message.addReaction("\uD83D\uDD00").queue();
+                message.addReaction("\uD83D\uDD02").queue();
+                BotStateManager.getInstance().setState(event.getGuild().getIdLong(), new PlaylistState(playlist, 0, message));
+                PlayerManager playerManager = PlayerManager.getInstance();
+                playerManager.loadAndPlayPlaylist(event.getChannel(), playlist);
+            });
+        }
     }
 
     @Override

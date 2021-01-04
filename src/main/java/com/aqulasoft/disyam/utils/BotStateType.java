@@ -5,5 +5,5 @@ public enum BotStateType {
     DOWNLOAD,
     BROWSE_TRACK,
     INFO,
-    PLAYLIST
+    YA_PLAYLIST
 }

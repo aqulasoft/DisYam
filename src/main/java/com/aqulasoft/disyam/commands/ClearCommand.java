@@ -28,7 +28,7 @@ public class ClearCommand implements Command {
             return;
         }
         PlayerManager playerManager = PlayerManager.getInstance();
-        playerManager.getGuildMusicManager(event.getGuild()).scheduler.clear();
+//        playerManager.getGuildMusicManager(event.getGuild()).scheduler.clear();
     }
 
     @Override
@@ -38,6 +38,6 @@ public class ClearCommand implements Command {
 
     @Override
     public String getInvoke() {
-        return "next";
+        return "clear";
     }
 }

@@ -1,7 +1,9 @@
 package com.aqulasoft.disyam.commands;
 
-
-import com.aqulasoft.disyam.audio.PlayerManager;
+import com.aqulasoft.disyam.models.bot.BotState;
+import com.aqulasoft.disyam.models.bot.PlaylistState;
+import com.aqulasoft.disyam.service.BotStateManager;
+import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -14,8 +16,11 @@ public class ShuffleCommand implements Command {
 
         TextChannel channel = event.getChannel();
         if (!Utils.checkVoiceChannelAvailability(event, channel)) return;
-        PlayerManager playerManager = PlayerManager.getInstance();
-        playerManager.getGuildMusicManager(event.getGuild()).scheduler.shuffle();
+        BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
+        if (state != null && state.getType() == BotStateType.YA_PLAYLIST) {
+            ((PlaylistState) state).updateShuffle();
+        }
+        event.getMessage().delete().queue();
     }
 
     @Override

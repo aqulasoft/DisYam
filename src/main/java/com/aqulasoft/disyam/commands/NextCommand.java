@@ -16,6 +16,7 @@ public class NextCommand implements Command {
         if (!Utils.checkVoiceChannelAvailability(event, channel)) return;
         PlayerManager playerManager = PlayerManager.getInstance();
         playerManager.getGuildMusicManager(event.getGuild()).scheduler.nextTrack();
+        event.getMessage().delete().queue();
     }
 
     @Override

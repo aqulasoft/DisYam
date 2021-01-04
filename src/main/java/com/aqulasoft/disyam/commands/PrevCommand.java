@@ -11,11 +11,11 @@ import java.util.List;
 public class PrevCommand implements Command {
     @Override
     public void handle(List<String> args, GuildMessageReceivedEvent event) {
-
         TextChannel channel = event.getChannel();
         if (!Utils.checkVoiceChannelAvailability(event, channel)) return;
         PlayerManager playerManager = PlayerManager.getInstance();
         playerManager.getGuildMusicManager(event.getGuild()).scheduler.prevTrack();
+        event.getMessage().delete().queue();
     }
 
 

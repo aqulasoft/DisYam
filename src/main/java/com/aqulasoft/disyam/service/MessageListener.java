@@ -2,6 +2,10 @@ package com.aqulasoft.disyam.service;
 
 import com.aqulasoft.disyam.audio.GuildMusicManager;
 import com.aqulasoft.disyam.audio.PlayerManager;
+import com.aqulasoft.disyam.models.bot.BotState;
+import com.aqulasoft.disyam.models.bot.PlaylistState;
+import com.aqulasoft.disyam.utils.BotStateType;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.dv8tion.jda.api.JDA;
@@ -55,8 +59,35 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReactionAdd(@Nonnull MessageReactionAddEvent event) {
-        log.info("REACTION");
         super.onMessageReactionAdd(event);
+        if (event.getMember().getUser().isBot()) return;
+        PlayerManager playerManager = PlayerManager.getInstance();
+        BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
+        switch (event.getReactionEmote().getEmoji()) {
+            case "⏮️":
+                playerManager.getGuildMusicManager(event.getGuild()).scheduler.prevTrack();
+                break;
+            case "⏯️":
+                AudioPlayer player = playerManager.getGuildMusicManager(event.getGuild()).player;
+                player.setPaused(!player.isPaused());
+                break;
+            case "⏭️":
+                playerManager.getGuildMusicManager(event.getGuild()).scheduler.nextTrack();
+                break;
+            case "\uD83D\uDD00":
+                if (state != null && state.getType() == BotStateType.YA_PLAYLIST) {
+                    ((PlaylistState) state).updateShuffle();
+                    ((PlaylistState) state).updateTrackMsg();
+                }
+                break;
+            case "\uD83D\uDD02":
+                if (state != null && state.getType() == BotStateType.YA_PLAYLIST) {
+                    ((PlaylistState) state).updateRepeatOne();
+                    ((PlaylistState) state).updateTrackMsg();
+                }
+                break;
+        }
+        event.getReaction().removeReaction(event.getUser()).queue();
     }
 
     @Override

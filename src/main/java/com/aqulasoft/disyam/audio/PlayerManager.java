@@ -32,7 +32,7 @@ public class PlayerManager {
         GuildMusicManager musicManager = musicManagers.get(guildId);
 
         if (musicManager == null) {
-            musicManager = new GuildMusicManager(playerManager);
+            musicManager = new GuildMusicManager(playerManager, guildId);
             musicManagers.put(guildId, musicManager);
         }
 
@@ -44,7 +44,7 @@ public class PlayerManager {
     public void loadAndPlayPlaylist(TextChannel channel, YaPlaylist playlist) {
         GuildMusicManager musicManager = getGuildMusicManager(channel.getGuild());
         musicManager.setTextChannel(channel);
-        musicManager.scheduler.queue(playlist);
+        musicManager.scheduler.nextTrack();
     }
 
     public void loadAndPlay(TextChannel channel, String trackUrl) {

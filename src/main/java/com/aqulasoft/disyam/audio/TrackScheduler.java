@@ -1,8 +1,11 @@
 package com.aqulasoft.disyam.audio;
 
-import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
+import com.aqulasoft.disyam.models.bot.BotState;
+import com.aqulasoft.disyam.models.bot.PlaylistState;
+import com.aqulasoft.disyam.service.BotStateManager;
 import com.aqulasoft.disyam.service.SecretManager;
+import com.aqulasoft.disyam.utils.BotStateType;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -23,10 +26,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TrackScheduler extends AudioEventAdapter {
     private final AudioPlayer player;
     private AudioPlayerManager playerManager;
+    private long guildId;
     private final BlockingQueue<AudioTrack> queue;
-    private YaPlaylist playlist;
-    private boolean shuffleOn = false;
-    private int position;
     private Random rnd = new Random();
 
     /**
@@ -36,9 +37,10 @@ public class TrackScheduler extends AudioEventAdapter {
 
     static Logger log = Logger.getLogger(TrackScheduler.class);
 
-    public TrackScheduler(AudioPlayer player, AudioPlayerManager manager) {
+    public TrackScheduler(AudioPlayer player, AudioPlayerManager manager, long guildId) {
         this.player = player;
         this.playerManager = manager;
+        this.guildId = guildId;
         this.queue = new LinkedBlockingQueue<>();
     }
 
@@ -51,16 +53,9 @@ public class TrackScheduler extends AudioEventAdapter {
         // Calling startTrack with the noInterrupt set to true will start the track only if nothing is currently playing. If
         // something is playing, it returns false and does nothing. In that case the player was already playing so this
         // track goes to the queue instead.
-        playlist = null;
         if (!player.startTrack(track, true)) {
             queue.offer(track);
         }
-    }
-
-    public void queue(YaPlaylist playlist) {
-        this.playlist = playlist;
-        position = 0;
-        loadFromPlaylist(position);
     }
 
     public BlockingQueue<AudioTrack> getQueue() {
@@ -73,8 +68,10 @@ public class TrackScheduler extends AudioEventAdapter {
     public void nextTrack() {
         // Start the next track, regardless of if something is already playing or not. In case queue was empty, we are
         // giving null to startTrack, which is a valid argument and will simply stop the player.
-        if (playlist != null) {
-            loadFromPlaylist(shuffleOn ? rnd.nextInt(playlist.getTracks().size()) : ++position);
+        PlaylistState state = getYaPlaylistState();
+        if (state != null) {
+            loadFromPlaylist(state.next());
+
         } else player.startTrack(queue.poll(), false);
     }
 
@@ -87,14 +84,17 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     private void loadFromPlaylist(int pos) {
-        if (pos < 0 || pos >= playlist.getTracks().size()) return;
-        YaTrack track = playlist.getTracks().get(pos);
-        String url = YandexMusicManager.getTrackDownloadLink(SecretManager.get("YaToken"), track.getRealId());
+        PlaylistState state = getYaPlaylistState();
+        if (state == null) return;
+        if (pos < 0 || pos >= state.getPlaylist().getTrackCount()) return;
+        YaTrack yaTrack = state.getTrack(pos);
+        String url = YandexMusicManager.getTrackDownloadLink(SecretManager.get("YaToken"), yaTrack.getRealId());
         playerManager.loadItemOrdered(this, url, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
 //                channel.sendMessage("Adding to queue " + track.getInfo().title).queue();
                 player.startTrack(track, false);
+                state.updateTrackMsg();
             }
 
             @Override
@@ -117,22 +117,22 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void prevTrack() {
-        if (playlist != null) {
-            --position;
-            if (position < 0 ) {
-                position = 0;
-            }
-            loadFromPlaylist(position);
+        PlaylistState state = getYaPlaylistState();
+        if (state != null) {
+            loadFromPlaylist(state.prev());
         }
     }
 
-    public void clear() {
-        queue.clear();
-        position = 0;
-        playlist = null;
+    private PlaylistState getYaPlaylistState() {
+        BotState state = BotStateManager.getInstance().getState(guildId);
+        if (state != null && state.getType() == BotStateType.YA_PLAYLIST) {
+            return ((PlaylistState) state);
+        }
+        return null;
     }
 
-    public void shuffle() {
-        shuffleOn = !shuffleOn;
+    private boolean isYaPlaylist() {
+        return BotStateManager.getInstance().getState(guildId).getType() == BotStateType.YA_PLAYLIST;
     }
+
 }
