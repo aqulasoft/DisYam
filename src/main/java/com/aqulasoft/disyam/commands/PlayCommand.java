@@ -69,7 +69,6 @@ public class PlayCommand implements Command {
         }
 
         PlayerManager playerManager = PlayerManager.getInstance();
-
         playerManager.loadAndPlay(event.getChannel(), args.get(0));
     }
 
@@ -78,18 +77,13 @@ public class PlayCommand implements Command {
         YaTrack track = playlist.getTrack(0);
         if (track != null) {
             EmbedBuilder builder = new EmbedBuilder();
-            builder.setTitle("\uD83C\uDFB5   " + track.getTitle() + "  \uD83C\uDFB5");
-            builder.setDescription(track.getFormattedArtists());
             builder.setColor(Color.ORANGE);
             event.getChannel().sendMessage(builder.build()).queue(message -> {
-                message.addReaction("⏮️").queue();
-                message.addReaction("⏯️").queue();
-                message.addReaction("⏭️").queue();
-                message.addReaction("\uD83D\uDD00").queue();
-                message.addReaction("\uD83D\uDD02").queue();
-                BotStateManager.getInstance().setState(event.getGuild().getIdLong(), new PlaylistState(playlist, 0, message));
+                PlaylistState state = new PlaylistState(playlist, 0, message);
+                BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state);
+                state.updateTrackMsg();
                 PlayerManager playerManager = PlayerManager.getInstance();
-                playerManager.loadAndPlayPlaylist(event.getChannel(), playlist);
+                playerManager.loadAndPlayPlaylist(event.getChannel());
             });
         }
     }

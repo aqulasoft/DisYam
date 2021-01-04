@@ -22,6 +22,10 @@ public class BotStateManager {
         return botStates.get(guildId);
     }
 
+    public void deleteState(long guildId) {
+        botStates.remove(guildId);
+    }
+
     public static synchronized BotStateManager getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new BotStateManager();

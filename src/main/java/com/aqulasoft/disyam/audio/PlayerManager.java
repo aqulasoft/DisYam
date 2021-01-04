@@ -41,10 +41,9 @@ public class PlayerManager {
         return musicManager;
     }
 
-    public void loadAndPlayPlaylist(TextChannel channel, YaPlaylist playlist) {
+    public void loadAndPlayPlaylist(TextChannel channel) {
         GuildMusicManager musicManager = getGuildMusicManager(channel.getGuild());
-        musicManager.setTextChannel(channel);
-        musicManager.scheduler.nextTrack();
+        musicManager.scheduler.playPlaylist();
     }
 
     public void loadAndPlay(TextChannel channel, String trackUrl) {

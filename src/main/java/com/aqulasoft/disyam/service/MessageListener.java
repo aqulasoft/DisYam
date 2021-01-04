@@ -77,13 +77,11 @@ public class MessageListener extends ListenerAdapter {
             case "\uD83D\uDD00":
                 if (state != null && state.getType() == BotStateType.YA_PLAYLIST) {
                     ((PlaylistState) state).updateShuffle();
-                    ((PlaylistState) state).updateTrackMsg();
                 }
                 break;
             case "\uD83D\uDD02":
                 if (state != null && state.getType() == BotStateType.YA_PLAYLIST) {
                     ((PlaylistState) state).updateRepeatOne();
-                    ((PlaylistState) state).updateTrackMsg();
                 }
                 break;
         }

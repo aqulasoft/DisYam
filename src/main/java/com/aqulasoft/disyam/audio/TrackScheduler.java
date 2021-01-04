@@ -1,5 +1,6 @@
 package com.aqulasoft.disyam.audio;
 
+import com.aqulasoft.disyam.models.audio.YaAudioException;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.BotState;
 import com.aqulasoft.disyam.models.bot.PlaylistState;
@@ -70,7 +71,10 @@ public class TrackScheduler extends AudioEventAdapter {
         // giving null to startTrack, which is a valid argument and will simply stop the player.
         PlaylistState state = getYaPlaylistState();
         if (state != null) {
-            loadFromPlaylist(state.next());
+            try {
+                loadFromPlaylist(state.next());
+            } catch (YaAudioException ignored) {
+            }
 
         } else player.startTrack(queue.poll(), false);
     }
@@ -80,6 +84,24 @@ public class TrackScheduler extends AudioEventAdapter {
         // Only start the next track if the end reason is suitable for it (FINISHED or LOAD_FAILED)
         if (endReason.mayStartNext) {
             nextTrack();
+        }
+    }
+
+    @Override
+    public void onPlayerPause(AudioPlayer player) {
+        super.onPlayerPause(player);
+        PlaylistState state = getYaPlaylistState();
+        if (state != null) {
+            state.setPaused(true);
+        }
+    }
+
+    @Override
+    public void onPlayerResume(AudioPlayer player) {
+        super.onPlayerResume(player);
+        PlaylistState state = getYaPlaylistState();
+        if (state != null) {
+            state.setPaused(false);
         }
     }
 
@@ -118,8 +140,9 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public void prevTrack() {
         PlaylistState state = getYaPlaylistState();
-        if (state != null) {
+        try {
             loadFromPlaylist(state.prev());
+        } catch (YaAudioException ignored) {
         }
     }
 
@@ -135,4 +158,10 @@ public class TrackScheduler extends AudioEventAdapter {
         return BotStateManager.getInstance().getState(guildId).getType() == BotStateType.YA_PLAYLIST;
     }
 
+    public void playPlaylist() {
+        PlaylistState state = getYaPlaylistState();
+        if (state != null) {
+            loadFromPlaylist(state.getPosition());
+        }
+    }
 }
