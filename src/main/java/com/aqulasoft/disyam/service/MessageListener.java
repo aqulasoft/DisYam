@@ -3,6 +3,7 @@ package com.aqulasoft.disyam.service;
 import com.aqulasoft.disyam.audio.GuildMusicManager;
 import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.models.bot.BotState;
+import com.aqulasoft.disyam.models.bot.PlayerState;
 import com.aqulasoft.disyam.models.bot.PlaylistState;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -80,8 +81,8 @@ public class MessageListener extends ListenerAdapter {
                 }
                 break;
             case "\uD83D\uDD02":
-                if (state != null && state.getType() == BotStateType.YA_PLAYLIST) {
-                    ((PlaylistState) state).updateRepeatOne();
+                if (state != null && (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH)) {
+                    ((PlayerState) state).updateRepeatOne();
                 }
                 break;
         }

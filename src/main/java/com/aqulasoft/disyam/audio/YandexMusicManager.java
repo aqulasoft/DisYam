@@ -2,6 +2,7 @@ package com.aqulasoft.disyam.audio;
 
 import com.aqulasoft.disyam.models.audio.DownloadInfo;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
+import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.utils.Utils;
 import kong.unirest.*;
 import org.apache.log4j.Logger;
@@ -72,15 +73,14 @@ public class YandexMusicManager {
         return 0;
     }
 
-    public static String search(String searchStr, String type) {
+    public static YaSearchResult search(String searchStr, String type) {
         String searchUrl = baseUrl + "/search";
         GetRequest request = Unirest.get(searchUrl)
                 .queryString("text", searchStr)
                 .queryString("type", type)
                 .queryString("nocorrect", false)
                 .queryString("page", 0);
-        JsonNode body = request.asJson().getBody();
-        return body.toPrettyString().substring(0, 1500) + "....";
+        return YaSearchResult.create(request.asJson().getBody().getObject().getJSONObject("result"));
     }
 
     public static byte[] downloadSong(String token, long songId) {

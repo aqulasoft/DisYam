@@ -14,7 +14,13 @@ public class BotStateManager {
         botStates = new HashMap<>();
     }
 
-    public void setState(long guildId, BotState botState) {
+    public void setState(long guildId, BotState botState, boolean removeMessageReactions) {
+        if (removeMessageReactions) {
+            BotState prevState = botStates.get(guildId);
+            if (prevState != null && prevState.getLastMessage() != null) {
+                prevState.getLastMessage().clearReactions().queue();
+            }
+        }
         botStates.put(guildId, botState);
     }
 

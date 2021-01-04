@@ -46,6 +46,11 @@ public class PlayerManager {
         musicManager.scheduler.playPlaylist();
     }
 
+    public void loadAndPlaySearch(TextChannel channel) {
+        GuildMusicManager musicManager = getGuildMusicManager(channel.getGuild());
+        musicManager.scheduler.playSearch();
+    }
+
     public void loadAndPlay(TextChannel channel, String trackUrl) {
         GuildMusicManager musicManager = getGuildMusicManager(channel.getGuild());
 

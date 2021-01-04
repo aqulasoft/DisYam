@@ -1,13 +1,21 @@
 package com.aqulasoft.disyam.commands;
 
+import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicManager;
+import com.aqulasoft.disyam.models.audio.YaSearchResult;
+import com.aqulasoft.disyam.models.bot.PlaylistState;
+import com.aqulasoft.disyam.models.bot.SearchState;
+import com.aqulasoft.disyam.service.BotStateManager;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.utils.AttachmentOption;
 
+import java.awt.*;
 import java.util.List;
 
 import static com.aqulasoft.disyam.utils.Consts.PREFIX;
+import static com.aqulasoft.disyam.utils.Utils.joinVoice;
 
 public class SearchCommand implements Command {
 
@@ -21,25 +29,22 @@ public class SearchCommand implements Command {
         TextChannel channel = event.getChannel();
 
 
-
         if (args.isEmpty()) {
-//            EmbedBuilder builder = new EmbedBuilder();
-//            builder.addField("name", "value", true);
-//            builder.addField("__name", "__value", true);
-//            builder.setAuthor("me");
-//            builder.setTitle("TITLE");
-//            builder.setDescription("DEscription");
-//            builder.setColor(Color.BLUE);
-//            channel.sendMessage(builder.build()).queue(message -> {
-//                message.addReaction("\uD83D\uDE42").queue();
-//                message.addReaction("\uD83E\uDD37\u200D♀️").queue();
-//                message.addReaction("\uD83D\uDE0E").queue();
-//            });
             channel.sendMessage("Please provide some arguments").queue();
             return;
         }
-        String searchResult = YandexMusicManager.search(args.get(0), "track");
-        channel.sendMessage(searchResult).queue();
+        if (joinVoice(event, channel)) return;
+
+        YaSearchResult searchResult = YandexMusicManager.search(String.join(" ", args), "track");
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setColor(Color.ORANGE);
+        event.getChannel().sendMessage(builder.build()).queue(message -> {
+            SearchState state = new SearchState(searchResult, message);
+            BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, true);
+            state.updateSearchMsg(true);
+            PlayerManager playerManager = PlayerManager.getInstance();
+            playerManager.loadAndPlaySearch(event.getChannel());
+        });
     }
 
     @Override

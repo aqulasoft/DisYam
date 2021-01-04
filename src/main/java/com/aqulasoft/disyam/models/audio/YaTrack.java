@@ -23,7 +23,8 @@ public class YaTrack {
     public static YaTrack create(JSONObject json) {
         YaTrack track = new YaTrack();
         track.id = json.getLong("id");
-        track.realId = json.getLong("realId");
+        if (json.has("realId"))
+            track.realId = json.getLong("realId");
         track.title = json.getString("title");
         track.duration = json.getLong("durationMs");
         track.artists = new ArrayList<>();

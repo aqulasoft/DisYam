@@ -3,7 +3,8 @@ package com.aqulasoft.disyam.audio;
 import com.aqulasoft.disyam.models.audio.YaAudioException;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.BotState;
-import com.aqulasoft.disyam.models.bot.PlaylistState;
+import com.aqulasoft.disyam.models.bot.PlayerState;
+import com.aqulasoft.disyam.models.bot.SearchState;
 import com.aqulasoft.disyam.service.BotStateManager;
 import com.aqulasoft.disyam.service.SecretManager;
 import com.aqulasoft.disyam.utils.BotStateType;
@@ -29,7 +30,6 @@ public class TrackScheduler extends AudioEventAdapter {
     private AudioPlayerManager playerManager;
     private long guildId;
     private final BlockingQueue<AudioTrack> queue;
-    private Random rnd = new Random();
 
     /**
      * @param player The audio player this scheduler uses
@@ -69,7 +69,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void nextTrack() {
         // Start the next track, regardless of if something is already playing or not. In case queue was empty, we are
         // giving null to startTrack, which is a valid argument and will simply stop the player.
-        PlaylistState state = getYaPlaylistState();
+        PlayerState state = getPlayerState();
         if (state != null) {
             try {
                 loadFromPlaylist(state.next());
@@ -90,7 +90,7 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onPlayerPause(AudioPlayer player) {
         super.onPlayerPause(player);
-        PlaylistState state = getYaPlaylistState();
+        PlayerState state = getPlayerState();
         if (state != null) {
             state.setPaused(true);
         }
@@ -99,24 +99,24 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onPlayerResume(AudioPlayer player) {
         super.onPlayerResume(player);
-        PlaylistState state = getYaPlaylistState();
+        PlayerState state = getPlayerState();
         if (state != null) {
             state.setPaused(false);
         }
     }
 
     private void loadFromPlaylist(int pos) {
-        PlaylistState state = getYaPlaylistState();
+        PlayerState state = getPlayerState();
         if (state == null) return;
-        if (pos < 0 || pos >= state.getPlaylist().getTrackCount()) return;
+        if (pos < 0 || pos >= state.getTracks().size()) return;
         YaTrack yaTrack = state.getTrack(pos);
-        String url = YandexMusicManager.getTrackDownloadLink(SecretManager.get("YaToken"), yaTrack.getRealId());
+        String url = YandexMusicManager.getTrackDownloadLink(SecretManager.get("YaToken"), yaTrack.getId());
         playerManager.loadItemOrdered(this, url, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
 //                channel.sendMessage("Adding to queue " + track.getInfo().title).queue();
                 player.startTrack(track, false);
-                state.updateTrackMsg(false);
+                state.updateMessage(true);
             }
 
             @Override
@@ -139,17 +139,25 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void prevTrack() {
-        PlaylistState state = getYaPlaylistState();
+        PlayerState state = getPlayerState();
         try {
             loadFromPlaylist(state.prev());
         } catch (YaAudioException ignored) {
         }
     }
 
-    private PlaylistState getYaPlaylistState() {
+    private PlayerState getPlayerState() {
         BotState state = BotStateManager.getInstance().getState(guildId);
-        if (state != null && state.getType() == BotStateType.YA_PLAYLIST) {
-            return ((PlaylistState) state);
+        if (state != null && (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH)) {
+            return ((PlayerState) state);
+        }
+        return null;
+    }
+
+    private SearchState getYaSearchState() {
+        BotState state = BotStateManager.getInstance().getState(guildId);
+        if (state != null && state.getType() == BotStateType.SEARCH) {
+            return ((SearchState) state);
         }
         return null;
     }
@@ -159,7 +167,14 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void playPlaylist() {
-        PlaylistState state = getYaPlaylistState();
+        PlayerState state = getPlayerState();
+        if (state != null) {
+            loadFromPlaylist(state.getPosition());
+        }
+    }
+
+    public void playSearch() {
+        PlayerState state = getYaSearchState();
         if (state != null) {
             loadFromPlaylist(state.getPosition());
         }

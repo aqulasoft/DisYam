@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import static com.aqulasoft.disyam.audio.YandexMusicManager.getPlaylist;
 import static com.aqulasoft.disyam.utils.Consts.PLAYLIST_URL_REGEX;
 import static com.aqulasoft.disyam.utils.Consts.PREFIX;
+import static com.aqulasoft.disyam.utils.Utils.joinVoice;
 
 public class PlayCommand implements Command {
 
@@ -40,26 +41,7 @@ public class PlayCommand implements Command {
             return;
         }
         Matcher playlistMatcher = playlistPattern.matcher(args.get(0));
-
-        AudioManager audioManager = event.getGuild().getAudioManager();
-
-        if (!audioManager.isConnected()) {
-            GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
-
-            if (memberVoiceState != null && !memberVoiceState.inVoiceChannel()) {
-                channel.sendMessage("Please join a voice channel first").queue();
-                return;
-            }
-            VoiceChannel voiceChannel = memberVoiceState.getChannel();
-            Member selfMember = event.getGuild().getSelfMember();
-
-            if (!selfMember.hasPermission(voiceChannel, Permission.VOICE_CONNECT)) {
-                channel.sendMessageFormat("I am missing permission to join %s", voiceChannel).queue();
-                return;
-            }
-
-            audioManager.openAudioConnection(voiceChannel);
-        }
+        if (joinVoice(event, channel)) return;
 
         if (playlistMatcher.matches()) {
             String username = playlistMatcher.group(1);
@@ -80,8 +62,8 @@ public class PlayCommand implements Command {
             builder.setColor(Color.ORANGE);
             event.getChannel().sendMessage(builder.build()).queue(message -> {
                 PlaylistState state = new PlaylistState(playlist, 0, message);
-                BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state);
-                state.updateTrackMsg(true);
+                BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, true);
+                state.updateMessage(true);
                 PlayerManager playerManager = PlayerManager.getInstance();
                 playerManager.loadAndPlayPlaylist(event.getChannel());
             });

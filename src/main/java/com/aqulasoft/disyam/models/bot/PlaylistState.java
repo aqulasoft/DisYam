@@ -1,9 +1,9 @@
 package com.aqulasoft.disyam.models.bot;
 
-import com.aqulasoft.disyam.models.audio.YaAudioException;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.utils.BotStateType;
+import com.aqulasoft.disyam.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PlaylistState implements BotState {
+public class PlaylistState extends PlayerState implements BotState {
     private final YaPlaylist playlist;
     @Setter
     @Getter
@@ -23,18 +23,11 @@ public class PlaylistState implements BotState {
     private Message message;
     private List<YaTrack> shuffledTracks;
     private boolean isShuffleOn = false;
-    private boolean isRepeatOneOn = false;
-    private boolean isPaused = false;
 
     public PlaylistState(YaPlaylist playlist, int position, Message message) {
         this.playlist = playlist;
         this.position = position;
         this.message = message;
-    }
-
-    public void setPaused(boolean paused) {
-        isPaused = paused;
-        updateTrackMsg(false);
     }
 
 
@@ -48,17 +41,8 @@ public class PlaylistState implements BotState {
         return BotStateType.YA_PLAYLIST;
     }
 
-    public YaPlaylist getPlaylist() {
-        return playlist;
-    }
-
     public int prev() {
-        if (isRepeatOneOn) return position;
-        if (position - 1 >= 0) {
-            position--;
-        } else {
-            throw new YaAudioException("Unable to load previous track");
-        }
+        super.prev();
         if (isShuffleOn) {
             shuffledTracks = new ArrayList<>(playlist.getTracks());
             Collections.shuffle(shuffledTracks);
@@ -68,17 +52,19 @@ public class PlaylistState implements BotState {
         return position;
     }
 
+    @Override
     public YaTrack getTrack(int pos) {
         return shuffledTracks != null ? shuffledTracks.get(pos) : playlist.getTrack(pos);
     }
 
+    @Override
+    public List<YaTrack> getTracks() {
+        return shuffledTracks != null ? shuffledTracks : playlist.getTracks();
+    }
+
+    @Override
     public int next() {
-        if (isRepeatOneOn) return position;
-        if (position + 1 < playlist.getTrackCount()) {
-            position++;
-        } else {
-            throw new YaAudioException("Unable to load next track");
-        }
+        super.next();
         if (isShuffleOn) {
             shuffledTracks = new ArrayList<>(playlist.getTracks());
             Collections.shuffle(shuffledTracks);
@@ -86,6 +72,11 @@ public class PlaylistState implements BotState {
             shuffledTracks = null;
         }
         return position;
+    }
+
+    @Override
+    public void updateMessage(boolean addReactions) {
+        updateTrackMsg(addReactions);
     }
 
     public void updateShuffle() {
@@ -93,17 +84,11 @@ public class PlaylistState implements BotState {
         updateTrackMsg(false);
     }
 
-    public void updateTrackMsg(boolean addReactions) {
+    private void updateTrackMsg(boolean addReactions) {
         message.editMessage(buildMessage(addReactions)).queue(m -> {
             message = m;
         });
     }
-
-    public void updateRepeatOne() {
-        isRepeatOneOn = !isRepeatOneOn;
-        updateTrackMsg(false);
-    }
-
 
     private MessageEmbed buildMessage(boolean addReactions) {
         EmbedBuilder builder = new EmbedBuilder();
@@ -126,8 +111,9 @@ public class PlaylistState implements BotState {
         return builder.build();
     }
 
-    private String getFooter() {
-        String additionalInfo = (isPaused ? "⏸ " : "▶️ ") + (isRepeatOneOn ? "\uD83D\uDD02 " : "") + (isShuffleOn ? "\uD83D\uDD00" : "");
-        return String.format("(%s/%s)    ", position + 1, playlist.getTrackCount()) + additionalInfo;
+    @Override
+    String getFooter() {
+        String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "") + (isShuffleOn ? "\uD83D\uDD00" : "");
+        return String.format("(%s/%s)   %s  ", position + 1, playlist.getTrackCount(), Utils.convertTimePeriod(getTrack(position).getDuration())) + additionalInfo;
     }
 }
