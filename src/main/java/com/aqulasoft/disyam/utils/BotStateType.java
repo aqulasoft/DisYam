@@ -1,9 +1,9 @@
 package com.aqulasoft.disyam.utils;
 
 public enum BotStateType {
+    SEARCH_TRACK,
+    SEARCH_PLAYLIST,
     SEARCH,
-    DOWNLOAD,
-    BROWSE_TRACK,
     INFO,
     YA_PLAYLIST
 }

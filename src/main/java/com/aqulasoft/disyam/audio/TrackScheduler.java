@@ -4,7 +4,7 @@ import com.aqulasoft.disyam.models.audio.YaAudioException;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.BotState;
 import com.aqulasoft.disyam.models.bot.PlayerState;
-import com.aqulasoft.disyam.models.bot.SearchState;
+import com.aqulasoft.disyam.models.bot.TrackSearchState;
 import com.aqulasoft.disyam.service.BotStateManager;
 import com.aqulasoft.disyam.service.SecretManager;
 import com.aqulasoft.disyam.utils.BotStateType;
@@ -147,16 +147,16 @@ public class TrackScheduler extends AudioEventAdapter {
 
     private PlayerState getPlayerState() {
         BotState state = BotStateManager.getInstance().getState(guildId);
-        if (state != null && (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH)) {
+        if (state != null && (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH_TRACK)) {
             return ((PlayerState) state);
         }
         return null;
     }
 
-    private SearchState getYaSearchState() {
+    private TrackSearchState getYaSearchState() {
         BotState state = BotStateManager.getInstance().getState(guildId);
-        if (state != null && state.getType() == BotStateType.SEARCH) {
-            return ((SearchState) state);
+        if (state != null && state.getType() == BotStateType.SEARCH_TRACK) {
+            return ((TrackSearchState) state);
         }
         return null;
     }

@@ -3,7 +3,7 @@ package com.aqulasoft.disyam.commands;
 import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicManager;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
-import com.aqulasoft.disyam.models.bot.SearchState;
+import com.aqulasoft.disyam.models.bot.TrackSearchState;
 import com.aqulasoft.disyam.service.BotStateManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -15,9 +15,9 @@ import java.util.List;
 import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 import static com.aqulasoft.disyam.utils.Utils.joinVoice;
 
-public class SearchCommand implements Command {
+public class SearchTrackCommand implements Command {
 
-    public SearchCommand() {
+    public SearchTrackCommand() {
 
     }
 
@@ -31,11 +31,11 @@ public class SearchCommand implements Command {
         }
         if (joinVoice(event, channel)) return;
 
-        YaSearchResult searchResult = YandexMusicManager.search(String.join(" ", args), "all");
+        YaSearchResult searchResult = YandexMusicManager.search(String.join(" ", args), "track");
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setColor(Color.ORANGE);
+        builder.setColor(Color.RED);
         event.getChannel().sendMessage(builder.build()).queue(message -> {
-            SearchState state = new SearchState(searchResult, message);
+            TrackSearchState state = new TrackSearchState(searchResult, message);
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, true);
             state.updateSearchMsg(true);
             PlayerManager playerManager = PlayerManager.getInstance();

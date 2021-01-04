@@ -13,6 +13,7 @@ public class YaPlaylist {
     private long id;
     private String title;
     private String author;
+    private String authorLogin;
     private long duration;
     private Date modified;
     private int trackCount;
@@ -27,18 +28,20 @@ public class YaPlaylist {
         YaPlaylist playlist = new YaPlaylist();
         playlist.id = json.getLong("kind");
         playlist.title = json.getString("title");
-        playlist.description = json.getString("description");
-        playlist.descriptionFormatted = json.getString("descriptionFormatted");
+        if (json.has("description")) playlist.description = json.getString("description");
+        if (json.has("descriptionFormatted")) playlist.descriptionFormatted = json.getString("descriptionFormatted");
         playlist.trackCount = json.getInt("trackCount");
         playlist.author = json.getJSONObject("owner").getString("name");
-        playlist.duration = json.getLong("duration");
+        playlist.authorLogin = json.getJSONObject("owner").getString("login");
+        if (json.has("duration")) playlist.duration = json.getLong("duration");
 //        playlist.modified = Date.from(Instant.parse(json.getString("modified")));
-        playlist.tracks = new ArrayList<>(playlist.trackCount);
-
-        JSONArray jsonTrackArray = json.getJSONArray("tracks");
-        for (int i = 0; i < jsonTrackArray.length(); i++) {
-            JSONObject track = jsonTrackArray.getJSONObject(i);
-            playlist.tracks.add(YaTrack.create(track));
+        if (json.has("tracks")) {
+            playlist.tracks = new ArrayList<>(playlist.trackCount);
+            JSONArray jsonTrackArray = json.getJSONArray("tracks");
+            for (int i = 0; i < jsonTrackArray.length(); i++) {
+                JSONObject track = jsonTrackArray.getJSONObject(i);
+                playlist.tracks.add(YaTrack.create(track));
+            }
         }
         return playlist;
     }

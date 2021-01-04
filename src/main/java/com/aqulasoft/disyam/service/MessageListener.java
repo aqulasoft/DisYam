@@ -3,15 +3,18 @@ package com.aqulasoft.disyam.service;
 import com.aqulasoft.disyam.audio.GuildMusicManager;
 import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicManager;
+import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.BotState;
 import com.aqulasoft.disyam.models.bot.PlayerState;
+import com.aqulasoft.disyam.models.bot.PlaylistSearchState;
 import com.aqulasoft.disyam.models.bot.PlaylistState;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -24,10 +27,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
+import static com.aqulasoft.disyam.audio.YandexMusicManager.getPlaylist;
 import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
 public class MessageListener extends ListenerAdapter {
@@ -69,7 +74,13 @@ public class MessageListener extends ListenerAdapter {
         event.getReaction().removeReaction(event.getUser()).queue();
         PlayerManager playerManager = PlayerManager.getInstance();
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
-        if(event.getMessageIdLong() != state.getLastMessage().getIdLong()) return;
+        if (event.getMessageIdLong() != state.getLastMessage().getIdLong()) return;
+
+        switch (state.getType()) {
+            case SEARCH_PLAYLIST:
+                handlePlaylistSelect((PlaylistSearchState) state, event);
+                return;
+        }
         switch (event.getReactionEmote().getEmoji()) {
             case "⏮️":
                 playerManager.getGuildMusicManager(event.getGuild()).scheduler.prevTrack();
@@ -87,12 +98,12 @@ public class MessageListener extends ListenerAdapter {
                 }
                 break;
             case "\uD83D\uDD02":
-                if (state != null && (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH)) {
+                if (state != null && (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH_TRACK)) {
                     ((PlayerState) state).updateRepeatOne();
                 }
                 break;
             case "\uD83D\uDCE5":
-                if (state != null && (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH)) {
+                if (state != null && (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH_TRACK)) {
                     YaTrack track = ((PlayerState) state).getCurrentTrack();
                     byte[] file = YandexMusicManager.downloadSong(track.getId());
                     try {
@@ -102,7 +113,27 @@ public class MessageListener extends ListenerAdapter {
                     }
                 }
                 break;
+        }
+    }
 
+    private void handlePlaylistSelect(PlaylistSearchState state, MessageReactionAddEvent event) {
+        int num = Utils.getEmojiNum(event.getReactionEmote().getEmoji());
+        YaPlaylist playlist = state.getPlaylist(num);
+        playlist = getPlaylist(playlist.getAuthorLogin(), String.valueOf(playlist.getId()));
+        YaTrack track = playlist.getTrack(0);
+        if (track != null) {
+            EmbedBuilder builder = new EmbedBuilder();
+            builder.setColor(Color.ORANGE);
+            YaPlaylist finalPlaylist = playlist;
+            event.getChannel().sendMessage(builder.build()).queue(message -> {
+                PlaylistState playlistState = new PlaylistState(finalPlaylist, 0, message);
+                state.getLastMessage().delete().queue();
+                BotStateManager.getInstance().setState(event.getGuild().getIdLong(), playlistState, false);
+
+                playlistState.updateMessage(true);
+                PlayerManager playerManager = PlayerManager.getInstance();
+                playerManager.loadAndPlayPlaylist(event.getTextChannel());
+            });
         }
     }
 

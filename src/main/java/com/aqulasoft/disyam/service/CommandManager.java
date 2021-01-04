@@ -17,12 +17,13 @@ public class CommandManager {
         addCommand(new JoinCommand());
         addCommand(new PlayCommand());
         addCommand(new DownloadCommand());
-        addCommand(new SearchCommand());
+        addCommand(new SearchTrackCommand());
         addCommand(new NextCommand());
         addCommand(new PauseCommand());
         addCommand(new ResumeCommand());
         addCommand(new PrevCommand());
         addCommand(new ShuffleCommand());
+        addCommand(new SearchPlaylistCommand());
     }
 
     private void addCommand(Command command) {
