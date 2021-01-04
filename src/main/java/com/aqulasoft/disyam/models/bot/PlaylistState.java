@@ -34,7 +34,7 @@ public class PlaylistState implements BotState {
 
     public void setPaused(boolean paused) {
         isPaused = paused;
-        updateTrackMsg();
+        updateTrackMsg(false);
     }
 
 
@@ -90,22 +90,22 @@ public class PlaylistState implements BotState {
 
     public void updateShuffle() {
         isShuffleOn = !isShuffleOn;
-        updateTrackMsg();
+        updateTrackMsg(false);
     }
 
-    public void updateTrackMsg() {
-        message.editMessage(buildMessage()).queue(m -> {
+    public void updateTrackMsg(boolean addReactions) {
+        message.editMessage(buildMessage(addReactions)).queue(m -> {
             message = m;
         });
     }
 
     public void updateRepeatOne() {
         isRepeatOneOn = !isRepeatOneOn;
-        updateTrackMsg();
+        updateTrackMsg(false);
     }
 
 
-    private MessageEmbed buildMessage() {
+    private MessageEmbed buildMessage(boolean addReactions) {
         EmbedBuilder builder = new EmbedBuilder();
 
         YaTrack track = getTrack(position);
@@ -116,11 +116,13 @@ public class PlaylistState implements BotState {
         builder.setAuthor(playlist.getTitle() + (playlist.getAuthor() != null ? " by " + playlist.getAuthor() : ""));
         builder.setColor(Color.ORANGE);
         builder.setFooter(getFooter());
-        message.addReaction("⏮️").queue();
-        message.addReaction("⏯️").queue();
-        message.addReaction("⏭️").queue();
-        message.addReaction("\uD83D\uDD00").queue();
-        message.addReaction("\uD83D\uDD02").queue();
+        if (addReactions) {
+            message.addReaction("⏮️").queue();
+            message.addReaction("⏯️").queue();
+            message.addReaction("⏭️").queue();
+            message.addReaction("\uD83D\uDD00").queue();
+            message.addReaction("\uD83D\uDD02").queue();
+        }
         return builder.build();
     }
 

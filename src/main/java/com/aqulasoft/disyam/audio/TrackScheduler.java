@@ -116,7 +116,7 @@ public class TrackScheduler extends AudioEventAdapter {
             public void trackLoaded(AudioTrack track) {
 //                channel.sendMessage("Adding to queue " + track.getInfo().title).queue();
                 player.startTrack(track, false);
-                state.updateTrackMsg();
+                state.updateTrackMsg(false);
             }
 
             @Override
