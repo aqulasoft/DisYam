@@ -53,6 +53,5 @@ docker run -d --name disyam disyam token username password
 
 ### Player
 
- <a href="https://play.google.com/store/apps/developer?id=AqulaSoft">
-         <img src="https://github.com/aqulasoft/DisYam/blob/master/img/example.png" width="50%" height="50%"/>
-         </a>
+ <img src="https://github.com/aqulasoft/DisYam/blob/master/img/example.png" width="50%" height="50%"/>
+
