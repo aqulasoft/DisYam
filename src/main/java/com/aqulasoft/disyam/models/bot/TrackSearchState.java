@@ -1,8 +1,10 @@
 package com.aqulasoft.disyam.models.bot;
 
+import com.aqulasoft.disyam.audio.YandexMusicManager;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.utils.BotStateType;
+import com.aqulasoft.disyam.utils.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -11,8 +13,9 @@ import java.awt.*;
 import java.util.List;
 
 public class TrackSearchState extends PlayerState implements BotState {
-    private final YaSearchResult searchResult;
+    private YaSearchResult searchResult;
     private Message message;
+    private int page = 0;
 
     public TrackSearchState(YaSearchResult searchResult, Message message) {
         this.message = message;
@@ -40,8 +43,38 @@ public class TrackSearchState extends PlayerState implements BotState {
     }
 
     @Override
+    public int getTrackCount() {
+        return searchResult.getTotal();
+    }
+
+    @Override
     public void updateMessage(boolean b) {
         updateSearchMsg(false);
+    }
+
+    @Override
+    public int next() {
+        if (getPosition() + 1 >= searchResult.getPerPage()) {
+            page++;
+            searchResult = YandexMusicManager.search(searchResult.getSearchStr(), searchResult.getSearchType(), page);
+        }
+        super.next();
+        return getPosition();
+    }
+
+    @Override
+    public int prev() {
+        if (getPosition() == 0) {
+            page--;
+            searchResult = YandexMusicManager.search(searchResult.getSearchStr(), searchResult.getSearchType(), page);
+        }
+        super.prev();
+        return getPosition();
+    }
+
+    @Override
+    public int getPosition() {
+        return super.getPosition() - page * searchResult.getPerPage();
     }
 
     public void updateSearchMsg(boolean addReactions) {
@@ -67,6 +100,11 @@ public class TrackSearchState extends PlayerState implements BotState {
             message.addReaction("\uD83D\uDCE5").queue();
         }
         return builder.build();
+    }
+
+    private String getFooter() {
+        String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "");
+        return String.format("(%s/%s)   %s  ", getPosition() + 1 + page * searchResult.getPerPage(), searchResult.getTotal(), Utils.convertTimePeriod(getTrack(getPosition()).getDuration())) + additionalInfo;
     }
 
 }

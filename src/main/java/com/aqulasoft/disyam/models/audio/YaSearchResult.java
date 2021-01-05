@@ -31,6 +31,7 @@ public class YaSearchResult {
             JSONArray tracks = tracksRes.getJSONArray("results");
             res.perPage = tracksRes.getInt("perPage");
             res.total = tracksRes.getInt("total");
+            res.searchType = "track";
             for (int i = 0; i < tracks.length(); i++) {
                 res.tracks.add(YaTrack.create(tracks.getJSONObject(i)));
             }
@@ -42,10 +43,9 @@ public class YaSearchResult {
             JSONArray playlists = tracksRes.getJSONArray("results");
             res.perPage = tracksRes.getInt("perPage");
             res.total = tracksRes.getInt("total");
+            res.searchType = "playlist";
             for (int i = 0; i < playlists.length(); i++) {
                 JSONObject playlistJson = playlists.getJSONObject(i);
-//                String username = playlistJson.getJSONObject("owner").getString("login");
-//                YandexMusicManager.getPlaylist(username, playlistJson.getString("kind"))
                 res.playlists.add(YaPlaylist.create(playlistJson));
             }
         }

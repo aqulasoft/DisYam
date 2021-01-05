@@ -23,7 +23,7 @@ public class PlaylistState extends PlayerState implements BotState {
     private List<YaTrack> shuffledTracks;
     private boolean isShuffleOn = false;
 
-    public PlaylistState(YaPlaylist playlist, int position, Message message) {
+    public PlaylistState(YaPlaylist playlist, Message message) {
         this.playlist = playlist;
         this.message = message;
     }
@@ -58,6 +58,11 @@ public class PlaylistState extends PlayerState implements BotState {
     @Override
     public List<YaTrack> getTracks() {
         return shuffledTracks != null ? shuffledTracks : playlist.getTracks();
+    }
+
+    @Override
+    public int getTrackCount() {
+        return getTracks().size();
     }
 
     @Override
@@ -110,7 +115,6 @@ public class PlaylistState extends PlayerState implements BotState {
         return builder.build();
     }
 
-    @Override
     String getFooter() {
         String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "") + (isShuffleOn ? "\uD83D\uDD00" : "");
         return String.format("(%s/%s)   %s  ", getPosition() + 1, playlist.getTrackCount(), Utils.convertTimePeriod(getTrack(getPosition()).getDuration())) + additionalInfo;

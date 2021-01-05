@@ -5,10 +5,7 @@ import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicManager;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
-import com.aqulasoft.disyam.models.bot.BotState;
-import com.aqulasoft.disyam.models.bot.PlayerState;
-import com.aqulasoft.disyam.models.bot.PlaylistSearchState;
-import com.aqulasoft.disyam.models.bot.PlaylistState;
+import com.aqulasoft.disyam.models.bot.*;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -76,10 +73,22 @@ public class MessageListener extends ListenerAdapter {
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
         if (event.getMessageIdLong() != state.getLastMessage().getIdLong()) return;
 
-        if (state.getType() == BotStateType.SEARCH_PLAYLIST) {
+        if (state instanceof SearchPager) {
+            switch (event.getReactionEmote().getEmoji()) {
+                case "➡️":
+                    ((SearchPager) state).nextPage();
+                    break;
+                case "⬅️":
+                    ((SearchPager) state).prevPage();
+                    break;
+            }
+        }
+
+        if (state instanceof PlaylistSearchState) {
             handlePlaylistSelect((PlaylistSearchState) state, event);
             return;
         }
+
         switch (event.getReactionEmote().getEmoji()) {
             case "⏮️":
                 playerManager.getGuildMusicManager(event.getGuild()).scheduler.prevTrack();
@@ -92,17 +101,18 @@ public class MessageListener extends ListenerAdapter {
                 playerManager.getGuildMusicManager(event.getGuild()).scheduler.nextTrack();
                 break;
             case "\uD83D\uDD00":
-                if (state.getType() == BotStateType.YA_PLAYLIST) {
+                if (state.getType() == BotStateType.YA_PLAYLIST && state instanceof PlayerState) {
                     ((PlaylistState) state).updateShuffle();
                 }
                 break;
             case "\uD83D\uDD02":
-                if (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH_TRACK) {
+                if (state instanceof PlayerState) {
                     ((PlayerState) state).updateRepeatOne();
+
                 }
                 break;
             case "\uD83D\uDCE5":
-                if (state.getType() == BotStateType.YA_PLAYLIST || state.getType() == BotStateType.SEARCH_TRACK) {
+                if (state instanceof PlayerState) {
                     YaTrack track = ((PlayerState) state).getCurrentTrack();
                     byte[] file = YandexMusicManager.downloadSong(track.getId());
                     try {
@@ -125,7 +135,7 @@ public class MessageListener extends ListenerAdapter {
             builder.setColor(Color.ORANGE);
             YaPlaylist finalPlaylist = playlist;
             event.getChannel().sendMessage(builder.build()).queue(message -> {
-                PlaylistState playlistState = new PlaylistState(finalPlaylist, 0, message);
+                PlaylistState playlistState = new PlaylistState(finalPlaylist, message);
                 state.getLastMessage().delete().queue();
                 BotStateManager.getInstance().setState(event.getGuild().getIdLong(), playlistState, false);
 

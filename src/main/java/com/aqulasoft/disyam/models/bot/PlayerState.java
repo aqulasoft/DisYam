@@ -49,7 +49,7 @@ abstract public class PlayerState {
 
     public int next() {
         if (isRepeatOneOn) return position;
-        if (position + 1 < getTracks().size()) {
+        if (position + 1 < getTrackCount()) {
             position++;
         } else {
             throw new YaAudioException("Unable to load next track");
@@ -66,11 +66,8 @@ abstract public class PlayerState {
 
     public abstract List<YaTrack> getTracks();
 
-    public abstract YaTrack getTrack(int pos);
+    public abstract int getTrackCount();
 
-    String getFooter() {
-        String additionalInfo = (isPaused ? "⏸ " : "▶️ ") + (isRepeatOneOn ? "\uD83D\uDD02 " : "");
-        return String.format("(%s/%s)   %s  ", position + 1, getTracks().size(), Utils.convertTimePeriod(getTrack(position).getDuration())) + additionalInfo;
-    }
+    public abstract YaTrack getTrack(int pos);
 
 }

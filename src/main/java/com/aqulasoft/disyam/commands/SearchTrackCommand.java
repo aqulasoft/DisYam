@@ -31,7 +31,7 @@ public class SearchTrackCommand implements Command {
         }
         if (joinVoice(event, channel)) return;
 
-        YaSearchResult searchResult = YandexMusicManager.search(String.join(" ", args), "track");
+        YaSearchResult searchResult = YandexMusicManager.search(String.join(" ", args), "track", 0);
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.RED);
         event.getChannel().sendMessage(builder.build()).queue(message -> {
@@ -51,6 +51,6 @@ public class SearchTrackCommand implements Command {
 
     @Override
     public String getInvoke() {
-        return "search";
+        return "st";
     }
 }
