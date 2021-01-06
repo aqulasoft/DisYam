@@ -2,7 +2,7 @@ package com.aqulasoft.disyam.service;
 
 import com.aqulasoft.disyam.audio.GuildMusicManager;
 import com.aqulasoft.disyam.audio.PlayerManager;
-import com.aqulasoft.disyam.audio.YandexMusicManager;
+import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.*;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-import static com.aqulasoft.disyam.audio.YandexMusicManager.getPlaylist;
+import static com.aqulasoft.disyam.audio.YandexMusicClient.getPlaylist;
 import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
 public class MessageListener extends ListenerAdapter {
@@ -114,7 +114,7 @@ public class MessageListener extends ListenerAdapter {
             case "\uD83D\uDCE5":
                 if (state instanceof PlayerState) {
                     YaTrack track = ((PlayerState) state).getCurrentTrack();
-                    byte[] file = YandexMusicManager.downloadSong(track.getId());
+                    byte[] file = YandexMusicClient.downloadSong(track.getId());
                     try {
                         event.getTextChannel().sendMessage(String.format("%s by %s", track.getTitle(), track.getFormattedArtists())).addFile(file, String.format("%s.mp3", Utils.transliterate(track.getTitle())), new AttachmentOption[0]).queue();
                     } catch (Exception e) {

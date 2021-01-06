@@ -12,8 +12,8 @@ import org.apache.log4j.Logger;
 
 import javax.security.auth.login.LoginException;
 
-import static com.aqulasoft.disyam.audio.YandexMusicManager.enterCaptcha;
-import static com.aqulasoft.disyam.audio.YandexMusicManager.getAuthRequest;
+import static com.aqulasoft.disyam.audio.YandexMusicClient.enterCaptcha;
+import static com.aqulasoft.disyam.audio.YandexMusicClient.getAuthRequest;
 
 
 public class DisYamBot {

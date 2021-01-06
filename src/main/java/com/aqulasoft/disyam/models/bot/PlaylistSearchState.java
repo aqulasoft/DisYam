@@ -1,6 +1,6 @@
 package com.aqulasoft.disyam.models.bot;
 
-import com.aqulasoft.disyam.audio.YandexMusicManager;
+import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.utils.BotStateType;
@@ -66,7 +66,7 @@ public class PlaylistSearchState extends SearchPager implements BotState {
 
     @Override
     public void updateResults(int page) {
-        searchResult = YandexMusicManager.search(searchResult.getSearchStr(), searchResult.getSearchType(), page);
+        searchResult = YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), page);
         updateMessage(false);
     }
 }

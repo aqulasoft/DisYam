@@ -109,7 +109,7 @@ public class TrackScheduler extends AudioEventAdapter {
         if (state == null) return;
         if (pos < 0 || pos >= state.getTracks().size()) return;
         YaTrack yaTrack = state.getTrack(pos);
-        String url = YandexMusicManager.getTrackDownloadLink(SecretManager.get("YaToken"), yaTrack.getId());
+        String url = YandexMusicClient.getTrackDownloadLink(SecretManager.get("YaToken"), yaTrack.getId());
         playerManager.loadItemOrdered(this, url, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {

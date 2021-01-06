@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.aqulasoft.disyam.audio.YandexMusicManager.getPlaylist;
+import static com.aqulasoft.disyam.audio.YandexMusicClient.getPlaylist;
 import static com.aqulasoft.disyam.utils.Consts.PLAYLIST_URL_REGEX;
 import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 import static com.aqulasoft.disyam.utils.Utils.joinVoice;

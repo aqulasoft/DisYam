@@ -1,7 +1,6 @@
 package com.aqulasoft.disyam.commands;
 
-import com.aqulasoft.disyam.audio.YandexMusicManager;
-import com.aqulasoft.disyam.service.SecretManager;
+import com.aqulasoft.disyam.audio.YandexMusicClient;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.utils.AttachmentOption;
@@ -25,7 +24,7 @@ public class DownloadCommand implements Command {
             channel.sendMessage("Please provide some arguments").queue();
             return;
         }
-        byte[] song = YandexMusicManager.downloadSong(Long.parseLong(args.get(0)));
+        byte[] song = YandexMusicClient.downloadSong(Long.parseLong(args.get(0)));
         channel.sendMessage("Here you are").addFile(song, "song.mp3", new AttachmentOption[0]).queue();
     }
 

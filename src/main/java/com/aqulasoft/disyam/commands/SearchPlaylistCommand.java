@@ -1,6 +1,6 @@
 package com.aqulasoft.disyam.commands;
 
-import com.aqulasoft.disyam.audio.YandexMusicManager;
+import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.models.bot.PlaylistSearchState;
 import com.aqulasoft.disyam.service.BotStateManager;
@@ -29,7 +29,7 @@ public class SearchPlaylistCommand implements Command {
         }
         if (joinVoice(event, channel)) return;
 
-        YaSearchResult searchResult = YandexMusicManager.search(String.join(" ", args), "playlist", 0);
+        YaSearchResult searchResult = YandexMusicClient.search(String.join(" ", args), "playlist", 0);
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.ORANGE);
         event.getChannel().sendMessage(builder.build()).queue(message -> {

@@ -17,7 +17,7 @@ import java.security.NoSuchAlgorithmException;
 
 import static com.aqulasoft.disyam.utils.Consts.*;
 
-public class YandexMusicManager {
+public class YandexMusicClient {
 
     static Logger log = Logger.getLogger(Utils.class);
 

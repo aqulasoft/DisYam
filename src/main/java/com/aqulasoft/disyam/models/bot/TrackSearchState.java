@@ -1,6 +1,6 @@
 package com.aqulasoft.disyam.models.bot;
 
-import com.aqulasoft.disyam.audio.YandexMusicManager;
+import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.utils.BotStateType;
@@ -56,7 +56,7 @@ public class TrackSearchState extends PlayerState implements BotState {
     public int next() {
         if (getPosition() + 1 >= searchResult.getPerPage()) {
             page++;
-            searchResult = YandexMusicManager.search(searchResult.getSearchStr(), searchResult.getSearchType(), page);
+            searchResult = YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), page);
         }
         super.next();
         return getPosition();
@@ -66,7 +66,7 @@ public class TrackSearchState extends PlayerState implements BotState {
     public int prev() {
         if (getPosition() == 0) {
             page--;
-            searchResult = YandexMusicManager.search(searchResult.getSearchStr(), searchResult.getSearchType(), page);
+            searchResult = YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), page);
         }
         super.prev();
         return getPosition();

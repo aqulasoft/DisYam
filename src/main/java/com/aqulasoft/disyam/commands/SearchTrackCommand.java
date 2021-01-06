@@ -1,7 +1,7 @@
 package com.aqulasoft.disyam.commands;
 
 import com.aqulasoft.disyam.audio.PlayerManager;
-import com.aqulasoft.disyam.audio.YandexMusicManager;
+import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.models.bot.TrackSearchState;
 import com.aqulasoft.disyam.service.BotStateManager;
@@ -31,7 +31,7 @@ public class SearchTrackCommand implements Command {
         }
         if (joinVoice(event, channel)) return;
 
-        YaSearchResult searchResult = YandexMusicManager.search(String.join(" ", args), "track", 0);
+        YaSearchResult searchResult = YandexMusicClient.search(String.join(" ", args), "all", 0);
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.RED);
         event.getChannel().sendMessage(builder.build()).queue(message -> {
