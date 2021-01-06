@@ -27,6 +27,13 @@ public abstract class SearchPager {
         updateResults(page);
     }
 
+    public String getPager() {
+        if (total < perPage) {
+            return "";
+        }
+        return String.format("%s-%s/%s", getPage() * getPerPage() + 1, (getPage() + 1) * getPerPage(), getTotal());
+    }
+
     public boolean hasPages() {
         return total / perPage > 0;
     }

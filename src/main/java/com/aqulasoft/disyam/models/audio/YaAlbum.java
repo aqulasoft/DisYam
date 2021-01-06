@@ -7,11 +7,11 @@ import java.util.List;
 
 @Getter
 public class YaAlbum {
-    long id;
-    int year;
-    String genre;
-    String title;
-    int trackCount;
-    Date releaseDate;
-    List<YaArtist> artists;
+    private long id;
+    private int year;
+    private String genre;
+    private String title;
+    private int trackCount;
+    private Date releaseDate;
+    private List<YaArtist> artists;
 }

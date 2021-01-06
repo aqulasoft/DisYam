@@ -1,6 +1,7 @@
 package com.aqulasoft.disyam.audio;
 
 import com.aqulasoft.disyam.models.audio.DownloadInfo;
+import com.aqulasoft.disyam.models.audio.YaArtist;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.service.SecretManager;
@@ -93,12 +94,14 @@ public class YandexMusicClient {
     public static YaPlaylist getPlaylist(String username, String playlistId) {
         Unirest.config().reset().enableCookieManagement(false);
         String url = String.format("https://music.yandex.ru/handlers/playlist.jsx?owner=%s&kinds=%s&light=true&madeFor=&lang=%s&external-domain=music.yandex.ru&overembed=false&ncrnd=0.9083773647705418", username, playlistId, "ru");
-        GetRequest request = Unirest.get(url);
-        HttpResponse<JsonNode> json = request.asJson();
-        JsonNode body = json.getBody();
+        JsonNode body = Unirest.get(url).asJson().getBody();
         Unirest.config().reset().enableCookieManagement(true);
         return YaPlaylist.create(body.getObject().getJSONObject("playlist"));
     }
 
-
+    public static YaPlaylist getArtistTracks(YaArtist artist) {
+        String url = String.format("%s/artists/%s/tracks", baseUrl, artist.getId());
+        JsonNode body = Unirest.get(url).queryString("page-size", 100).asJson().getBody();
+        return YaPlaylist.createArtistPlaylist(body.getObject().getJSONObject("result"), artist);
+    }
 }

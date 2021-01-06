@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 public class YaArtist {
-    long id;
-    String name;
+    private long id;
+    private String name;
 
     private YaArtist() {
     }

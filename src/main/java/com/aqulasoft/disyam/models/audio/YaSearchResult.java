@@ -36,6 +36,18 @@ public class YaSearchResult {
             }
         }
 
+        if (json.has("artists")) {
+            res.artists = new ArrayList<>();
+            JSONObject artistsRes = json.getJSONObject("artists");
+            JSONArray artists = artistsRes.getJSONArray("results");
+            res.perPage = artistsRes.getInt("perPage");
+            res.total = artistsRes.getInt("total");
+            res.searchType = "artist";
+            for (int i = 0; i < artists.length(); i++) {
+                res.artists.add(YaArtist.create(artists.getJSONObject(i)));
+            }
+        }
+
         if (json.has("playlists")) {
             res.playlists = new ArrayList<>();
             JSONObject tracksRes = json.getJSONObject("playlists");
@@ -58,5 +70,4 @@ public class YaSearchResult {
         }
         throw new YaAudioException("Unable to get track by position");
     }
-
 }

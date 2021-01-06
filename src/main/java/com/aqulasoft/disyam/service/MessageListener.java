@@ -3,6 +3,7 @@ package com.aqulasoft.disyam.service;
 import com.aqulasoft.disyam.audio.GuildMusicManager;
 import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicClient;
+import com.aqulasoft.disyam.models.audio.YaArtist;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.*;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
+import static com.aqulasoft.disyam.audio.YandexMusicClient.getArtistTracks;
 import static com.aqulasoft.disyam.audio.YandexMusicClient.getPlaylist;
 import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
@@ -71,6 +73,9 @@ public class MessageListener extends ListenerAdapter {
         event.getReaction().removeReaction(event.getUser()).queue();
         PlayerManager playerManager = PlayerManager.getInstance();
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
+
+        if (state == null) return;
+
         if (event.getMessageIdLong() != state.getLastMessage().getIdLong()) return;
 
         if (state instanceof SearchPager) {
@@ -86,6 +91,11 @@ public class MessageListener extends ListenerAdapter {
 
         if (state instanceof PlaylistSearchState) {
             handlePlaylistSelect((PlaylistSearchState) state, event);
+            return;
+        }
+
+        if (state instanceof ArtistSearchState) {
+            handleArtistSelect((ArtistSearchState) state, event);
             return;
         }
 
@@ -125,10 +135,21 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
+    private void handleArtistSelect(ArtistSearchState state, MessageReactionAddEvent event) {
+        int num = Utils.getEmojiNum(event.getReactionEmote().getEmoji()) - 1;
+        YaArtist artist = state.getArtist(num);
+        YaPlaylist playlist = getArtistTracks(artist);
+        playPlaylist(state, event, playlist);
+    }
+
     private void handlePlaylistSelect(PlaylistSearchState state, MessageReactionAddEvent event) {
         int num = Utils.getEmojiNum(event.getReactionEmote().getEmoji()) - 1;
         YaPlaylist playlist = state.getPlaylist(num);
         playlist = getPlaylist(playlist.getAuthorLogin(), String.valueOf(playlist.getId()));
+        playPlaylist(state, event, playlist);
+    }
+
+    private void playPlaylist(BotState state, MessageReactionAddEvent event, YaPlaylist playlist) {
         YaTrack track = playlist.getTrack(0);
         if (track != null) {
             EmbedBuilder builder = new EmbedBuilder();

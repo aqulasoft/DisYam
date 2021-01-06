@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
 
 @Getter
 public class YaTrack {
-    long id;
-    long realId;
-    String title;
-    long duration;
-    List<YaArtist> artists;
-//    List<YaAlbum> albums;
+    private long id;
+    private long realId;
+    private String title;
+    private long duration;
+    private List<YaArtist> artists;
+//    private List<YaAlbum> albums;
 
     private YaTrack() {
     }
