@@ -37,15 +37,13 @@ public class SearchArtistCommand implements Command {
             ArtistSearchState state = new ArtistSearchState(searchResult, message);
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);
             state.updateMessage(true);
-//            PlayerManager playerManager = PlayerManager.getInstance();
-//            playerManager.loadAndPlaySearch(event.getChannel());
         });
     }
 
     @Override
     public String getHelp() {
         return "Search by artist\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <text>`";
+                "Usage: `" + PREFIX + getInvoke() + " <artist name>`";
     }
 
     @Override

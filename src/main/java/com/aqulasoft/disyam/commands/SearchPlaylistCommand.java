@@ -36,15 +36,13 @@ public class SearchPlaylistCommand implements Command {
             PlaylistSearchState state = new PlaylistSearchState(searchResult, message);
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);
             state.updateMessage(true);
-//            PlayerManager playerManager = PlayerManager.getInstance();
-//            playerManager.loadAndPlaySearch(event.getChannel());
         });
     }
 
     @Override
     public String getHelp() {
         return "Search playlists\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <song url>`";
+                "Usage: `" + PREFIX + getInvoke() + " <playlist name>`";
     }
 
     @Override

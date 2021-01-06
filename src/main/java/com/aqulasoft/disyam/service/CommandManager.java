@@ -25,6 +25,7 @@ public class CommandManager {
         addCommand(new ShuffleCommand());
         addCommand(new SearchPlaylistCommand());
         addCommand(new SearchArtistCommand());
+        addCommand(new SearchCommand());
     }
 
     private void addCommand(Command command) {

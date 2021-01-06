@@ -49,7 +49,7 @@ public class TrackSearchState extends PlayerState implements BotState {
 
     @Override
     public void updateMessage(boolean b) {
-        updateSearchMsg(false);
+        updateSearchMsg(b);
     }
 
     @Override

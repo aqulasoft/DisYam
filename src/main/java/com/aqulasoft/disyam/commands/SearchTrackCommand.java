@@ -46,7 +46,7 @@ public class SearchTrackCommand implements Command {
     @Override
     public String getHelp() {
         return "Search a song\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <song url>`";
+                "Usage: `" + PREFIX + getInvoke() + " <song name>`";
     }
 
     @Override

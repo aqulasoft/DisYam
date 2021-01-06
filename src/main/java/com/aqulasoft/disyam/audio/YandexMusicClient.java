@@ -81,7 +81,8 @@ public class YandexMusicClient {
                 .queryString("text", searchStr)
                 .queryString("type", type)
                 .queryString("nocorrect", false)
-                .queryString("page", page);
+                .queryString("page", page)
+                .queryString("page-size", 10);
         return YaSearchResult.create(request.asJson().getBody().getObject().getJSONObject("result"));
     }
 
