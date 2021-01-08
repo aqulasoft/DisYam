@@ -62,7 +62,7 @@ public class BotStateManager {
         BotState curState = botStates.get(guildId);
         if (!(curState instanceof PlayerState)) {
             if (prevState instanceof PlayerState) {
-                curState.getMessage().clearReactions().queue(c->{
+                curState.getMessage().clearReactions().queue(c -> {
                     curState.getMessage().getJDA().cancelRequests();
                     prevState.getMessage().delete().queue();
                     prevState.setMessage(curState.getMessage());
@@ -79,6 +79,7 @@ public class BotStateManager {
 
     public void checkInactivity() {
         Date now = new Date();
+        List<Long> needsToBeFree = new ArrayList<>();
         for (Long guildId : botStates.keySet()) {
             BotState state = botStates.get(guildId);
             AudioPlayer player = PlayerManager.getInstance().getGuildMusicManager(state.getGuild()).player;
@@ -100,7 +101,7 @@ public class BotStateManager {
                         audioManager.closeAudioConnection();
                         player.destroy();
                         PlayerManager.getInstance().removeMusicManager(guildId);
-                        botStates.remove(guildId);
+                        needsToBeFree.add(guildId);
                         botPlayerStates.remove(guildId);
                     }
                 } else {
@@ -110,5 +111,6 @@ public class BotStateManager {
 
             } else inactivityEntities.remove(guildId);
         }
+        needsToBeFree.forEach(botStates::remove);
     }
 }
