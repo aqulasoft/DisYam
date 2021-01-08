@@ -4,7 +4,6 @@ import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.models.bot.ArtistSearchState;
-import com.aqulasoft.disyam.models.bot.BotState;
 import com.aqulasoft.disyam.models.bot.PlaylistSearchState;
 import com.aqulasoft.disyam.models.bot.TrackSearchState;
 import com.aqulasoft.disyam.service.BotStateManager;
@@ -39,7 +38,7 @@ public class SearchCommand implements Command {
         event.getChannel().sendMessage(builder.build()).queue(message -> {
             switch (searchResult.getSearchType()) {
                 case "track":
-                    TrackSearchState trackState = new TrackSearchState(searchResult, message);
+                    TrackSearchState trackState = new TrackSearchState(searchResult, message, event.getGuild());
                     BotStateManager.getInstance().setState(event.getGuild().getIdLong(), trackState, false);
                     trackState.updateMessage(true);
                     PlayerManager playerManager = PlayerManager.getInstance();
@@ -47,12 +46,12 @@ public class SearchCommand implements Command {
                     break;
 
                 case "artist":
-                    ArtistSearchState artistState = new ArtistSearchState(searchResult, message);
+                    ArtistSearchState artistState = new ArtistSearchState(searchResult, message, event.getGuild());
                     BotStateManager.getInstance().setState(event.getGuild().getIdLong(), artistState, false);
                     artistState.updateMessage(true);
                     break;
                 case "playlist":
-                    PlaylistSearchState playlistState = new PlaylistSearchState(YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), 0), message);
+                    PlaylistSearchState playlistState = new PlaylistSearchState(YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), 0), message, event.getGuild());
                     BotStateManager.getInstance().setState(event.getGuild().getIdLong(), playlistState, false);
                     playlistState.updateMessage(true);
                     break;

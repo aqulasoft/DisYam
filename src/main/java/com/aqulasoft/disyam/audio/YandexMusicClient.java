@@ -20,7 +20,7 @@ import static com.aqulasoft.disyam.utils.Consts.*;
 
 public class YandexMusicClient {
 
-    static Logger log = Logger.getLogger(Utils.class);
+    static Logger log = Logger.getLogger(YandexMusicClient.class);
 
     public static String getTrackDownloadLink(String token, long songId) {
         log.info(String.format("%s/tracks/%s/download-info", baseUrl, songId));

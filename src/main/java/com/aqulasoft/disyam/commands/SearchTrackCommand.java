@@ -35,7 +35,7 @@ public class SearchTrackCommand implements Command {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.RED);
         event.getChannel().sendMessage(builder.build()).queue(message -> {
-            TrackSearchState state = new TrackSearchState(searchResult, message);
+            TrackSearchState state = new TrackSearchState(searchResult, message, event.getGuild());
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);
             state.updateSearchMsg(true);
             PlayerManager playerManager = PlayerManager.getInstance();

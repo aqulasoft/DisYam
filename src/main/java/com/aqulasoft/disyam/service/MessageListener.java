@@ -154,9 +154,8 @@ public class MessageListener extends ListenerAdapter {
         if (track != null) {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setColor(Color.ORANGE);
-            YaPlaylist finalPlaylist = playlist;
             event.getChannel().sendMessage(builder.build()).queue(message -> {
-                PlaylistState playlistState = new PlaylistState(finalPlaylist, message);
+                PlaylistState playlistState = new PlaylistState(playlist, message, event.getGuild());
                 state.getLastMessage().delete().queue();
                 BotStateManager.getInstance().setState(event.getGuild().getIdLong(), playlistState, false);
 

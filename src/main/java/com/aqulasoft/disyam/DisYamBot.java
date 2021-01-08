@@ -1,5 +1,6 @@
 package com.aqulasoft.disyam;
 
+import com.aqulasoft.disyam.service.BotStateManager;
 import com.aqulasoft.disyam.service.CommandManager;
 import com.aqulasoft.disyam.service.MessageListener;
 import com.aqulasoft.disyam.service.SecretManager;
@@ -13,8 +14,12 @@ import org.apache.log4j.Logger;
 
 import javax.security.auth.login.LoginException;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import static com.aqulasoft.disyam.audio.YandexMusicClient.enterCaptcha;
 import static com.aqulasoft.disyam.audio.YandexMusicClient.getAuthRequest;
+import static com.aqulasoft.disyam.utils.Consts.INACTIVITY_CHECK_PERIOD;
 import static net.dv8tion.jda.api.utils.cache.CacheFlag.*;
 
 
@@ -56,6 +61,14 @@ public class DisYamBot {
                     .setActivity(Activity.playing("Yandex Music"))
                     .disableCache(CLIENT_STATUS, ACTIVITY, MEMBER_OVERRIDES, ROLE_TAGS);
             builder.build().awaitReady();
+
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    BotStateManager.getInstance().checkInactivity();
+                }
+            }, 5000, INACTIVITY_CHECK_PERIOD);
             log.info("Running");
         } catch (LoginException | InterruptedException e) {
             log.error(e);

@@ -58,7 +58,7 @@ public class PlayCommand implements Command {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setColor(Color.ORANGE);
             event.getChannel().sendMessage(builder.build()).queue(message -> {
-                PlaylistState state = new PlaylistState(playlist, message);
+                PlaylistState state = new PlaylistState(playlist, message, event.getGuild());
                 BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);
                 state.updateMessage(true);
                 PlayerManager playerManager = PlayerManager.getInstance();

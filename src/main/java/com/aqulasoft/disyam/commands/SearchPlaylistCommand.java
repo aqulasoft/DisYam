@@ -33,7 +33,7 @@ public class SearchPlaylistCommand implements Command {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.ORANGE);
         event.getChannel().sendMessage(builder.build()).queue(message -> {
-            PlaylistSearchState state = new PlaylistSearchState(searchResult, message);
+            PlaylistSearchState state = new PlaylistSearchState(searchResult, message, event.getGuild());
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);
             state.updateMessage(true);
         });

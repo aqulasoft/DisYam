@@ -4,7 +4,9 @@ import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.utils.BotStateType;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -17,16 +19,14 @@ public class PlaylistSearchState extends SearchPager implements BotState {
 
     private YaSearchResult searchResult;
     private Message message;
+    @Getter
+    private final Guild guild;
 
-    public PlaylistSearchState(YaSearchResult searchResult, Message message) {
+    public PlaylistSearchState(YaSearchResult searchResult, Message message, Guild guild) {
         super(searchResult.getTotal(), searchResult.getPerPage());
         this.searchResult = searchResult;
         this.message = message;
-    }
-
-    public PlaylistSearchState(YaSearchResult searchResult) {
-        super(searchResult.getTotal(), searchResult.getPerPage());
-        this.searchResult = searchResult;
+        this.guild = guild;
     }
 
     @Override

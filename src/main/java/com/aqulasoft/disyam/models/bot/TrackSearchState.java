@@ -5,7 +5,9 @@ import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -18,10 +20,13 @@ public class TrackSearchState extends PlayerState implements BotState {
     private YaSearchResult searchResult;
     private Message message;
     private int page = 0;
+    @Getter
+    private final Guild guild;
 
-    public TrackSearchState(YaSearchResult searchResult, Message message) {
+    public TrackSearchState(YaSearchResult searchResult, Message message, Guild guild) {
         this.message = message;
         this.searchResult = searchResult;
+        this.guild = guild;
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.aqulasoft.disyam.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -24,12 +25,14 @@ public class PlaylistState extends PlayerState implements BotState {
     private Message message;
     private List<YaTrack> shuffledTracks;
     private boolean isShuffleOn = false;
+    @Getter
+    private final Guild guild;
 
-    public PlaylistState(YaPlaylist playlist, Message message) {
+    public PlaylistState(YaPlaylist playlist, Message message, Guild guild) {
         this.playlist = playlist;
         this.message = message;
+        this.guild = guild;
     }
-
 
     @Override
     public Message getLastMessage() {

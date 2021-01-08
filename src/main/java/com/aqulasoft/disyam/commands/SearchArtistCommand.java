@@ -3,7 +3,6 @@ package com.aqulasoft.disyam.commands;
 import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.models.bot.ArtistSearchState;
-import com.aqulasoft.disyam.models.bot.PlaylistSearchState;
 import com.aqulasoft.disyam.service.BotStateManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -34,7 +33,7 @@ public class SearchArtistCommand implements Command {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.CYAN);
         event.getChannel().sendMessage(builder.build()).queue(message -> {
-            ArtistSearchState state = new ArtistSearchState(searchResult, message);
+            ArtistSearchState state = new ArtistSearchState(searchResult, message, event.getGuild());
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);
             state.updateMessage(true);
         });

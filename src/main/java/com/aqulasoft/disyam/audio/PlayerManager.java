@@ -1,6 +1,5 @@
 package com.aqulasoft.disyam.audio;
 
-import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -39,6 +38,10 @@ public class PlayerManager {
         guild.getAudioManager().setSendingHandler(musicManager.getSendHandler());
 
         return musicManager;
+    }
+
+    public synchronized void removeMusicManager(long guildId) {
+        musicManagers.remove(guildId);
     }
 
     public void loadAndPlayPlaylist(TextChannel channel) {
