@@ -5,7 +5,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 
 public interface BotState {
-    Message getLastMessage();
+    Message getMessage();
+    void setMessage(Message msg);
     Guild getGuild();
     BotStateType getType();
 }

@@ -29,7 +29,7 @@ public class SearchArtistCommand implements Command {
         }
         if (joinVoice(event, channel)) return;
 
-        YaSearchResult searchResult = YandexMusicClient.search(String.join(" ", args), "artist", 0);
+        YaSearchResult searchResult = YandexMusicClient.search(String.join(" ", args), "artist", 0, 9);
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.CYAN);
         event.getChannel().sendMessage(builder.build()).queue(message -> {

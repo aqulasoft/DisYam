@@ -6,6 +6,7 @@ import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -18,6 +19,8 @@ import static com.aqulasoft.disyam.utils.Consts.*;
 
 public class TrackSearchState extends PlayerState implements BotState {
     private YaSearchResult searchResult;
+    @Getter
+    @Setter
     private Message message;
     private int page = 0;
     @Getter
@@ -27,11 +30,6 @@ public class TrackSearchState extends PlayerState implements BotState {
         this.message = message;
         this.searchResult = searchResult;
         this.guild = guild;
-    }
-
-    @Override
-    public Message getLastMessage() {
-        return message;
     }
 
     @Override
@@ -63,7 +61,7 @@ public class TrackSearchState extends PlayerState implements BotState {
     public int next() {
         if (getPosition() + 1 >= searchResult.getPerPage()) {
             page++;
-            searchResult = YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), page);
+            searchResult = YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), page, searchResult.getPerPage());
         }
         super.next();
         return getPosition();
@@ -73,7 +71,7 @@ public class TrackSearchState extends PlayerState implements BotState {
     public int prev() {
         if (getPosition() == 0) {
             page--;
-            searchResult = YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), page);
+            searchResult = YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), page, searchResult.getPerPage());
         }
         super.prev();
         return getPosition();

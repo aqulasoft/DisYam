@@ -32,7 +32,7 @@ public class SearchCommand implements Command {
         }
         if (joinVoice(event, channel)) return;
 
-        YaSearchResult searchResult = YandexMusicClient.search(String.join(" ", args), "all", 0);
+        YaSearchResult searchResult = YandexMusicClient.search(String.join(" ", args), "all", 0, 9);
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.CYAN);
         event.getChannel().sendMessage(builder.build()).queue(message -> {
@@ -51,7 +51,7 @@ public class SearchCommand implements Command {
                     artistState.updateMessage(true);
                     break;
                 case "playlist":
-                    PlaylistSearchState playlistState = new PlaylistSearchState(YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), 0), message, event.getGuild());
+                    PlaylistSearchState playlistState = new PlaylistSearchState(YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), 0, 9), message, event.getGuild());
                     BotStateManager.getInstance().setState(event.getGuild().getIdLong(), playlistState, false);
                     playlistState.updateMessage(true);
                     break;

@@ -30,6 +30,8 @@ public class YaSearchResult {
             switch (res.searchType) {
                 case "artist":
                     parseJsonArtists(json, res);
+                    if (res.artists.size() > 9)
+                        res.artists = res.getArtists().subList(0, 9);
                     return res;
                 case "track":
                     parseJsonTracks(json, res);

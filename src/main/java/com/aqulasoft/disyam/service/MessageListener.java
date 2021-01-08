@@ -76,28 +76,7 @@ public class MessageListener extends ListenerAdapter {
 
         if (state == null) return;
 
-        if (event.getMessageIdLong() != state.getLastMessage().getIdLong()) return;
-
-        if (state instanceof SearchPager) {
-            switch (event.getReactionEmote().getEmoji()) {
-                case "➡️":
-                    ((SearchPager) state).nextPage();
-                    break;
-                case "⬅️":
-                    ((SearchPager) state).prevPage();
-                    break;
-            }
-        }
-
-        if (state instanceof PlaylistSearchState) {
-            handlePlaylistSelect((PlaylistSearchState) state, event);
-            return;
-        }
-
-        if (state instanceof ArtistSearchState) {
-            handleArtistSelect((ArtistSearchState) state, event);
-            return;
-        }
+        if (event.getMessageIdLong() != state.getMessage().getIdLong()) return;
 
         switch (event.getReactionEmote().getEmoji()) {
             case EMOJI_PREVIOUS:
@@ -132,6 +111,30 @@ public class MessageListener extends ListenerAdapter {
                     }
                 }
                 break;
+            case EMOJI_CANCEL:
+                BotStateManager.getInstance().revertPlayerState(event.getGuild().getIdLong());
+                return;
+        }
+
+        if (state instanceof SearchPager) {
+            switch (event.getReactionEmote().getEmoji()) {
+                case "➡️":
+                    ((SearchPager) state).nextPage();
+                    break;
+                case "⬅️":
+                    ((SearchPager) state).prevPage();
+                    break;
+            }
+        }
+
+        if (state instanceof PlaylistSearchState) {
+            handlePlaylistSelect((PlaylistSearchState) state, event);
+            return;
+        }
+
+        if (state instanceof ArtistSearchState) {
+            handleArtistSelect((ArtistSearchState) state, event);
+            return;
         }
     }
 
@@ -156,7 +159,7 @@ public class MessageListener extends ListenerAdapter {
             builder.setColor(Color.ORANGE);
             event.getChannel().sendMessage(builder.build()).queue(message -> {
                 PlaylistState playlistState = new PlaylistState(playlist, message, event.getGuild());
-                state.getLastMessage().delete().queue();
+                state.getMessage().delete().queue();
                 BotStateManager.getInstance().setState(event.getGuild().getIdLong(), playlistState, false);
 
                 playlistState.updateMessage(true);

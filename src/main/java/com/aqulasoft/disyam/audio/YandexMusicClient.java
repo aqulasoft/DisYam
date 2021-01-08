@@ -75,14 +75,14 @@ public class YandexMusicClient {
         return 0;
     }
 
-    public static YaSearchResult search(String searchStr, String type, int page) {
+    public static YaSearchResult search(String searchStr, String type, int page, int pageSize) {
         String searchUrl = baseUrl + "/search";
         GetRequest request = Unirest.get(searchUrl)
                 .queryString("text", searchStr)
                 .queryString("type", type)
                 .queryString("nocorrect", false)
                 .queryString("page", page)
-                .queryString("page-size", 10);
+                .queryString("page-size", pageSize);
         return YaSearchResult.create(request.asJson().getBody().getObject().getJSONObject("result"));
     }
 

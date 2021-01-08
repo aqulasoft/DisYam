@@ -35,11 +35,6 @@ public class PlaylistState extends PlayerState implements BotState {
     }
 
     @Override
-    public Message getLastMessage() {
-        return message;
-    }
-
-    @Override
     public BotStateType getType() {
         return BotStateType.YA_PLAYLIST;
     }

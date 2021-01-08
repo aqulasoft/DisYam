@@ -5,6 +5,7 @@ import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.utils.BotStateType;
 import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -13,11 +14,14 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import java.awt.*;
 import java.util.List;
 
+import static com.aqulasoft.disyam.utils.Consts.EMOJI_CANCEL;
 import static com.aqulasoft.disyam.utils.Consts.EMOJI_MAP;
 
 public class PlaylistSearchState extends SearchPager implements BotState {
 
     private YaSearchResult searchResult;
+    @Getter
+    @Setter
     private Message message;
     @Getter
     private final Guild guild;
@@ -29,10 +33,6 @@ public class PlaylistSearchState extends SearchPager implements BotState {
         this.guild = guild;
     }
 
-    @Override
-    public Message getLastMessage() {
-        return message;
-    }
 
     @Override
     public BotStateType getType() {
@@ -63,7 +63,10 @@ public class PlaylistSearchState extends SearchPager implements BotState {
                 builder.addField(String.format("%s %s", emojiNum, playlist.getTitle()), playlist.getAuthor(), true);
                 if (addReactions) message.addReaction(emojiNum).queue();
             }
-            if (addReactions && hasPages()) message.addReaction("➡️").queue();
+            if (addReactions) {
+                if (hasPages()) message.addReaction("➡️").queue();
+                message.addReaction(EMOJI_CANCEL).queue();
+            }
         }
         builder.setFooter(String.format("%s-%s/%s", getPage() * getPerPage() + 1, (getPage() + 1) * getPerPage(), getTotal()));
         return builder.build();
@@ -71,7 +74,7 @@ public class PlaylistSearchState extends SearchPager implements BotState {
 
     @Override
     public void updateResults(int page) {
-        searchResult = YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), page);
+        searchResult = YandexMusicClient.search(searchResult.getSearchStr(), searchResult.getSearchType(), page, 9);
         updateMessage(false);
     }
 }
