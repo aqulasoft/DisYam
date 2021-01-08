@@ -72,5 +72,5 @@ jobs:
               docker pull ${{ secrets.DOCKER_HUB_REPO }}
               docker stop disyam
               docker rm disyam 
-              docker run --restart always -d --name disyam ${{ secrets.BOT_TOKEN }} ${{ secrets.YANDEX_MUSIC_USERNAME }} ${{ secrets.YANDEX_MUSIC_PASSWORD }} 
+              docker run --restart always -d --name disyam aqulasoft/disyam ${{ secrets.BOT_TOKEN }} ${{ secrets.YANDEX_MUSIC_USERNAME }} ${{ secrets.YANDEX_MUSIC_PASSWORD }} 
               docker ps
