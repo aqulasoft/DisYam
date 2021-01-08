@@ -64,7 +64,6 @@ docker run -d --name disyam disyam token username password
 
 ### Launch as docker container from docker hub
 ```
-docker build -t disyam .
 docker run -d --name disyam aqulasoft/disyam token username password
 ```
 
