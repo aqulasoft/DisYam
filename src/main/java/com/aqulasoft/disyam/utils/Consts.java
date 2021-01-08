@@ -21,6 +21,7 @@ public class Consts {
     public static final String EMOJI_PLAY_PAUSE = "⏯️";
     public static final String EMOJI_REPEAT_ONE = "\uD83D\uDD02";
     public static final String EMOJI_DOWNLOAD = "\uD83D\uDCE5";
+    public static final String EMOJI_STOP = "\uD83D\uDEAB";
 
     public static final Map<String, String> EMOJI_MAP = new HashMap() {{
         put("1", "1️⃣");

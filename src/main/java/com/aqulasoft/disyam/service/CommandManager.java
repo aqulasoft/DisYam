@@ -1,6 +1,8 @@
 package com.aqulasoft.disyam.service;
 
 import com.aqulasoft.disyam.commands.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,21 +13,23 @@ import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
 public class CommandManager {
 
-    private final Map<String, Command> commands = new HashMap<>();
+    private final Map<String, Command> commands = new LinkedHashMap<>();
 
     public CommandManager() {
-        addCommand(new JoinCommand());
         addCommand(new PlayCommand());
-        addCommand(new DownloadCommand());
-        addCommand(new SearchTrackCommand());
-        addCommand(new NextCommand());
+        addCommand(new StopCommand());
         addCommand(new PauseCommand());
         addCommand(new ResumeCommand());
+
+        addCommand(new NextCommand());
         addCommand(new PrevCommand());
-        addCommand(new ShuffleCommand());
+
+        addCommand(new DownloadCommand());
+
+        addCommand(new SearchCommand());
+        addCommand(new SearchTrackCommand());
         addCommand(new SearchPlaylistCommand());
         addCommand(new SearchArtistCommand());
-        addCommand(new SearchCommand());
     }
 
     private void addCommand(Command command) {
@@ -43,17 +47,28 @@ public class CommandManager {
     }
 
     public void handleCommand(GuildMessageReceivedEvent event) {
-        final String prefix = PREFIX;
 
         final String[] split = event.getMessage().getContentRaw().replaceFirst(
-                "(?i)" + Pattern.quote(prefix), "").split("\\s+");
+                "(?i)" + Pattern.quote(PREFIX), "").split("\\s+");
         final String invoke = split[0].toLowerCase();
+
+        if (invoke.equals("help")) {
+            showHelp(event.getChannel());
+            return;
+        }
 
         if (commands.containsKey(invoke)) {
             final List<String> args = Arrays.asList(split).subList(1, split.length);
-
-            event.getChannel().sendTyping().queue();
             commands.get(invoke).handle(args, event);
         }
+    }
+
+    private void showHelp(TextChannel channel) {
+        EmbedBuilder builder = new EmbedBuilder();
+
+        commands.keySet().forEach(cmd -> {
+            builder.addField(commands.get(cmd).getInvoke(), commands.get(cmd).getHelp(), false);
+        });
+        channel.sendMessage(builder.build()).queue();
     }
 }

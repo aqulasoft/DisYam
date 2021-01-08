@@ -55,7 +55,7 @@ public class DisYamBot {
 
         try {
             log.info("Booting");
-            JDABuilder builder = JDABuilder.createDefault(botToken, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS,
+            JDABuilder builder = JDABuilder.createDefault(botToken, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.GUILD_EMOJIS,
                     GatewayIntent.GUILD_VOICE_STATES)
                     .addEventListeners(messageListener)
                     .setActivity(Activity.playing("Yandex Music"))

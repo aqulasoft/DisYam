@@ -69,8 +69,8 @@ public class PlayCommand implements Command {
 
     @Override
     public String getHelp() {
-        return "Plays a song\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <song url>`";
+        return "Play Yandex playlist by url\n" +
+                "Usage: `" + PREFIX + getInvoke() + " <Yandex playlist url>`";
     }
 
     @Override

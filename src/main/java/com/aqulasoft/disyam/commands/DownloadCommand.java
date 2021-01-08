@@ -31,7 +31,7 @@ public class DownloadCommand implements Command {
     @Override
     public String getHelp() {
         return "Download a song\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <song url>`";
+                "Usage: `" + PREFIX + getInvoke() + " <Yandex song url>`";
     }
 
     @Override
