@@ -32,7 +32,7 @@ import java.util.concurrent.BlockingQueue;
 
 import static com.aqulasoft.disyam.audio.YandexMusicClient.getArtistTracks;
 import static com.aqulasoft.disyam.audio.YandexMusicClient.getPlaylist;
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
+import static com.aqulasoft.disyam.utils.Consts.*;
 
 public class MessageListener extends ListenerAdapter {
 
@@ -100,28 +100,28 @@ public class MessageListener extends ListenerAdapter {
         }
 
         switch (event.getReactionEmote().getEmoji()) {
-            case "⏮️":
+            case EMOJI_PREVIOUS:
                 playerManager.getGuildMusicManager(event.getGuild()).scheduler.prevTrack();
                 break;
-            case "⏯️":
+            case EMOJI_PLAY_PAUSE:
                 AudioPlayer player = playerManager.getGuildMusicManager(event.getGuild()).player;
                 player.setPaused(!player.isPaused());
                 break;
-            case "⏭️":
+            case EMOJI_NEXT:
                 playerManager.getGuildMusicManager(event.getGuild()).scheduler.nextTrack();
                 break;
-            case "\uD83D\uDD00":
+            case EMOJI_SHUFFLE:
                 if (state.getType() == BotStateType.YA_PLAYLIST && state instanceof PlayerState) {
                     ((PlaylistState) state).updateShuffle();
                 }
                 break;
-            case "\uD83D\uDD02":
+            case EMOJI_REPEAT_ONE:
                 if (state instanceof PlayerState) {
                     ((PlayerState) state).updateRepeatOne();
 
                 }
                 break;
-            case "\uD83D\uDCE5":
+            case EMOJI_DOWNLOAD:
                 if (state instanceof PlayerState) {
                     YaTrack track = ((PlayerState) state).getCurrentTrack();
                     byte[] file = YandexMusicClient.downloadSong(track.getId());

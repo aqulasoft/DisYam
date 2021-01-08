@@ -84,7 +84,7 @@ public class Utils {
         return builder.toString();
     }
 
-    public static int getEmojiNum(String emoji) {
+    public static Integer getEmojiNum(String emoji) throws NumberFormatException {
         switch (emoji) {
             case "1️⃣":
                 return 1;
@@ -107,6 +107,6 @@ public class Utils {
             case "\uD83D\uDD1F":
                 return 10;
         }
-        return -1;
+        throw new NumberFormatException("Unknown emoji: " + emoji);
     }
 }

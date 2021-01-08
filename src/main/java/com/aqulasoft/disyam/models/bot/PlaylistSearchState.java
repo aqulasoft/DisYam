@@ -24,6 +24,11 @@ public class PlaylistSearchState extends SearchPager implements BotState {
         this.message = message;
     }
 
+    public PlaylistSearchState(YaSearchResult searchResult) {
+        super(searchResult.getTotal(), searchResult.getPerPage());
+        this.searchResult = searchResult;
+    }
+
     @Override
     public Message getLastMessage() {
         return message;

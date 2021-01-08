@@ -2,7 +2,6 @@ package com.aqulasoft.disyam.models.bot;
 
 import com.aqulasoft.disyam.models.audio.YaAudioException;
 import com.aqulasoft.disyam.models.audio.YaTrack;
-import com.aqulasoft.disyam.utils.Utils;
 import lombok.Getter;
 
 import java.util.List;
@@ -43,7 +42,6 @@ abstract public class PlayerState {
         } else {
             throw new YaAudioException("Unable to load previous track");
         }
-        updateMessage(false);
         return position;
     }
 
@@ -54,7 +52,6 @@ abstract public class PlayerState {
         } else {
             throw new YaAudioException("Unable to load next track");
         }
-        updateMessage(false);
         return position;
     }
 

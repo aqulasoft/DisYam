@@ -5,14 +5,21 @@ import java.util.Map;
 
 public class Consts {
 
-    public static String baseUrl = "https://api.music.yandex.net";
-    public static String authUrl = "https://oauth.yandex.ru";
-    public static String CLIENT_ID = "23cabbbdc6cd418abb4b39c32c41195d";
-    public static String CLIENT_SECRET = "53bc75238f0c4d08a118e51fe9203300";
-    public static String PREFIX = "-";
-    public static String PLAYLIST_URL_REGEX = ".*music\\.yandex\\.ru/users/(.+)/playlists/(\\d+)\\D*";
+    public static final String baseUrl = "https://api.music.yandex.net";
+    public static final String authUrl = "https://oauth.yandex.ru";
+    public static final String CLIENT_ID = "23cabbbdc6cd418abb4b39c32c41195d";
+    public static final String CLIENT_SECRET = "53bc75238f0c4d08a118e51fe9203300";
+    public static final String PREFIX = "!";
+    public static final String PLAYLIST_URL_REGEX = ".*music\\.yandex\\.ru/users/(.+)/playlists/(\\d+)\\D*";
 
-    public static Map<String, String> EMOJI_MAP = new HashMap() {{
+    public static final String EMOJI_SHUFFLE = "\uD83D\uDD00";
+    public static final String EMOJI_PREVIOUS = "⏮️";
+    public static final String EMOJI_NEXT = "⏭️";
+    public static final String EMOJI_PLAY_PAUSE = "⏯️";
+    public static final String EMOJI_REPEAT_ONE = "\uD83D\uDD02";
+    public static final String EMOJI_DOWNLOAD = "\uD83D\uDCE5";
+
+    public static final Map<String, String> EMOJI_MAP = new HashMap() {{
         put("1", "1️⃣");
         put("2", "2️⃣");
         put("3", "3️⃣");

@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import java.awt.*;
 import java.util.List;
 
+import static com.aqulasoft.disyam.utils.Consts.*;
+
 public class TrackSearchState extends PlayerState implements BotState {
     private YaSearchResult searchResult;
     private Message message;
@@ -93,11 +95,11 @@ public class TrackSearchState extends PlayerState implements BotState {
         builder.setColor(Color.GREEN);
         builder.setFooter(getFooter());
         if (addReactions) {
-            message.addReaction("⏮️").queue();
-            message.addReaction("⏯️").queue();
-            message.addReaction("⏭️").queue();
-            message.addReaction("\uD83D\uDD02").queue();
-            message.addReaction("\uD83D\uDCE5").queue();
+            message.addReaction(EMOJI_PREVIOUS).queue();
+            message.addReaction(EMOJI_PLAY_PAUSE).queue();
+            message.addReaction(EMOJI_NEXT).queue();
+            message.addReaction(EMOJI_REPEAT_ONE).queue();
+            message.addReaction(EMOJI_DOWNLOAD).queue();
         }
         return builder.build();
     }
