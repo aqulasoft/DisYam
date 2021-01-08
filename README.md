@@ -14,6 +14,11 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 [![[Telegram] aqulasoft live][telegram-shield]][telegram-url]
+
+[![Pulls](https://shields.beevelop.com/docker/pulls/aqulasoft/disyam.svg?style=flat-square)](https://hub.docker.com/repository/docker/aqulasoft/disyam)
+[![Layers](https://shields.beevelop.com/docker/image/layers/aqulasoft/disyam/latest.svg?style=flat-square)](https://hub.docker.com/repository/docker/aqulasoft/disyam)
+[![Size](https://shields.beevelop.com/docker/image/image-size/aqulasoft/disyam/latest.svg?style=flat-square)](https://hub.docker.com/repository/docker/aqulasoft/disyam)
+
 <!--
 [![Pulls](https://shields.beevelop.com/docker/pulls/aqulasoft/twarden.svg?style=flat-square)](https://hub.docker.com/repository/docker/aqulasoft/twarden)
 [![Layers](https://shields.beevelop.com/docker/image/layers/aqulasoft/twarden/latest.svg?style=flat-square)](https://hub.docker.com/repository/docker/aqulasoft/twarden)
@@ -38,6 +43,8 @@
 # DisYam
 Discord Yandex Music Player
 
+### Docker image on Docker Hub =>> [DisYam](https://hub.docker.com/repository/docker/aqulasoft/disyam)
+
 Allows you to play Yandex Music playlists on your Discord server.
 
 > "I solemnly swear that I am up to no good."
@@ -49,10 +56,16 @@ Allows you to play Yandex Music playlists on your Discord server.
 mvn clean compile exec:java -Dexec.args="token username password"
 ```
 
-### Launch as docker container
+### Launch as docker container from local image
 ```
 docker build -t disyam .
 docker run -d --name disyam disyam token username password
+```
+
+### Launch as docker container from docker hub
+```
+docker build -t disyam .
+docker run -d --name disyam aqulasoft/disyam token username password
 ```
 
 ### Player
