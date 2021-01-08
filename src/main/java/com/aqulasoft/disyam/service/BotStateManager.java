@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.aqulasoft.disyam.utils.Consts.INACTIVITY_MINUTE_MAX;
 
@@ -59,12 +60,14 @@ public class BotStateManager {
             BotState state = botStates.get(guildId);
             AudioPlayer player = PlayerManager.getInstance().getGuildMusicManager(state.getGuild()).player;
             AudioManager audioManager = state.getGuild().getAudioManager();
-            boolean isEmptyChannel = true;
+            AtomicBoolean isEmptyChannel = new AtomicBoolean(true);
             if (audioManager.isConnected()) {
-                isEmptyChannel = audioManager.getConnectedChannel().getMembers().size() == 1;
+                audioManager.getConnectedChannel().getMembers().forEach(member -> {
+                    if (!member.getUser().isBot()) isEmptyChannel.set(false);
+                });
             }
 
-            if (isEmptyChannel) {
+            if (isEmptyChannel.get()) {
                 if (inactivityEntities.containsKey(guildId)) {
                     long diffInMillies = Math.abs(now.getTime() - inactivityEntities.get(guildId).getTime());
                     long diff = TimeUnit.MINUTES.convert(diffInMillies, TimeUnit.MILLISECONDS);
