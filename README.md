@@ -47,10 +47,6 @@ Discord Yandex Music Player
 
 Allows you to play Yandex Music playlists on your Discord server.
 
-> "I solemnly swear that I am up to no good."
-> 
-> ~ Harry Potter Universe
-
 ### Launch as maven project
 ```
 mvn clean compile exec:java -Dexec.args="token username password"
