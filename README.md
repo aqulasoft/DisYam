@@ -91,4 +91,6 @@ docker run -d --name disyam aqulasoft/disyam token username password
 
 <img src="https://github.com/aqulasoft/DisYam/blob/master/img/help.png" width="50%" height="50%"/>
 
+Thanks [MarshalX](https://github.com/MarshalX) for his [API Yandex Music](https://github.com/MarshalX/yandex-music-api) documentation.
+
 <sub><sup>Disclaimer:Any misuse is the responsibility of the user</sup></sub>

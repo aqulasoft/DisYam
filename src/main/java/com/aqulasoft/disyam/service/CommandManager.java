@@ -25,6 +25,7 @@ public class CommandManager {
         addCommand(new PrevCommand());
 
         addCommand(new DownloadCommand());
+        addCommand(new RecommendationCommand());
 
         addCommand(new SearchCommand());
         addCommand(new SearchTrackCommand());

@@ -60,7 +60,7 @@ public class PlaylistSearchState extends SearchPager implements BotState {
             for (int i = 0; i < playlists.size(); i++) {
                 YaPlaylist playlist = playlists.get(i);
                 String emojiNum = EMOJI_MAP.get(String.valueOf(i + 1));
-                builder.addField(String.format("%s %s", emojiNum, playlist.getTitle()), playlist.getAuthor(), true);
+                builder.addField(String.format("%s %s", emojiNum, playlist.getTitle()), playlist.getOwner().getName(), true);
                 if (addReactions) message.addReaction(emojiNum).queue();
             }
             if (addReactions) {

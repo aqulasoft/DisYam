@@ -4,9 +4,7 @@ import com.aqulasoft.disyam.models.audio.YaAudioException;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.BotState;
 import com.aqulasoft.disyam.models.bot.PlayerState;
-import com.aqulasoft.disyam.models.bot.TrackSearchState;
 import com.aqulasoft.disyam.service.BotStateManager;
-import com.aqulasoft.disyam.service.SecretManager;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -109,12 +107,13 @@ public class TrackScheduler extends AudioEventAdapter {
         if (state == null) return;
         if (pos < 0 || pos >= state.getTracks().size()) return;
         YaTrack yaTrack = state.getTrack(pos);
-        String url = YandexMusicClient.getTrackDownloadLink(SecretManager.get("YaToken"), yaTrack.getId());
+        String url = YandexMusicClient.getTrackDownloadLink(yaTrack.getId());
         playerManager.loadItemOrdered(this, url, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
 //                channel.sendMessage("Adding to queue " + track.getInfo().title).queue();
                 player.startTrack(track, false);
+                YandexMusicClient.playAudio(yaTrack);
                 state.updateMessage(true);
             }
 
@@ -153,27 +152,8 @@ public class TrackScheduler extends AudioEventAdapter {
         return null;
     }
 
-    private TrackSearchState getYaSearchState() {
-        BotState state = BotStateManager.getInstance().getState(guildId);
-        if (state != null && state.getType() == BotStateType.SEARCH_TRACK) {
-            return ((TrackSearchState) state);
-        }
-        return null;
-    }
-
-    private boolean isYaPlaylist() {
-        return BotStateManager.getInstance().getState(guildId).getType() == BotStateType.YA_PLAYLIST;
-    }
-
     public void playPlaylist() {
         PlayerState state = getPlayerState();
-        if (state != null) {
-            loadFromPlaylist(state.getPosition());
-        }
-    }
-
-    public void playSearch() {
-        PlayerState state = getYaSearchState();
         if (state != null) {
             loadFromPlaylist(state.getPosition());
         }

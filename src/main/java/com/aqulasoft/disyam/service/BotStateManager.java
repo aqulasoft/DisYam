@@ -108,7 +108,6 @@ public class BotStateManager {
                     log.info(String.format("Found inactivity entity: %s-%s", state.getGuild().getName(), audioManager.isConnected() ? audioManager.getConnectedChannel().getName() : "null"));
                     inactivityEntities.put(guildId, now);
                 }
-
             } else inactivityEntities.remove(guildId);
         }
         needsToBeFree.forEach(botStates::remove);

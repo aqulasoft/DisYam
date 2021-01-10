@@ -10,30 +10,33 @@ import java.util.stream.Collectors;
 
 @Getter
 public class YaTrack {
-    private long id;
+    private final long id;
     private long realId;
-    private String title;
-    private long duration;
-    private List<YaArtist> artists;
-//    private List<YaAlbum> albums;
+    private final String title;
+    private final long duration;
+    private final List<YaArtist> artists;
+    private final List<YaAlbum> albums;
 
-    private YaTrack() {
-    }
-
-    public static YaTrack create(JSONObject json) {
-        YaTrack track = new YaTrack();
-        track.id = json.getLong("id");
+    public YaTrack(JSONObject json) {
+        id = json.getLong("id");
         if (json.has("realId"))
-            track.realId = json.getLong("realId");
-        track.title = json.getString("title");
-        track.duration = json.getLong("durationMs");
-        track.artists = new ArrayList<>();
+            realId = json.getLong("realId");
+        title = json.getString("title");
+        duration = json.getLong("durationMs");
+        artists = new ArrayList<>();
         JSONArray jsonArtistArray = json.getJSONArray("artists");
         for (int i = 0; i < jsonArtistArray.length(); i++) {
             JSONObject artist = jsonArtistArray.getJSONObject(i);
-            track.artists.add(YaArtist.create(artist));
+            artists.add(new YaArtist(artist));
         }
-        return track;
+
+        albums = new ArrayList<>();
+
+        JSONArray jsonAlbumArray = json.getJSONArray("albums");
+        for (int i = 0; i < jsonAlbumArray.length(); i++) {
+            JSONObject album = jsonAlbumArray.getJSONObject(i);
+            albums.add(new YaAlbum(album));
+        }
     }
 
     public String getFormattedArtists() {

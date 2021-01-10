@@ -39,7 +39,7 @@ public class SearchTrackCommand implements Command {
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);
             state.updateSearchMsg(true);
             PlayerManager playerManager = PlayerManager.getInstance();
-            playerManager.loadAndPlaySearch(event.getChannel());
+            playerManager.loadAndPlayPlaylist(event.getChannel());
         });
     }
 

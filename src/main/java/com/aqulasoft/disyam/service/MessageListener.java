@@ -70,13 +70,14 @@ public class MessageListener extends ListenerAdapter {
     public void onMessageReactionAdd(@Nonnull MessageReactionAddEvent event) {
         super.onMessageReactionAdd(event);
         if (event.getMember().getUser().isBot()) return;
-        event.getReaction().removeReaction(event.getUser()).queue();
         PlayerManager playerManager = PlayerManager.getInstance();
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
 
         if (state == null) return;
 
         if (event.getMessageIdLong() != state.getMessage().getIdLong()) return;
+
+        event.getReaction().removeReaction(event.getUser()).queue();
 
         switch (event.getReactionEmote().getEmoji()) {
             case EMOJI_PREVIOUS:
@@ -139,6 +140,7 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private void handleArtistSelect(ArtistSearchState state, MessageReactionAddEvent event) {
+        event.getJDA().cancelRequests();
         int num = Utils.getEmojiNum(event.getReactionEmote().getEmoji()) - 1;
         YaArtist artist = state.getArtist(num);
         YaPlaylist playlist = getArtistTracks(artist);
@@ -146,9 +148,10 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private void handlePlaylistSelect(PlaylistSearchState state, MessageReactionAddEvent event) {
+        event.getJDA().cancelRequests();
         int num = Utils.getEmojiNum(event.getReactionEmote().getEmoji()) - 1;
         YaPlaylist playlist = state.getPlaylist(num);
-        playlist = getPlaylist(playlist.getAuthorLogin(), String.valueOf(playlist.getId()));
+        playlist = getPlaylist(playlist.getOwner().getLogin(), String.valueOf(playlist.getId()));
         playPlaylist(state, event, playlist);
     }
 

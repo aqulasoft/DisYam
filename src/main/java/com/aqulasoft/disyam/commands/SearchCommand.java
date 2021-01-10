@@ -42,7 +42,7 @@ public class SearchCommand implements Command {
                     BotStateManager.getInstance().setState(event.getGuild().getIdLong(), trackState, false);
                     trackState.updateMessage(true);
                     PlayerManager playerManager = PlayerManager.getInstance();
-                    playerManager.loadAndPlaySearch(event.getChannel());
+                    playerManager.loadAndPlayPlaylist(event.getChannel());
                     break;
 
                 case "artist":
