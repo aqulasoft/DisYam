@@ -7,6 +7,7 @@ import com.aqulasoft.disyam.service.SecretManager;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.MultipartBody;
+import kong.unirest.json.JSONObject;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -33,17 +34,24 @@ public class DisYamBot {
         MultipartBody request = getAuthRequest(username, password);
         HttpResponse<JsonNode> res = request.asJson();
         String yaToken;
+        String uid;
         if (res.getStatus() == 200) {
-            yaToken = res.getBody().getObject().getString("access_token");
+            JSONObject resObj = res.getBody().getObject();
+            yaToken = resObj.getString("access_token");
+            uid = resObj.getString("uid");
             log.info("Got Yandex Auth token: " + yaToken);
             SecretManager.set("YaToken", yaToken);
+            SecretManager.set("uid", uid);
         } else {
             String capchaKey = res.getBody().getObject().getString("x_captcha_key");
             if (capchaKey != null) {
                 enterCaptcha(capchaKey, username, password);
-                yaToken = res.getBody().getObject().getString("access_token");
+                JSONObject resObj = res.getBody().getObject();
+                yaToken = resObj.getString("access_token");
+                uid = resObj.getString("uid");
                 log.info("Got Ya token: " + yaToken);
                 SecretManager.set("YaToken", yaToken);
+                SecretManager.set("uid", uid);
             }
         }
 

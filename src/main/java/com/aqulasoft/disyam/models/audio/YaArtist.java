@@ -5,16 +5,20 @@ import lombok.Getter;
 
 @Getter
 public class YaArtist {
-    private long id;
-    private String name;
+    private final long id;
+    private final String name;
+    private String login;
 
-    private YaArtist() {
+    public YaArtist(long id, String name, String login) {
+        this.id = id;
+        this.name = name;
+        this.login = login;
     }
 
-    public static YaArtist create(JSONObject json) {
-        YaArtist artist = new YaArtist();
-        artist.id = json.getLong("id");
-        artist.name = json.getString("name");
-        return artist;
+    public YaArtist(JSONObject json) {
+        id = json.getLong("id");
+        name = json.getString("name");
+        if (json.has("login")) login = json.getString("login");
     }
+
 }

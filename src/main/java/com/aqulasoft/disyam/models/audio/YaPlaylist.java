@@ -11,49 +11,47 @@ import java.util.List;
 public class YaPlaylist {
     private long id;
     private String title;
-    private String author;
-    private String authorLogin;
+    private YaArtist owner;
     private long duration;
-//    private Date modified;
+    //    private Date modified;
     private int trackCount;
     private String description;
     private List<YaTrack> tracks;
     private String descriptionFormatted;
 
-    private YaPlaylist() {
-    }
-
-    public static YaPlaylist create(JSONObject json) {
-        YaPlaylist playlist = new YaPlaylist();
-        playlist.id = json.getLong("kind");
-        playlist.title = json.getString("title");
-        if (json.has("description")) playlist.description = json.getString("description");
-        if (json.has("descriptionFormatted")) playlist.descriptionFormatted = json.getString("descriptionFormatted");
-        playlist.trackCount = json.getInt("trackCount");
-        playlist.author = json.getJSONObject("owner").getString("name");
-        playlist.authorLogin = json.getJSONObject("owner").getString("login");
-        if (json.has("duration")) playlist.duration = json.getLong("duration");
+    public YaPlaylist(JSONObject json) {
+        id = json.getLong("kind");
+        title = json.getString("title");
+        if (json.has("description")) description = json.getString("description");
+        if (json.has("descriptionFormatted")) descriptionFormatted = json.getString("descriptionFormatted");
+        trackCount = json.getInt("trackCount");
+        JSONObject ownerJson = json.getJSONObject("owner");
+        owner = new YaArtist(ownerJson.getLong("uid"), ownerJson.getString("name"), ownerJson.getString("login"));
+        if (json.has("duration")) duration = json.getLong("duration");
 //        playlist.modified = Date.from(Instant.parse(json.getString("modified")));
-        parseTracks(json, playlist);
-        return playlist;
+        parseTracks(json);
     }
 
-    private static void parseTracks(JSONObject json, YaPlaylist playlist) {
+    private YaPlaylist() {
+
+    }
+
+    private void parseTracks(JSONObject json) {
         if (json.has("tracks")) {
-            playlist.tracks = new ArrayList<>(playlist.trackCount);
+            tracks = new ArrayList<>(trackCount);
             JSONArray jsonTrackArray = json.getJSONArray("tracks");
             for (int i = 0; i < jsonTrackArray.length(); i++) {
                 JSONObject track = jsonTrackArray.getJSONObject(i);
-                playlist.tracks.add(YaTrack.create(track));
+                tracks.add(new YaTrack(track));
             }
         }
     }
 
-    public static YaPlaylist createArtistPlaylist(JSONObject json, YaArtist artist){
+    public static YaPlaylist createArtistPlaylist(JSONObject json, YaArtist artist) {
         YaPlaylist playlist = new YaPlaylist();
-        playlist.author = artist.getName();
+        playlist.owner = artist;
         playlist.title = "Top Tracks";
-        parseTracks(json, playlist);
+        playlist.parseTracks(json);
         playlist.trackCount = playlist.tracks.size();
         return playlist;
     }

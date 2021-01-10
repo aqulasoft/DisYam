@@ -1,6 +1,5 @@
 package com.aqulasoft.disyam.models.audio;
 
-import com.aqulasoft.disyam.audio.YandexMusicClient;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import lombok.Getter;
@@ -10,7 +9,7 @@ import java.util.List;
 
 @Getter
 public class YaSearchResult {
-    private String searchStr;
+    private final String searchStr;
     private List<YaTrack> tracks;
     private List<YaArtist> artists;
     private List<YaPlaylist> playlists;
@@ -18,79 +17,73 @@ public class YaSearchResult {
     private int total;
     private String searchType;
 
-    private YaSearchResult() {
-    }
-
-    public static YaSearchResult create(JSONObject json) {
-        YaSearchResult res = new YaSearchResult();
-        res.searchStr = json.getString("text");
+    public YaSearchResult(JSONObject json) {
+        searchStr = json.getString("text");
         if (json.has("best")) {
             JSONObject best = json.getJSONObject("best");
-            res.searchType = best.getString("type");
-            switch (res.searchType) {
+            searchType = best.getString("type");
+            switch (searchType) {
                 case "artist":
-                    parseJsonArtists(json, res);
-                    if (res.artists.size() > 9)
-                        res.artists = res.getArtists().subList(0, 9);
-                    return res;
+                    parseJsonArtists(json);
+                    if (artists.size() > 9)
+                        artists = getArtists().subList(0, 9);
+                    break;
                 case "track":
-                    parseJsonTracks(json, res);
-                    return res;
+                    parseJsonTracks(json);
+                    break;
                 case "playlist":
-                    parseJsonPlaylists(json, res);
-                    return res;
+                    parseJsonPlaylists(json);
+                    break;
             }
         }
 
         if (json.has("tracks")) {
-            parseJsonTracks(json, res);
+            parseJsonTracks(json);
         }
 
         if (json.has("artists")) {
-            parseJsonArtists(json, res);
+            parseJsonArtists(json);
         }
 
         if (json.has("playlists")) {
-            parseJsonPlaylists(json, res);
+            parseJsonPlaylists(json);
         }
-
-        return res;
     }
 
-    private static void parseJsonPlaylists(JSONObject json, YaSearchResult res) {
-        res.playlists = new ArrayList<>();
+    private void parseJsonPlaylists(JSONObject json) {
+        playlists = new ArrayList<>();
         JSONObject tracksRes = json.getJSONObject("playlists");
-        JSONArray playlists = tracksRes.getJSONArray("results");
-        res.perPage = tracksRes.getInt("perPage");
-        res.total = tracksRes.getInt("total");
-        res.searchType = "playlist";
-        for (int i = 0; i < playlists.length(); i++) {
-            JSONObject playlistJson = playlists.getJSONObject(i);
-            res.playlists.add(YaPlaylist.create(playlistJson));
+        JSONArray playlistsJson = tracksRes.getJSONArray("results");
+        perPage = tracksRes.getInt("perPage");
+        total = tracksRes.getInt("total");
+        searchType = "playlist";
+        for (int i = 0; i < playlistsJson.length(); i++) {
+            JSONObject playlistJson = playlistsJson.getJSONObject(i);
+            playlists.add(new YaPlaylist(playlistJson));
         }
     }
 
-    private static void parseJsonArtists(JSONObject json, YaSearchResult res) {
-        res.artists = new ArrayList<>();
+    private void parseJsonArtists(JSONObject json) {
+        artists = new ArrayList<>();
         JSONObject artistsRes = json.getJSONObject("artists");
-        JSONArray artists = artistsRes.getJSONArray("results");
-        res.perPage = artistsRes.getInt("perPage");
-        res.total = artistsRes.getInt("total");
-        res.searchType = "artist";
-        for (int i = 0; i < artists.length(); i++) {
-            res.artists.add(YaArtist.create(artists.getJSONObject(i)));
+        JSONArray artistsJson = artistsRes.getJSONArray("results");
+        perPage = artistsRes.getInt("perPage");
+        total = artistsRes.getInt("total");
+        searchType = "artist";
+        for (int i = 0; i < artistsJson.length(); i++) {
+            artists.add(new YaArtist(artistsJson.getJSONObject(i)));
         }
     }
 
-    private static void parseJsonTracks(JSONObject json, YaSearchResult res) {
-        res.tracks = new ArrayList<>();
+    private void parseJsonTracks(JSONObject json) {
+        tracks = new ArrayList<>();
         JSONObject tracksRes = json.getJSONObject("tracks");
-        JSONArray tracks = tracksRes.getJSONArray("results");
-        res.perPage = tracksRes.getInt("perPage");
-        res.total = tracksRes.getInt("total");
-        res.searchType = "track";
-        for (int i = 0; i < tracks.length(); i++) {
-            res.tracks.add(YaTrack.create(tracks.getJSONObject(i)));
+        JSONArray tracksJson = tracksRes.getJSONArray("results");
+        perPage = tracksRes.getInt("perPage");
+        total = tracksRes.getInt("total");
+        searchType = "track";
+        for (int i = 0; i < tracksJson.length(); i++) {
+            tracks.add(new YaTrack(tracksJson.getJSONObject(i)));
         }
     }
 

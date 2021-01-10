@@ -19,6 +19,7 @@ import java.util.List;
 import static com.aqulasoft.disyam.utils.Consts.*;
 
 public class PlaylistState extends PlayerState implements BotState {
+    @Getter
     private final YaPlaylist playlist;
     @Setter
     @Getter
@@ -101,7 +102,7 @@ public class PlaylistState extends PlayerState implements BotState {
         message.getEmbeds().get(0).getTitle();
         builder.setTitle(trackTitle);
         builder.setDescription(trackAuthor);
-        builder.setAuthor(playlist.getTitle() + (playlist.getAuthor() != null ? " by " + playlist.getAuthor() : ""));
+        builder.setAuthor(playlist.getTitle() + (playlist.getOwner().getName() != null ? " by " + playlist.getOwner().getName() : ""));
         builder.setColor(Color.ORANGE);
         builder.setFooter(footer);
         if (addReactions) {

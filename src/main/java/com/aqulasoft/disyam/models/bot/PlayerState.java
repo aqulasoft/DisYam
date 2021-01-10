@@ -3,6 +3,7 @@ package com.aqulasoft.disyam.models.bot;
 import com.aqulasoft.disyam.models.audio.YaAudioException;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
 abstract public class PlayerState {
     private boolean isRepeatOneOn = false;
     private boolean isPaused = false;
+    @Setter
     private int position;
 
     public boolean isRepeatOneOn() {

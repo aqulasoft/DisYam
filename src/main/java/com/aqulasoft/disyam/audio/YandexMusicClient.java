@@ -1,11 +1,7 @@
 package com.aqulasoft.disyam.audio;
 
-import com.aqulasoft.disyam.models.audio.DownloadInfo;
-import com.aqulasoft.disyam.models.audio.YaArtist;
-import com.aqulasoft.disyam.models.audio.YaPlaylist;
-import com.aqulasoft.disyam.models.audio.YaSearchResult;
+import com.aqulasoft.disyam.models.audio.*;
 import com.aqulasoft.disyam.service.SecretManager;
-import com.aqulasoft.disyam.utils.Utils;
 import kong.unirest.*;
 import org.apache.log4j.Logger;
 
@@ -15,18 +11,25 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.HashMap;
 
 import static com.aqulasoft.disyam.utils.Consts.*;
 
 public class YandexMusicClient {
 
     static Logger log = Logger.getLogger(YandexMusicClient.class);
+    private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
-    public static String getTrackDownloadLink(String token, long songId) {
-        log.info(String.format("%s/tracks/%s/download-info", baseUrl, songId));
-        GetRequest request = Unirest.get(String.format("%s/tracks/%s/download-info", baseUrl, songId)).header("Authorization", "OAuth " + token);
+    public static String getTrackDownloadLink(long songId) {
+//        log.info(String.format("%s/tracks/%s/download-info", baseUrl, songId));
+        GetRequest request = Unirest.get(String.format("%s/tracks/%s/download-info", baseUrl, songId)).header("Authorization", "OAuth " + SecretManager.get("YaToken"));
         String res = request.asJson().getBody().getObject().getJSONArray("result").getJSONObject(0).getString("downloadInfoUrl");
-        byte[] body = Unirest.get(res).header("Authorization", "OAuth " + token).asBytes().getBody();
+        byte[] body = Unirest.get(res).header("Authorization", "OAuth " + SecretManager.get("YaToken")).asBytes().getBody();
         DownloadInfo dInfo = DownloadInfo.create(body);
         if (dInfo != null) {
             try {
@@ -83,12 +86,12 @@ public class YandexMusicClient {
                 .queryString("nocorrect", false)
                 .queryString("page", page)
                 .queryString("page-size", pageSize);
-        return YaSearchResult.create(request.asJson().getBody().getObject().getJSONObject("result"));
+        return new YaSearchResult(request.asJson().getBody().getObject().getJSONObject("result"));
     }
 
     public static byte[] downloadSong(long songId) {
         String token = SecretManager.get("YaToken");
-        String link = getTrackDownloadLink(token, songId);
+        String link = getTrackDownloadLink(songId);
         return Unirest.get(link).header("Authorization", "OAuth " + token).asBytes().getBody();
     }
 
@@ -97,12 +100,69 @@ public class YandexMusicClient {
         String url = String.format("https://music.yandex.ru/handlers/playlist.jsx?owner=%s&kinds=%s&light=true&madeFor=&lang=%s&external-domain=music.yandex.ru&overembed=false&ncrnd=0.9083773647705418", username, playlistId, "ru");
         JsonNode body = Unirest.get(url).asJson().getBody();
         Unirest.config().reset().enableCookieManagement(true);
-        return YaPlaylist.create(body.getObject().getJSONObject("playlist"));
+        return new YaPlaylist(body.getObject().getJSONObject("playlist"));
     }
 
     public static YaPlaylist getArtistTracks(YaArtist artist) {
         String url = String.format("%s/artists/%s/tracks", baseUrl, artist.getId());
         JsonNode body = Unirest.get(url).queryString("page-size", 100).asJson().getBody();
         return YaPlaylist.createArtistPlaylist(body.getObject().getJSONObject("result"), artist);
+    }
+
+    public static String getAccountInfo() {
+        return Unirest.get(String.format("%s/rotor/account/status", baseUrl)).queryString("user", "1292461505")
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .asJson().getBody().toPrettyString();
+    }
+
+    public static String getPlaylistRecommendations(long userId, long playlistId) {
+        String url = String.format("%s/users/%d/playlists/%d/recommendations", baseUrl, userId, playlistId);
+        return Unirest.get(url)
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .asJson().getBody().toPrettyString();
+    }
+
+    public static YaStationSequence getStationTracks(YaTrack track, Long trackId) {
+        String url = String.format("%s/rotor/station/%s/tracks", baseUrl, String.format("track:%s", track.getId()));
+        return new YaStationSequence(Unirest.get(url)
+                .queryString("settings2", false)
+                .queryString("queue", trackId)
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .asJson().getBody().getObject().getJSONObject("result"), track);
+    }
+
+    public static void sendStationFeedback(String station, String type, String batchId, Long trackId, Long position) {
+        String url = String.format("%s/rotor/station/%s/feedback", baseUrl, station);
+        JsonNode jsonNode = new JsonNode("{}");
+        jsonNode.getObject().put("type", type);
+        jsonNode.getObject().put("timestamp", new Date().getTime());
+        if (position != null) jsonNode.getObject().put("totalPlayedSeconds", position);
+        jsonNode.getObject().put("batch-id", batchId);
+        if (trackId != null) jsonNode.getObject().put("trackId", trackId);
+
+        RequestBodyEntity request = Unirest.post(url)
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .body(jsonNode);
+
+        request.asJson();
+    }
+
+    public static void playAudio(YaTrack track) {
+        log.info(track.getTitle());
+        String url = String.format("%s/play-audio", baseUrl);
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("track-id", track.getId());
+        map.put("from", SecretManager.get("uid"));
+        map.put("album-id", track.getAlbums().get(0).getId());
+        map.put("timestamp", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
+        map.put("play-id", "");
+
+        MultipartBody request = Unirest.post(url)
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .fields(map);
+        String res = request.asJson().getBody().toPrettyString();
+        log.info(res);
+
     }
 }
