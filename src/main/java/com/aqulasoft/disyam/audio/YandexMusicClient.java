@@ -11,8 +11,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -23,7 +21,6 @@ import static com.aqulasoft.disyam.utils.Consts.*;
 public class YandexMusicClient {
 
     static Logger log = Logger.getLogger(YandexMusicClient.class);
-    private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     public static String getTrackDownloadLink(long songId) {
 //        log.info(String.format("%s/tracks/%s/download-info", baseUrl, songId));
@@ -158,11 +155,9 @@ public class YandexMusicClient {
         map.put("timestamp", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
         map.put("play-id", "");
 
-        MultipartBody request = Unirest.post(url)
+        Unirest.post(url)
                 .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
-                .fields(map);
-        String res = request.asJson().getBody().toPrettyString();
-        log.info(res);
+                .fields(map).asEmpty();
 
     }
 }

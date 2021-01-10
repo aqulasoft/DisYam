@@ -17,7 +17,6 @@ import org.apache.log4j.Logger;
 
 import java.awt.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.aqulasoft.disyam.utils.Consts.*;
 
@@ -80,9 +79,6 @@ public class StationState extends PlayerState implements BotState {
         super.next();
         if (getPosition() >= tracks.size()) {
             sequence  = YandexMusicClient.getStationTracks(sequence.getTrack(), curTrackId);
-            List<YaTrack> sTracks = sequence.getTracks();
-            log.info(sTracks.stream().map(YaTrack::getTitle).collect(Collectors.joining(", ")));
-            message.getChannel().sendMessage(sTracks.stream().map(YaTrack::getTitle).collect(Collectors.joining(", "))).queue();
             tracks.addAll(sequence.getTracks());
         }
         YandexMusicClient.sendStationFeedback(String.format("track:%s", sequence.getTrack().getId()), "trackStarted", sequence.getBatchId(), getCurrentTrack().getId(), 0L);
