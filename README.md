@@ -45,7 +45,7 @@ Discord Yandex Music Player
 
 ### Docker image on Docker Hub =>> [DisYam](https://hub.docker.com/repository/docker/aqulasoft/disyam)
 
-Allows you to play Yandex Music playlists on your Discord server.
+Allows you to play Yandex Music playlists, search by artist, playlist and song on your Discord server.
 
 ### Launch as maven project
 ```
