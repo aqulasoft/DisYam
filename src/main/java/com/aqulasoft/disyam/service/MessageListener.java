@@ -121,10 +121,10 @@ public class MessageListener extends ListenerAdapter {
             switch (event.getReactionEmote().getEmoji()) {
                 case "➡️":
                     ((SearchPager) state).nextPage();
-                    break;
+                    return;
                 case "⬅️":
                     ((SearchPager) state).prevPage();
-                    break;
+                    return;
             }
         }
 
@@ -135,7 +135,6 @@ public class MessageListener extends ListenerAdapter {
 
         if (state instanceof ArtistSearchState) {
             handleArtistSelect((ArtistSearchState) state, event);
-            return;
         }
     }
 
