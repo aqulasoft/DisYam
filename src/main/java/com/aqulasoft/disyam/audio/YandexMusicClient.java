@@ -158,6 +158,11 @@ public class YandexMusicClient {
         Unirest.post(url)
                 .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
                 .fields(map).asEmpty();
+    }
 
+    public static YaTrackSupplement getTrackSupplement(long trackId) {
+        String url = String.format("%s/tracks/%s/supplement", baseUrl, trackId);
+        HttpResponse<JsonNode> res = Unirest.get(url).asJson();
+        return new YaTrackSupplement(res.getBody().getObject().getJSONObject("result"));
     }
 }

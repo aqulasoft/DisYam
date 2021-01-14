@@ -26,6 +26,7 @@ public class CommandManager {
 
         addCommand(new DownloadCommand());
         addCommand(new RecommendationCommand());
+        addCommand(new LyricsCommand());
 
         addCommand(new SearchCommand());
         addCommand(new SearchTrackCommand());

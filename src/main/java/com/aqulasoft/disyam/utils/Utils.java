@@ -1,12 +1,14 @@
 package com.aqulasoft.disyam.utils;
 
+import com.aqulasoft.disyam.models.audio.YaTrack;
+import com.aqulasoft.disyam.models.audio.YaTrackSupplement;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
+
+import java.awt.*;
 
 public class Utils {
     public static boolean checkVoiceChannelAvailability(GuildMessageReceivedEvent event, TextChannel channel) {
@@ -108,5 +110,18 @@ public class Utils {
                 return 10;
         }
         throw new NumberFormatException("Unknown emoji: " + emoji);
+    }
+
+    public static MessageEmbed buildLyricsMessage(YaTrack track, YaTrackSupplement supplement) {
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setColor(Color.ORANGE);
+        builder.setTitle(String.format("♪ %s ♪", track.getTitle()));
+        if (supplement.isHasLyrics()) {
+            String lyrics = supplement.getFullLyrics().length() > 2048 ? supplement.getFullLyrics().substring(0, 2048) : supplement.getFullLyrics();
+            builder.setFooter(lyrics);
+        } else {
+            builder.setDescription("No lyrics available.");
+        }
+        return builder.build();
     }
 }

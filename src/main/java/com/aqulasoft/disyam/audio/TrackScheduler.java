@@ -113,7 +113,6 @@ public class TrackScheduler extends AudioEventAdapter {
             public void trackLoaded(AudioTrack track) {
 //                channel.sendMessage("Adding to queue " + track.getInfo().title).queue();
                 player.startTrack(track, false);
-                YandexMusicClient.playAudio(yaTrack);
                 state.updateMessage(true);
             }
 

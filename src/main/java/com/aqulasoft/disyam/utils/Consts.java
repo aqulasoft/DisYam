@@ -23,6 +23,7 @@ public class Consts {
     public static final String EMOJI_DOWNLOAD = "\uD83D\uDCE5";
     public static final String EMOJI_STOP = "\uD83D\uDEAB";
     public static final String EMOJI_CANCEL = "\uD83D\uDEAB";
+    public static final String EMOJI_OK = "✔";
 
     public static final Map<String, String> EMOJI_MAP = new HashMap() {{
         put("1", "1️⃣");

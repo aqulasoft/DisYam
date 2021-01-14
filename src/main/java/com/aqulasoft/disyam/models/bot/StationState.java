@@ -39,6 +39,7 @@ public class StationState extends PlayerState implements BotState {
         this.guild = guild;
         YandexMusicClient.sendStationFeedback(String.format("track:%s", sequence.getTrack().getId()), "radioStarted", sequence.getBatchId(), null, null);
         YandexMusicClient.sendStationFeedback(String.format("track:%s", sequence.getTrack().getId()), "trackStarted", sequence.getBatchId(), getCurrentTrack().getId(), 0L);
+        YandexMusicClient.playAudio(getCurrentTrack());
     }
 
     @Override
@@ -78,9 +79,10 @@ public class StationState extends PlayerState implements BotState {
         YandexMusicClient.sendStationFeedback(String.format("track:%s", sequence.getTrack().getId()), actionType, sequence.getBatchId(), curTrackId, duration);
         super.next();
         if (getPosition() >= tracks.size()) {
-            sequence  = YandexMusicClient.getStationTracks(sequence.getTrack(), curTrackId);
+            sequence = YandexMusicClient.getStationTracks(sequence.getTrack(), curTrackId);
             tracks.addAll(sequence.getTracks());
         }
+        YandexMusicClient.playAudio(getCurrentTrack());
         YandexMusicClient.sendStationFeedback(String.format("track:%s", sequence.getTrack().getId()), "trackStarted", sequence.getBatchId(), getCurrentTrack().getId(), 0L);
         return getPosition();
     }
@@ -110,7 +112,9 @@ public class StationState extends PlayerState implements BotState {
     }
 
     private String getFooter() {
-        String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "");
-        return String.format("(%s/%s)    %s", getPosition() + 1, tracks.size(), Utils.convertTimePeriod(getTrack(getPosition()).getDuration())) + additionalInfo;
+        YaTrack track = sequence.getTrack();
+        String additionalInfo = (isPaused() ? "  ⏸ " : "  ▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "");
+        String stationInfo = String.format("station by track \"%s\" by %s", track.getTitle(), track.getFormattedArtists());
+        return String.format("(%s/∞)    %s \n%s", getPosition() + 1, Utils.convertTimePeriod(getTrack(getPosition()).getDuration()) + additionalInfo, stationInfo);
     }
 }

@@ -69,53 +69,62 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onMessageReactionAdd(@Nonnull MessageReactionAddEvent event) {
         super.onMessageReactionAdd(event);
-        if (event.getMember().getUser().isBot()) return;
+        MessageReaction.ReactionEmote emote = event.getReactionEmote();
+        if (event.getMember().getUser().isBot()) {
+            return;
+        }
         PlayerManager playerManager = PlayerManager.getInstance();
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
 
         if (state == null) return;
 
-        if (event.getMessageIdLong() != state.getMessage().getIdLong()) return;
+        if (event.getMessageIdLong() != state.getMessage().getIdLong() && !emote.getEmoji().equals(EMOJI_OK)) return;
 
         event.getReaction().removeReaction(event.getUser()).queue();
-
-        switch (event.getReactionEmote().getEmoji()) {
-            case EMOJI_PREVIOUS:
-                playerManager.getGuildMusicManager(event.getGuild()).scheduler.prevTrack();
-                break;
-            case EMOJI_PLAY_PAUSE:
-                AudioPlayer player = playerManager.getGuildMusicManager(event.getGuild()).player;
-                player.setPaused(!player.isPaused());
-                break;
-            case EMOJI_NEXT:
-                playerManager.getGuildMusicManager(event.getGuild()).scheduler.nextTrack();
-                break;
-            case EMOJI_SHUFFLE:
-                if (state.getType() == BotStateType.YA_PLAYLIST && state instanceof PlayerState) {
-                    ((PlaylistState) state).updateShuffle();
-                }
-                break;
-            case EMOJI_REPEAT_ONE:
-                if (state instanceof PlayerState) {
-                    ((PlayerState) state).updateRepeatOne();
-
-                }
-                break;
-            case EMOJI_DOWNLOAD:
-                if (state instanceof PlayerState) {
-                    YaTrack track = ((PlayerState) state).getCurrentTrack();
-                    byte[] file = YandexMusicClient.downloadSong(track.getId());
-                    try {
-                        event.getTextChannel().sendMessage(String.format("%s by %s", track.getTitle(), track.getFormattedArtists())).addFile(file, String.format("%s.mp3", Utils.transliterate(track.getTitle())), new AttachmentOption[0]).queue();
-                    } catch (Exception e) {
-                        event.getTextChannel().sendMessage(String.format("File size: %d bytes. %s", file.length, e.getLocalizedMessage())).queue();
+        if (emote.isEmoji())
+            switch (emote.getEmoji()) {
+                case EMOJI_PREVIOUS:
+                    playerManager.getGuildMusicManager(event.getGuild()).scheduler.prevTrack();
+                    break;
+                case EMOJI_PLAY_PAUSE:
+                    AudioPlayer player = playerManager.getGuildMusicManager(event.getGuild()).player;
+                    player.setPaused(!player.isPaused());
+                    break;
+                case EMOJI_NEXT:
+                    playerManager.getGuildMusicManager(event.getGuild()).scheduler.nextTrack();
+                    break;
+                case EMOJI_SHUFFLE:
+                    if (state.getType() == BotStateType.YA_PLAYLIST && state instanceof PlayerState) {
+                        ((PlaylistState) state).updateShuffle();
                     }
-                }
-                break;
-            case EMOJI_CANCEL:
-                BotStateManager.getInstance().revertPlayerState(event.getGuild().getIdLong());
-                return;
-        }
+                    break;
+                case EMOJI_REPEAT_ONE:
+                    if (state instanceof PlayerState) {
+                        ((PlayerState) state).updateRepeatOne();
+
+                    }
+                    break;
+                case EMOJI_DOWNLOAD:
+                    if (state instanceof PlayerState) {
+                        YaTrack track = ((PlayerState) state).getCurrentTrack();
+                        byte[] file = YandexMusicClient.downloadSong(track.getId());
+                        try {
+                            event.getTextChannel().sendMessage(String.format("%s by %s", track.getTitle(), track.getFormattedArtists())).addFile(file, String.format("%s.mp3", Utils.transliterate(track.getTitle())), new AttachmentOption[0]).queue();
+                        } catch (Exception e) {
+                            event.getTextChannel().sendMessage(String.format("File size: %d bytes. %s", file.length, e.getLocalizedMessage())).queue();
+                        }
+                    }
+                    break;
+                case EMOJI_CANCEL:
+                    BotStateManager.getInstance().revertPlayerState(event.getGuild().getIdLong());
+                    return;
+                case EMOJI_OK:
+                    event.retrieveMessage().queue(message -> {
+                        if (message.getJDA().getSelfUser().getIdLong() == message.getAuthor().getIdLong())
+                            message.delete().queue();
+                    });
+                    return;
+            }
 
         if (state instanceof SearchPager) {
             switch (event.getReactionEmote().getEmoji()) {
