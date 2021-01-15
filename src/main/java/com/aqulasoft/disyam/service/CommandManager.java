@@ -16,6 +16,11 @@ public class CommandManager {
     private final Map<String, Command> commands = new LinkedHashMap<>();
 
     public CommandManager() {
+        addCommand(new SearchCommand());
+        addCommand(new SearchTrackCommand());
+        addCommand(new SearchPlaylistCommand());
+        addCommand(new SearchArtistCommand());
+
         addCommand(new PlayCommand());
         addCommand(new StopCommand());
         addCommand(new PauseCommand());
@@ -28,11 +33,6 @@ public class CommandManager {
         addCommand(new RecommendationCommand());
         addCommand(new LyricsCommand());
         addCommand(new QueueInfoCommand());
-
-        addCommand(new SearchCommand());
-        addCommand(new SearchTrackCommand());
-        addCommand(new SearchPlaylistCommand());
-        addCommand(new SearchArtistCommand());
     }
 
     private void addCommand(Command command) {
