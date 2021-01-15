@@ -112,16 +112,8 @@ public class Utils {
         throw new NumberFormatException("Unknown emoji: " + emoji);
     }
 
-    public static MessageEmbed buildLyricsMessage(YaTrack track, YaTrackSupplement supplement) {
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setColor(Color.ORANGE);
-        builder.setTitle(String.format("♪ %s ♪", track.getTitle()));
-        if (supplement.isHasLyrics()) {
-            String lyrics = supplement.getFullLyrics().length() > 2048 ? supplement.getFullLyrics().substring(0, 2048) : supplement.getFullLyrics();
-            builder.setFooter(lyrics);
-        } else {
-            builder.setDescription("No lyrics available.");
-        }
-        return builder.build();
+    public static String trimString(String str, int maxLen) {
+        return str.length() > maxLen ? str.substring(0, maxLen) : str;
+
     }
 }

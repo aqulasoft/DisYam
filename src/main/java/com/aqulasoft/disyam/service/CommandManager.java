@@ -27,6 +27,7 @@ public class CommandManager {
         addCommand(new DownloadCommand());
         addCommand(new RecommendationCommand());
         addCommand(new LyricsCommand());
+        addCommand(new QueueInfoCommand());
 
         addCommand(new SearchCommand());
         addCommand(new SearchTrackCommand());
@@ -67,7 +68,7 @@ public class CommandManager {
 
     private void showHelp(TextChannel channel) {
         EmbedBuilder builder = new EmbedBuilder();
-
+        builder.addField("developed by aqulasoft.com", "https://github.com/aqulasoft/DisYam", false);
         commands.keySet().forEach(cmd -> {
             builder.addField(commands.get(cmd).getInvoke(), commands.get(cmd).getHelp(), false);
         });

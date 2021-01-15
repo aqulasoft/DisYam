@@ -5,6 +5,7 @@ import com.aqulasoft.disyam.models.audio.YaTrack;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -55,6 +56,17 @@ abstract public class PlayerState {
             throw new YaAudioException("Unable to load next track");
         }
         return position;
+    }
+
+    public List<YaTrack> getNextTracks(int count) {
+        int end = Math.min((position + count), getTracks().size() - 1);
+        return getTracks().subList(position + 1, end);
+    }
+
+    public List<YaTrack> getPrevTracks(int count) {
+        if (position == 0) return new ArrayList<>();
+        int start = Math.max(position - count, 0);
+        return getTracks().subList(start, position);
     }
 
     public YaTrack getCurrentTrack() {
