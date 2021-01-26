@@ -83,7 +83,7 @@ public class YandexMusicClient {
                 .queryString("nocorrect", false)
                 .queryString("page", page)
                 .queryString("page-size", pageSize);
-        return new YaSearchResult(request.asJson().getBody().getObject().getJSONObject("result"));
+        return new YaSearchResult(request.asJson().getBody().getObject().getJSONObject("result"), type);
     }
 
     public static byte[] downloadSong(long songId) {

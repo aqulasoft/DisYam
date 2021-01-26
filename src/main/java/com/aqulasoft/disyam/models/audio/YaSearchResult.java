@@ -17,36 +17,40 @@ public class YaSearchResult {
     private int total;
     private String searchType;
 
-    public YaSearchResult(JSONObject json) {
+    public YaSearchResult(JSONObject json, String type) {
         searchStr = json.getString("text");
-        if (json.has("best")) {
-            JSONObject best = json.getJSONObject("best");
-            searchType = best.getString("type");
-            switch (searchType) {
-                case "artist":
-                    parseJsonArtists(json);
-                    if (artists.size() > 9)
-                        artists = getArtists().subList(0, 9);
-                    break;
-                case "track":
-                    parseJsonTracks(json);
-                    break;
-                case "playlist":
-                    parseJsonPlaylists(json);
-                    break;
-            }
-        }
 
-        if (json.has("tracks")) {
-            parseJsonTracks(json);
-        }
+        switch (type) {
+            case "all":
+                if (json.has("best")) {
+                    JSONObject best = json.getJSONObject("best");
+                    searchType = best.getString("type");
+                    switch (searchType) {
+                        case "artist":
+                            parseJsonArtists(json);
+                            if (artists.size() > 9)
+                                artists = getArtists().subList(0, 9);
+                            break;
+                        case "track":
+                            parseJsonTracks(json);
+                            break;
+                        case "playlist":
+                            parseJsonPlaylists(json);
+                            break;
+                    }
+                }
+                break;
 
-        if (json.has("artists")) {
-            parseJsonArtists(json);
-        }
+            case "track":
+                parseJsonTracks(json);
+                break;
 
-        if (json.has("playlists")) {
-            parseJsonPlaylists(json);
+            case "artist":
+                parseJsonArtists(json);
+                break;
+            case "playlist":
+                parseJsonPlaylists(json);
+                break;
         }
     }
 
