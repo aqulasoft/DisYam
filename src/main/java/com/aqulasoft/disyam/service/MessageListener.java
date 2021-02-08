@@ -1,6 +1,5 @@
 package com.aqulasoft.disyam.service;
 
-import com.aqulasoft.disyam.audio.GuildMusicManager;
 import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaArtist;
@@ -10,12 +9,12 @@ import com.aqulasoft.disyam.models.bot.*;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -26,9 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 import static com.aqulasoft.disyam.audio.YandexMusicClient.getArtistTracks;
 import static com.aqulasoft.disyam.audio.YandexMusicClient.getPlaylist;
@@ -67,12 +63,25 @@ public class MessageListener extends ListenerAdapter {
     }
 
     @Override
+    public void onGuildVoiceJoin(@Nonnull GuildVoiceJoinEvent event) {
+        log.info(String.format("%s has joined the %s-%s voice", event.getMember().getUser().getName(), event.getChannelJoined().getGuild().getName(), event.getChannelJoined().getName()));
+        super.onGuildVoiceJoin(event);
+    }
+
+    @Override
+    public void onGuildVoiceLeave(@Nonnull GuildVoiceLeaveEvent event) {
+        log.info(String.format("%s has left the %s-%s voice", event.getMember().getUser().getName(), event.getChannelLeft().getGuild().getName(), event.getChannelLeft().getName()));
+        super.onGuildVoiceLeave(event);
+    }
+
+    @Override
     public void onMessageReactionAdd(@Nonnull MessageReactionAddEvent event) {
         super.onMessageReactionAdd(event);
         MessageReaction.ReactionEmote emote = event.getReactionEmote();
         if (event.getMember().getUser().isBot()) {
             return;
         }
+        String username = event.getUser().getName();
         PlayerManager playerManager = PlayerManager.getInstance();
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
 
@@ -85,23 +94,27 @@ public class MessageListener extends ListenerAdapter {
             switch (emote.getEmoji()) {
                 case EMOJI_PREVIOUS:
                     playerManager.getGuildMusicManager(event.getGuild()).scheduler.prevTrack();
+                    log.info(String.format("[%s]: previous track", username));
                     break;
                 case EMOJI_PLAY_PAUSE:
                     AudioPlayer player = playerManager.getGuildMusicManager(event.getGuild()).player;
                     player.setPaused(!player.isPaused());
+                    log.info(String.format("[%s]: Player is %s", username, !player.isPaused() ? "on" : "off"));
                     break;
                 case EMOJI_NEXT:
                     playerManager.getGuildMusicManager(event.getGuild()).scheduler.nextTrack();
+                    log.info(String.format("[%s]: next track", username));
                     break;
                 case EMOJI_SHUFFLE:
                     if (state.getType() == BotStateType.YA_PLAYLIST && state instanceof PlayerState) {
                         ((PlaylistState) state).updateShuffle();
+                        log.info(String.format("[%s]: shuffle", username));
                     }
                     break;
                 case EMOJI_REPEAT_ONE:
                     if (state instanceof PlayerState) {
                         ((PlayerState) state).updateRepeatOne();
-
+                        log.info(String.format("[%s]: Repeat is %s", username, ((PlayerState) state).isRepeatOneOn() ? "on" : "off"));
                     }
                     break;
                 case EMOJI_DOWNLOAD:
@@ -110,6 +123,7 @@ public class MessageListener extends ListenerAdapter {
                         byte[] file = YandexMusicClient.downloadSong(track.getId());
                         try {
                             event.getTextChannel().sendMessage(String.format("%s by %s", track.getTitle(), track.getFormattedArtists())).addFile(file, String.format("%s.mp3", Utils.transliterate(track.getTitle())), new AttachmentOption[0]).queue();
+                            log.info(String.format("[%s]: %s by %s has been downloaded.", username, track.getTitle(), track.getFormattedArtists()));
                         } catch (Exception e) {
                             event.getTextChannel().sendMessage(String.format("File size: %d bytes. %s", file.length, e.getLocalizedMessage())).queue();
                         }
@@ -153,6 +167,7 @@ public class MessageListener extends ListenerAdapter {
         YaArtist artist = state.getArtist(num);
         YaPlaylist playlist = getArtistTracks(artist);
         playPlaylist(state, event, playlist);
+        log.info(String.format("[%s]: Selected artist: %s", event.getUser().getName(), artist.getName()));
     }
 
     private void handlePlaylistSelect(PlaylistSearchState state, MessageReactionAddEvent event) {
@@ -161,6 +176,7 @@ public class MessageListener extends ListenerAdapter {
         YaPlaylist playlist = state.getPlaylist(num);
         playlist = getPlaylist(playlist.getOwner().getLogin(), String.valueOf(playlist.getId()));
         playPlaylist(state, event, playlist);
+        log.info(String.format("[%s]: Selected playlist: %s by %s", event.getUser().getName(), playlist.getTitle(), playlist.getOwner().getName()));
     }
 
     private void playPlaylist(BotState state, MessageReactionAddEvent event, YaPlaylist playlist) {

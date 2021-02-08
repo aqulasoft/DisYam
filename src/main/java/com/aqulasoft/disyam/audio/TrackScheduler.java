@@ -111,7 +111,7 @@ public class TrackScheduler extends AudioEventAdapter {
         playerManager.loadItemOrdered(this, url, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-//                channel.sendMessage("Adding to queue " + track.getInfo().title).queue();
+                log.info(String.format("Playing %s by %s", yaTrack.getTitle(), yaTrack.getFormattedArtists()));
                 player.startTrack(track, false);
                 state.updateMessage(true);
             }
