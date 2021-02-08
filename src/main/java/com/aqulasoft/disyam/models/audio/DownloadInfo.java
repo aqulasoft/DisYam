@@ -24,7 +24,6 @@ public class DownloadInfo {
     private DownloadInfo(NodeList data) {
         for (int i = 0; i < data.getLength(); i++) {
             Node item = data.item(i);
-            System.out.println(item.getTextContent());
             switch (item.getNodeName()) {
                 case "host":
                     this.host = item.getTextContent();

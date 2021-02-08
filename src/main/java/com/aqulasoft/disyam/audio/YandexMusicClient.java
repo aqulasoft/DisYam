@@ -145,7 +145,6 @@ public class YandexMusicClient {
     }
 
     public static void playAudio(YaTrack track) {
-        log.info(track.getTitle());
         String url = String.format("%s/play-audio", baseUrl);
 
         HashMap<String, Object> map = new HashMap<>();
