@@ -184,6 +184,7 @@ public class MessageListener extends ListenerAdapter {
         if (track != null) {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setColor(Color.ORANGE);
+            builder.setDescription("Loading...");
             event.getChannel().sendMessage(builder.build()).queue(message -> {
                 PlaylistState playlistState = new PlaylistState(playlist, message, event.getGuild());
                 state.getMessage().delete().queue();

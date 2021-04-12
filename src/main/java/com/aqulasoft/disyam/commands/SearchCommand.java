@@ -35,6 +35,7 @@ public class SearchCommand implements Command {
         YaSearchResult searchResult = YandexMusicClient.search(String.join(" ", args), "all", 0, 9);
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.CYAN);
+        builder.setDescription("Loading...");
         event.getChannel().sendMessage(builder.build()).queue(message -> {
             switch (searchResult.getSearchType()) {
                 case "track":

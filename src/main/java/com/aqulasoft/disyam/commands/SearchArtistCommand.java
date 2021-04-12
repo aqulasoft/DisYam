@@ -32,6 +32,7 @@ public class SearchArtistCommand implements Command {
         YaSearchResult searchResult = YandexMusicClient.search(String.join(" ", args), "artist", 0, 9);
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.CYAN);
+        builder.setDescription("Loading...");
         event.getChannel().sendMessage(builder.build()).queue(message -> {
             ArtistSearchState state = new ArtistSearchState(searchResult, message, event.getGuild());
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);

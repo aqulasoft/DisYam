@@ -26,6 +26,7 @@ public class RecommendationCommand implements Command {
             YaStationSequence seq = YandexMusicClient.getStationTracks(track, track.getId());
             EmbedBuilder builder = new EmbedBuilder();
             builder.setColor(Color.RED);
+            builder.setDescription("Loading...");
             event.getChannel().sendMessage(builder.build()).queue(message -> {
                 StationState newState = new StationState(seq, message, event.getGuild());
                 BotStateManager.getInstance().setState(event.getGuild().getIdLong(), newState, false);
