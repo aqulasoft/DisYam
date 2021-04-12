@@ -33,6 +33,7 @@ public class SearchTrackCommand implements Command {
 
         YaSearchResult searchResult = YandexMusicClient.search(String.join(" ", args), "track", 0, 9);
         EmbedBuilder builder = new EmbedBuilder();
+        builder.setDescription("Loading...");
         builder.setColor(Color.RED);
         event.getChannel().sendMessage(builder.build()).queue(message -> {
             TrackSearchState state = new TrackSearchState(searchResult, message, event.getGuild());
