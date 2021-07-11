@@ -132,6 +132,10 @@ public class MessageListener extends ListenerAdapter {
                 case EMOJI_CANCEL:
                     BotStateManager.getInstance().revertPlayerState(event.getGuild().getIdLong());
                     return;
+                case EMOJI_LIKE:
+                    log.info(String.format("[%s]: Liked song",username));
+                    break;
+
                 case EMOJI_OK:
                     event.retrieveMessage().queue(message -> {
                         if (message.getJDA().getSelfUser().getIdLong() == message.getAuthor().getIdLong())
