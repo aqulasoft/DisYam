@@ -5,6 +5,7 @@ import com.aqulasoft.disyam.service.SecretManager;
 import kong.unirest.*;
 import org.apache.log4j.Logger;
 
+import javax.swing.text.TabableView;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
@@ -99,6 +100,14 @@ public class YandexMusicClient {
         Unirest.config().reset().enableCookieManagement(true);
         return new YaPlaylist(body.getObject().getJSONObject("playlist"));
     }
+
+    public static YaPlaylist createPlaylist(){
+        String url = String.format("%s/users/udalowilya/playlists", baseUrl);
+        JsonNode body = Unirest.get(url).queryString("page-size", 100).asJson().getBody();
+        return YaPlaylist.createGuildPlaylist(body.getObject().getJSONObject("resultat"));
+
+    }
+
 
     public static YaPlaylist getArtistTracks(YaArtist artist) {
         String url = String.format("%s/artists/%s/tracks", baseUrl, artist.getId());
