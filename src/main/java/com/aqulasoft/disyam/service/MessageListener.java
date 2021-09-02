@@ -4,6 +4,7 @@ import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaArtist;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
+import com.aqulasoft.disyam.models.audio.YaStationSequence;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.*;
 import com.aqulasoft.disyam.utils.BotStateType;
@@ -26,8 +27,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.awt.*;
 
-import static com.aqulasoft.disyam.audio.YandexMusicClient.getArtistTracks;
-import static com.aqulasoft.disyam.audio.YandexMusicClient.getPlaylist;
+import static com.aqulasoft.disyam.audio.YandexMusicClient.*;
 import static com.aqulasoft.disyam.utils.Consts.*;
 
 public class MessageListener extends ListenerAdapter {
@@ -138,7 +138,13 @@ public class MessageListener extends ListenerAdapter {
                             message.delete().queue();
                     });
                     return;
+                case EMOJI_LIKE:
+                    Guild guild = event.getGuild();
+                    YandexMusicClient.createPlaylist(guild.getName());
+                    log.info(String.format("[%s]: Liked song in %s", event.getUser().getName(), guild.getName()));
+                    return;
             }
+
 
         if (state instanceof SearchPager) {
             switch (event.getReactionEmote().getEmoji()) {
@@ -151,10 +157,12 @@ public class MessageListener extends ListenerAdapter {
             }
         }
 
+//        if (state instanceof )
         if (state instanceof PlaylistSearchState) {
             handlePlaylistSelect((PlaylistSearchState) state, event);
             return;
         }
+
 
         if (state instanceof ArtistSearchState) {
             handleArtistSelect((ArtistSearchState) state, event);

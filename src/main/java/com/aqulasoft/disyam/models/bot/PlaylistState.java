@@ -35,6 +35,7 @@ public class PlaylistState extends PlayerState implements BotState {
         this.guild = guild;
     }
 
+
     @Override
     public BotStateType getType() {
         return BotStateType.YA_PLAYLIST;
@@ -112,6 +113,7 @@ public class PlaylistState extends PlayerState implements BotState {
             message.addReaction(EMOJI_SHUFFLE).queue();
             message.addReaction(EMOJI_REPEAT_ONE).queue();
             message.addReaction(EMOJI_DOWNLOAD).queue();
+            message.addReaction(EMOJI_LIKE).queue();
         }
         return builder.build();
     }

@@ -1,8 +1,11 @@
 package com.aqulasoft.disyam.audio;
 
 import com.aqulasoft.disyam.models.audio.*;
+import com.aqulasoft.disyam.models.bot.ChannelPlaylistName;
 import com.aqulasoft.disyam.service.SecretManager;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import kong.unirest.*;
+import kong.unirest.json.JSONObject;
 import org.apache.log4j.Logger;
 
 import javax.swing.text.TabableView;
@@ -14,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -101,12 +105,27 @@ public class YandexMusicClient {
         return new YaPlaylist(body.getObject().getJSONObject("playlist"));
     }
 
-    public static YaPlaylist createPlaylist(){
-        String url = String.format("%s/users/udalowilya/playlists", baseUrl);
-        JsonNode body = Unirest.get(url).queryString("page-size", 100).asJson().getBody();
-        return YaPlaylist.createGuildPlaylist(body.getObject().getJSONObject("resultat"));
-
+    public static void createPlaylist(String name) {
+        int time = 10;
+//        ChannelPlaylistName ChannelName = new ChannelPlaylistName();
+//        if (!ChannelName.GetState()){
+//            String userUrl = "https://api.webmaster.yandex.net/v4/user";
+//            String user = Unirest.get(userUrl)
+//                    .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+//                    .asJson().getBody().toPrettyString();
+//            .queryString("page-size", 100).asJson().getBody()
+        String url = String.format("%s/users/playlists/create", baseUrl);
+//            JSONObject user = body.getObject().getJSONObject("user_id");
+        Unirest.post(url)
+                .field("title", name)
+                .field("visibility", "public")
+                .field("user_id", SecretManager.get("uid"))
+                .field("timeout", Collections.singleton(time));
     }
+//        } else {
+//
+//        }
+
 
 
     public static YaPlaylist getArtistTracks(YaArtist artist) {
