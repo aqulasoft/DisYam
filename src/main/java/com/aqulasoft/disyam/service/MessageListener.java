@@ -140,7 +140,7 @@ public class MessageListener extends ListenerAdapter {
                     return;
                 case EMOJI_LIKE:
                     Guild guild = event.getGuild();
-                    YandexMusicClient.createPlaylist(guild.getName());
+                    System.out.println(YandexMusicClient.createPlaylist(guild.getName()));
                     log.info(String.format("[%s]: Liked song in %s", event.getUser().getName(), guild.getName()));
                     return;
             }

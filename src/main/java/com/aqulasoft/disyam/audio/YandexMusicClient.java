@@ -4,6 +4,7 @@ import com.aqulasoft.disyam.models.audio.*;
 import com.aqulasoft.disyam.models.bot.ChannelPlaylistName;
 import com.aqulasoft.disyam.service.SecretManager;
 import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.util.Converter;
 import kong.unirest.*;
 import kong.unirest.json.JSONObject;
 import org.apache.log4j.Logger;
@@ -105,8 +106,7 @@ public class YandexMusicClient {
         return new YaPlaylist(body.getObject().getJSONObject("playlist"));
     }
 
-    public static void createPlaylist(String name) {
-        int time = 10;
+//    public static void createPlaylist(String name) {
 //        ChannelPlaylistName ChannelName = new ChannelPlaylistName();
 //        if (!ChannelName.GetState()){
 //            String userUrl = "https://api.webmaster.yandex.net/v4/user";
@@ -114,19 +114,13 @@ public class YandexMusicClient {
 //                    .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
 //                    .asJson().getBody().toPrettyString();
 //            .queryString("page-size", 100).asJson().getBody()
-        String url = String.format("%s/users/playlists/create", baseUrl);
-//            JSONObject user = body.getObject().getJSONObject("user_id");
-        Unirest.post(url)
-                .field("title", name)
+    public static String createPlaylist(String name) {
+        String url = String.format("%s/users/%s/playlists/create", baseUrl, SecretManager.get("username"));
+        return Unirest.post(url).field("title", name)
                 .field("visibility", "public")
-                .field("user_id", SecretManager.get("uid"))
-                .field("timeout", Collections.singleton(time));
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .asJson().getBody().toPrettyString();
     }
-//        } else {
-//
-//        }
-
-
 
     public static YaPlaylist getArtistTracks(YaArtist artist) {
         String url = String.format("%s/artists/%s/tracks", baseUrl, artist.getId());

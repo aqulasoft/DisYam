@@ -40,6 +40,7 @@ public class DisYamBot {
             yaToken = resObj.getString("access_token");
             uid = resObj.getString("uid");
             log.info("Got Yandex Auth token: " + yaToken);
+            SecretManager.set("username",username);
             SecretManager.set("YaToken", yaToken);
             SecretManager.set("uid", uid);
         } else {
