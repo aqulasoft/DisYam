@@ -2,14 +2,14 @@ package com.aqulasoft.disyam.audio;
 
 import com.aqulasoft.disyam.models.audio.*;
 import com.aqulasoft.disyam.models.bot.ChannelPlaylistName;
+import com.aqulasoft.disyam.models.bot.Operation;
 import com.aqulasoft.disyam.service.SecretManager;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.util.Converter;
+//import kong.unirest.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.*;
-import kong.unirest.json.JSONObject;
 import org.apache.log4j.Logger;
 
-import javax.swing.text.TabableView;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
@@ -18,7 +18,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -55,6 +54,7 @@ public class YandexMusicClient {
     }
 
     public static MultipartBody getAuthRequest(String username, String password) {
+// Json
         return Unirest.post(authUrl + "/token")
                 .field("grant_type", "password")
                 .field("client_id", CLIENT_ID)
@@ -115,12 +115,37 @@ public class YandexMusicClient {
 //                    .asJson().getBody().toPrettyString();
 //            .queryString("page-size", 100).asJson().getBody()
     public static String createPlaylist(String name) {
-        String url = String.format("%s/users/%s/playlists/create", baseUrl, SecretManager.get("username"));
-        return Unirest.post(url).field("title", name)
-                .field("visibility", "public")
-                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
-                .asJson().getBody().toPrettyString();
+        ChannelPlaylistName ChannelName = new ChannelPlaylistName();
+        if (!ChannelName.getState()) {
+            String url = String.format("%s/users/%s/playlists/create", baseUrl, SecretManager.get("username"));
+            Unirest.post(url).field("title", name)
+                    .field("visibility", "public")
+                    .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                    .asJson().getBody().toPrettyString();
+        }
+        return name;
     }
+    public void addTrackToPlaylist(int kind, int trackId, int albumId,  int timeout ) throws JsonProcessingException {
+        Operation operation = new Operation(1,trackId, albumId);
+        ObjectMapper mapper = new ObjectMapper();
+
+        String url = String.format("%s/users/%s/playlists/%s/change", baseUrl, SecretManager.get("username"), kind);
+        Unirest.post(url).field("kind",kind)
+            .field("revison", String.valueOf(1))
+            .field("diff",mapper.writeValueAsString(operation))
+            .field("timeout", String.valueOf(timeout));
+
+    }
+
+
+    public static String downloadPlaylists(){
+        String url = String.format("%s/users/%s/playlists/list", baseUrl, SecretManager.get("username"));
+        return Unirest.get(url)
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .asString().getBody();
+
+    }
+
 
     public static YaPlaylist getArtistTracks(YaArtist artist) {
         String url = String.format("%s/artists/%s/tracks", baseUrl, artist.getId());
@@ -187,3 +212,4 @@ public class YandexMusicClient {
         return new YaTrackSupplement(res.getBody().getObject().getJSONObject("result"));
     }
 }
+
