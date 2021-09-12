@@ -9,6 +9,7 @@ import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.*;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -140,7 +141,12 @@ public class MessageListener extends ListenerAdapter {
                     return;
                 case EMOJI_LIKE:
                     Guild guild = event.getGuild();
-                    System.out.println(YandexMusicClient.createPlaylist(guild.getName()));
+                    PlaylistManager playlistManager = new PlaylistManager();
+                    try {
+                        playlistManager.addTrackToPlaylist(guild.getName(),state);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
                     log.info(String.format("[%s]: Liked song in %s", event.getUser().getName(), guild.getName()));
                     return;
             }

@@ -7,6 +7,8 @@ import com.aqulasoft.disyam.models.dto.UserPlaylistDto;
 import com.aqulasoft.disyam.models.dto.YaResponseDto;
 import com.aqulasoft.disyam.service.SecretManager;
 //import kong.unirest.*;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.*;
@@ -128,15 +130,16 @@ public class YandexMusicClient {
         }
         return name;
     }
-    public static void addTrackToPlaylist(int kind, int trackId, int albumId,  int timeout ) throws JsonProcessingException {
+    public static void addTrackToPlaylist(int kind, long trackId, int albumId) throws JsonProcessingException {
         Operation operation = new Operation(1,trackId, albumId);
         ObjectMapper mapper = new ObjectMapper();
-
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        String diff = mapper.writeValueAsString(operation);
         String url = String.format("%s/users/%s/playlists/%s/change", baseUrl, SecretManager.get("username"), kind);
-        Unirest.post(url).field("kind",kind)
+        System.out.println(diff);
+        System.out.println(Unirest.post(url).field("kind",kind)
             .field("revison", String.valueOf(1))
-            .field("diff",mapper.writeValueAsString(operation))
-            .field("timeout", String.valueOf(timeout));
+            .field("diff",diff));
 
     }
 

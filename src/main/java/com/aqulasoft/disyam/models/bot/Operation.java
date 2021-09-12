@@ -12,10 +12,10 @@ public class Operation {
     private final PlaylistOperation playlistOperation;
     private final int at;
     private final List<Map<String, Integer>> tracks;
-    int trackId;
-    int albumId;
+    long trackId;
+    long albumId;
 
-    public Operation(int at, int trackId, int albumId) {
+    public Operation(int at, long trackId, long albumId) {
         playlistOperation = PlaylistOperation.INSERT;
         tracks = new ArrayList<>();
         this.at = at;
