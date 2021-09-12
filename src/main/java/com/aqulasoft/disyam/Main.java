@@ -1,7 +1,10 @@
 package com.aqulasoft.disyam;
 
+import com.aqulasoft.disyam.models.dto.UserPlaylistDto;
 import com.aqulasoft.disyam.service.PlaylistManager;
 import org.apache.log4j.Logger;
+
+import java.util.List;
 
 public class Main {
     static Logger log = Logger.getLogger(Main.class);
@@ -10,8 +13,8 @@ public class Main {
         final String username = args[1];
         final String password = args[2];
         DisYamBot disYamBot = new DisYamBot(token, username, password);
-        PlaylistManager playlistManager = new PlaylistManager();
-        log.info(playlistManager.getPlaylist());
+//        PlaylistManager playlistManager = new PlaylistManager();
+//        List<UserPlaylistDto> playlists = playlistManager.getPlaylists();
         log.info("Bot created");
         disYamBot.Start();
     }

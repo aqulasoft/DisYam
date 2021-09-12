@@ -3,6 +3,8 @@ package com.aqulasoft.disyam.audio;
 import com.aqulasoft.disyam.models.audio.*;
 import com.aqulasoft.disyam.models.bot.ChannelPlaylistName;
 import com.aqulasoft.disyam.models.bot.Operation;
+import com.aqulasoft.disyam.models.dto.UserPlaylistDto;
+import com.aqulasoft.disyam.models.dto.YaResponseDto;
 import com.aqulasoft.disyam.service.SecretManager;
 //import kong.unirest.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.aqulasoft.disyam.utils.Consts.*;
 
@@ -125,7 +128,7 @@ public class YandexMusicClient {
         }
         return name;
     }
-    public void addTrackToPlaylist(int kind, int trackId, int albumId,  int timeout ) throws JsonProcessingException {
+    public static void addTrackToPlaylist(int kind, int trackId, int albumId,  int timeout ) throws JsonProcessingException {
         Operation operation = new Operation(1,trackId, albumId);
         ObjectMapper mapper = new ObjectMapper();
 
@@ -138,11 +141,12 @@ public class YandexMusicClient {
     }
 
 
-    public static String downloadPlaylists(){
+    public static List<UserPlaylistDto> getUserPlaylists(){
         String url = String.format("%s/users/%s/playlists/list", baseUrl, SecretManager.get("username"));
         return Unirest.get(url)
                 .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
-                .asString().getBody();
+                .asObject(new GenericType<YaResponseDto<List<UserPlaylistDto>>>() {
+                }).getBody().getResult();
 
     }
 
