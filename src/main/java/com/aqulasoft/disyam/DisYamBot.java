@@ -1,9 +1,6 @@
 package com.aqulasoft.disyam;
 
-import com.aqulasoft.disyam.service.BotStateManager;
-import com.aqulasoft.disyam.service.CommandManager;
-import com.aqulasoft.disyam.service.MessageListener;
-import com.aqulasoft.disyam.service.SecretManager;
+import com.aqulasoft.disyam.service.*;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.MultipartBody;
@@ -28,7 +25,7 @@ public class DisYamBot {
     private final String botToken;
 
     static Logger log = Logger.getLogger(DisYamBot.class);
-
+    private   PlaylistManager playlistManager;
     public DisYamBot(String botToken, String username, String password) {
         this.botToken = botToken;
         MultipartBody request = getAuthRequest(username, password);
@@ -56,11 +53,14 @@ public class DisYamBot {
             }
         }
 
+
     }
 
     public void Start() {
+        this.playlistManager = new PlaylistManager();
+        playlistManager.updatePLaylist();
         CommandManager commandManager = new CommandManager();
-        MessageListener messageListener = new MessageListener(commandManager);
+        MessageListener messageListener = new MessageListener(commandManager, playlistManager);
 
         try {
             log.info("Booting");
