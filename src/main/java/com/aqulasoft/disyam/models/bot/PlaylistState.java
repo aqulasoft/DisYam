@@ -28,11 +28,13 @@ public class PlaylistState extends PlayerState implements BotState {
     private boolean isShuffleOn = false;
     @Getter
     private final Guild guild;
+    private String emoji;
 
     public PlaylistState(YaPlaylist playlist, Message message, Guild guild) {
         this.playlist = playlist;
         this.message = message;
         this.guild = guild;
+        this.emoji = "";
     }
 
 
@@ -113,7 +115,7 @@ public class PlaylistState extends PlayerState implements BotState {
             message.addReaction(EMOJI_SHUFFLE).queue();
             message.addReaction(EMOJI_REPEAT_ONE).queue();
             message.addReaction(EMOJI_DOWNLOAD).queue();
-            message.addReaction(EMOJI_LIKE).queue();
+            message.addReaction(emoji).queue();
         }
         return builder.build();
     }
@@ -121,5 +123,13 @@ public class PlaylistState extends PlayerState implements BotState {
     String getFooter() {
         String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "") + (isShuffleOn ? EMOJI_SHUFFLE : "");
         return String.format("(%s/%s)   %s  ", getPosition() + 1, playlist.getTrackCount(), Utils.convertTimePeriod(getTrack(getPosition()).getDuration())) + additionalInfo;
+    }
+    public void getEmoji() {
+        if (getCurrentTrack().getId() == 0) {
+            this.emoji = EMOJI_DISLIKE;
+        } else {
+            this.emoji = EMOJI_LIKE;
+        }
+
     }
 }

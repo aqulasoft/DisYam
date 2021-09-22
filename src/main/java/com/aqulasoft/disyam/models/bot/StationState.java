@@ -31,10 +31,12 @@ public class StationState extends PlayerState implements BotState {
     private Message message;
     @Getter
     private final Guild guild;
+    private String emoji;
 
     public StationState(YaStationSequence seq, Message message, Guild guild) {
         sequence = seq;
         tracks = seq.getTracks();
+        emoji = "";
         this.message = message;
         this.guild = guild;
         YandexMusicClient.sendStationFeedback(String.format("track:%s", sequence.getTrack().getId()), "radioStarted", sequence.getBatchId(), null, null);
@@ -61,6 +63,7 @@ public class StationState extends PlayerState implements BotState {
     public int getTrackCount() {
         return tracks.size() + 1; // +1 to not throw exception
     }
+
 
     @Override
     public void updateMessage(boolean addReactions) {
@@ -107,7 +110,7 @@ public class StationState extends PlayerState implements BotState {
             message.addReaction(EMOJI_NEXT).queue();
             message.addReaction(EMOJI_REPEAT_ONE).queue();
             message.addReaction(EMOJI_DOWNLOAD).queue();
-            message.addReaction(EMOJI_LIKE).queue();
+            message.addReaction(emoji).queue();
         }
         return builder.build();
     }
@@ -117,5 +120,13 @@ public class StationState extends PlayerState implements BotState {
         String additionalInfo = (isPaused() ? "  ⏸ " : "  ▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "");
         String stationInfo = String.format("station by track \"%s\" by %s", track.getTitle(), track.getFormattedArtists());
         return String.format("(%s/∞)    %s \n%s", getPosition() + 1, Utils.convertTimePeriod(getTrack(getPosition()).getDuration()) + additionalInfo, stationInfo);
+    }
+    public void getEmoji(long id) {
+        if (getCurrentTrack().getId() == id) {
+            this.emoji = EMOJI_DISLIKE;
+        } else {
+            this.emoji = EMOJI_LIKE;
+        }
+
     }
 }

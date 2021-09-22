@@ -28,7 +28,7 @@ public class UserPlaylistDto {
     private Boolean isPremiere;
     private int durationMs;
     private String ogImage;
+    private List<TracksPlaylistDto> tracks;
     private List<String> tags;
     private List<String> prerolls;
-
 }

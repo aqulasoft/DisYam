@@ -114,16 +114,20 @@ public class YandexMusicClient {
         JsonNode body = Unirest.get(url).asJson().getBody();
         Unirest.config().reset().enableCookieManagement(true);
         return new YaPlaylist(body.getObject().getJSONObject("playlist"));
+
     }
 
-//    public static void createPlaylist(String name) {
-//        ChannelPlaylistName ChannelName = new ChannelPlaylistName();
-//        if (!ChannelName.GetState()){
-//            String userUrl = "https://api.webmaster.yandex.net/v4/user";
-//            String user = Unirest.get(userUrl)
-//                    .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
-//                    .asJson().getBody().toPrettyString();
-//            .queryString("page-size", 100).asJson().getBody()
+    public static List<UserPlaylistDto> getUserPlaylist(int kinds){
+        String url = String.format("%s/users/%s/playlists", baseUrl, SecretManager.get("username"));
+        return Unirest.get(url)
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .queryString("kinds", kinds).asObject(new GenericType<YaResponseDto<List<UserPlaylistDto>>>() {
+                }).getBody().getResult();
+
+
+    }
+
+
     public static String createPlaylist(String name) {
         ChannelPlaylistName ChannelName = new ChannelPlaylistName();
         if (!ChannelName.getState()) {
@@ -138,18 +142,16 @@ public class YandexMusicClient {
     public static void addTrackToPlaylist(int kind, long trackId, int albumId, int revision) throws PlaylistWrongRevisionException {
         Operation operation = new Operation(0,trackId, albumId);
         ObjectMapper mapper = new ObjectMapper();
-        char leftDig = '[';
-        char rightDog = ']';
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-        String difficult = null;
+        String difference;
         try {
-            difficult = mapper.writeValueAsString(operation);
+            difference = mapper.writeValueAsString(operation);
         } catch (JsonProcessingException e) {
             log.error(e.getLocalizedMessage());
             return;
         }
         String url = String.format("%s/users/%s/playlists/%s/change", baseUrl, SecretManager.get("username"), kind);
-        String diff = String.format("%s%s%s",leftDig ,difficult,rightDog);
+        String diff = String.format("[%s]",difference);
         String result;
         System.out.println(
         result = Unirest.post(url)
@@ -161,7 +163,7 @@ public class YandexMusicClient {
             throw new PlaylistWrongRevisionException("Unable to get revision");
         }
 
-        }
+    }
 
 
     public static List<UserPlaylistDto> getUserPlaylists(){

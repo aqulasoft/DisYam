@@ -1,5 +1,8 @@
 package com.aqulasoft.disyam;
 
+import com.aqulasoft.disyam.audio.YandexMusicClient;
+import com.aqulasoft.disyam.models.audio.YaPlaylist;
+import com.aqulasoft.disyam.models.dto.UserPlaylistDto;
 import com.aqulasoft.disyam.service.*;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -12,6 +15,7 @@ import org.apache.log4j.Logger;
 
 import javax.security.auth.login.LoginException;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -53,12 +57,12 @@ public class DisYamBot {
             }
         }
 
+        YaPlaylist a = YandexMusicClient.getPlaylist("475098494","1008");
 
+        log.error(a.getTitle());
     }
 
     public void Start() {
-        this.playlistManager = new PlaylistManager();
-        playlistManager.updatePLaylist();
         CommandManager commandManager = new CommandManager();
         MessageListener messageListener = new MessageListener(commandManager, playlistManager);
 
@@ -82,5 +86,8 @@ public class DisYamBot {
         } catch (LoginException | InterruptedException e) {
             log.error(e);
         }
+
+        this.playlistManager = new PlaylistManager();
+        playlistManager.updatePLaylist();
     }
 }

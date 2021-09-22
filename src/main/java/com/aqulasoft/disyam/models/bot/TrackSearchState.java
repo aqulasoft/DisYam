@@ -25,11 +25,13 @@ public class TrackSearchState extends PlayerState implements BotState {
     private int page = 0;
     @Getter
     private final Guild guild;
+    private String emoji;
 
     public TrackSearchState(YaSearchResult searchResult, Message message, Guild guild) {
         this.message = message;
         this.searchResult = searchResult;
         this.guild = guild;
+        this.emoji = "";
     }
 
     @Override
@@ -103,7 +105,7 @@ public class TrackSearchState extends PlayerState implements BotState {
             message.addReaction(EMOJI_NEXT).queue();
             message.addReaction(EMOJI_REPEAT_ONE).queue();
             message.addReaction(EMOJI_DOWNLOAD).queue();
-            message.addReaction(EMOJI_LIKE).queue();
+            message.addReaction(emoji).queue();
         }
         return builder.build();
     }
@@ -112,4 +114,14 @@ public class TrackSearchState extends PlayerState implements BotState {
         String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "");
         return String.format("(%s/%s)   %s  ", getPosition() + 1 + page * searchResult.getPerPage(), searchResult.getTotal(), Utils.convertTimePeriod(getTrack(getPosition()).getDuration())) + additionalInfo;
     }
+
+    public void getEmoji(long id) {
+        if (getCurrentTrack().getId() == id) {
+            this.emoji = EMOJI_DISLIKE;
+        } else {
+            this.emoji = EMOJI_LIKE;
+        }
+
+    }
 }
+

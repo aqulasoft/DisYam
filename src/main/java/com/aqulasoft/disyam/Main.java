@@ -13,8 +13,8 @@ public class Main {
         final String username = args[1];
         final String password = args[2];
         DisYamBot disYamBot = new DisYamBot(token, username, password);
-        PlaylistManager playlistManager = new PlaylistManager();
-        playlistManager.updatePLaylist();
+//        PlaylistManager playlistManager = new PlaylistManager();
+//        playlistManager.updatePLaylist();
         log.info("Bot created");
         disYamBot.Start();
     }

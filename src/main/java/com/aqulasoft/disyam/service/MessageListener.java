@@ -141,14 +141,17 @@ public class MessageListener extends ListenerAdapter {
                     return;
                 case EMOJI_LIKE:
                     Guild guild = event.getGuild();
+                    // TODO: 17.09.2021 create variable with guild
                     try {
                         playlistManager.addTrackToPlaylist(guild.getName(),state);
-                    } catch (PlaylistWrongRevisionException e) {
+                    } catch (PlaylistWrongRevisionException e){
                         playlistManager.updatePLaylist();
                         playlistManager.addTrackToPlaylist(guild.getName(),state);
                     }
                     log.info(String.format("[%s]: Liked song in %s", event.getUser().getName(), guild.getName()));
                     return;
+                case EMOJI_DISLIKE:
+                    log.info("Dislike");
             }
 
 
