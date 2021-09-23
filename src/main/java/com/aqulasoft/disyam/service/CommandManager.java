@@ -15,6 +15,7 @@ public class CommandManager {
 
     private final Map<String, Command> commands = new LinkedHashMap<>();
 
+
     public CommandManager() {
         addCommand(new SearchCommand());
         addCommand(new SearchTrackCommand());

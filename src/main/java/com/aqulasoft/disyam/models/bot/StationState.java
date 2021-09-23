@@ -4,6 +4,7 @@ import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaStationSequence;
 import com.aqulasoft.disyam.models.audio.YaTrack;
+import com.aqulasoft.disyam.service.PlaylistManager;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -31,17 +32,16 @@ public class StationState extends PlayerState implements BotState {
     private Message message;
     @Getter
     private final Guild guild;
-    private String emoji;
 
     public StationState(YaStationSequence seq, Message message, Guild guild) {
         sequence = seq;
         tracks = seq.getTracks();
-        emoji = "";
         this.message = message;
         this.guild = guild;
         YandexMusicClient.sendStationFeedback(String.format("track:%s", sequence.getTrack().getId()), "radioStarted", sequence.getBatchId(), null, null);
         YandexMusicClient.sendStationFeedback(String.format("track:%s", sequence.getTrack().getId()), "trackStarted", sequence.getBatchId(), getCurrentTrack().getId(), 0L);
         YandexMusicClient.playAudio(getCurrentTrack());
+
     }
 
     @Override
@@ -97,6 +97,10 @@ public class StationState extends PlayerState implements BotState {
 
     private MessageEmbed buildMessage(boolean addReactions) {
         EmbedBuilder builder = new EmbedBuilder();
+        String emoji;
+        if (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())){
+            emoji = EMOJI_DISLIKE;
+        }else emoji = EMOJI_LIKE;
         YaTrack track = getTrack(getPosition());
         String trackTitle = "\uD83C\uDFB5   " + track.getTitle() + "  \uD83C\uDFB5";
         String trackAuthor = track.getFormattedArtists();
@@ -121,12 +125,5 @@ public class StationState extends PlayerState implements BotState {
         String stationInfo = String.format("station by track \"%s\" by %s", track.getTitle(), track.getFormattedArtists());
         return String.format("(%s/∞)    %s \n%s", getPosition() + 1, Utils.convertTimePeriod(getTrack(getPosition()).getDuration()) + additionalInfo, stationInfo);
     }
-    public void getEmoji(long id) {
-        if (getCurrentTrack().getId() == id) {
-            this.emoji = EMOJI_DISLIKE;
-        } else {
-            this.emoji = EMOJI_LIKE;
-        }
 
-    }
 }

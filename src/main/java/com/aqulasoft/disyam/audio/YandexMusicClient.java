@@ -6,7 +6,6 @@ import com.aqulasoft.disyam.models.bot.ChannelPlaylistName;
 import com.aqulasoft.disyam.models.bot.Operation;
 import com.aqulasoft.disyam.models.dto.UserPlaylistDto;
 import com.aqulasoft.disyam.models.dto.YaResponseDto;
-import com.aqulasoft.disyam.service.PlaylistManager;
 import com.aqulasoft.disyam.service.SecretManager;
 //import kong.unirest.*;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -18,7 +17,6 @@ import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -117,14 +115,18 @@ public class YandexMusicClient {
 
     }
 
-    public static List<UserPlaylistDto> getUserPlaylist(int kinds){
+    public static UserPlaylistDto getUserPlaylist(int kinds){
         String url = String.format("%s/users/%s/playlists", baseUrl, SecretManager.get("username"));
-        return Unirest.get(url)
+        List<UserPlaylistDto> result = Unirest.get(url)
                 .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
                 .queryString("kinds", kinds).asObject(new GenericType<YaResponseDto<List<UserPlaylistDto>>>() {
                 }).getBody().getResult();
+        if (result.size() != 0){
+            return result.get(0);
+        }
 
 
+        return null;
     }
 
 
@@ -153,6 +155,7 @@ public class YandexMusicClient {
         String url = String.format("%s/users/%s/playlists/%s/change", baseUrl, SecretManager.get("username"), kind);
         String diff = String.format("[%s]",difference);
         String result;
+        System.out.println(diff);
         System.out.println(
         result = Unirest.post(url)
                 .header("Authorization", "OAuth " + SecretManager.get("YaToken"))

@@ -29,7 +29,6 @@ public class DisYamBot {
     private final String botToken;
 
     static Logger log = Logger.getLogger(DisYamBot.class);
-    private   PlaylistManager playlistManager;
     public DisYamBot(String botToken, String username, String password) {
         this.botToken = botToken;
         MultipartBody request = getAuthRequest(username, password);
@@ -64,7 +63,7 @@ public class DisYamBot {
 
     public void Start() {
         CommandManager commandManager = new CommandManager();
-        MessageListener messageListener = new MessageListener(commandManager, playlistManager);
+        MessageListener messageListener = new MessageListener(commandManager);
 
         try {
             log.info("Booting");
@@ -86,8 +85,6 @@ public class DisYamBot {
         } catch (LoginException | InterruptedException e) {
             log.error(e);
         }
-
-        this.playlistManager = new PlaylistManager();
-        playlistManager.updatePLaylist();
+        PlaylistManager.getInstance().updatePLaylist();
     }
 }

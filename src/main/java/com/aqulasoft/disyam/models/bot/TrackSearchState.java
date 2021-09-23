@@ -3,6 +3,7 @@ package com.aqulasoft.disyam.models.bot;
 import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.models.audio.YaTrack;
+import com.aqulasoft.disyam.service.PlaylistManager;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import lombok.Getter;
@@ -25,13 +26,12 @@ public class TrackSearchState extends PlayerState implements BotState {
     private int page = 0;
     @Getter
     private final Guild guild;
-    private String emoji;
 
     public TrackSearchState(YaSearchResult searchResult, Message message, Guild guild) {
         this.message = message;
         this.searchResult = searchResult;
         this.guild = guild;
-        this.emoji = "";
+
     }
 
     @Override
@@ -91,6 +91,10 @@ public class TrackSearchState extends PlayerState implements BotState {
     }
 
     private MessageEmbed buildMessage(boolean addReactions) {
+        String emoji;
+        if (PlaylistManager.getInstance().isInPlaylist(getCurrentTrack().getId(),guild.getName())){
+            emoji = EMOJI_DISLIKE;
+        }else emoji = EMOJI_LIKE;
         EmbedBuilder builder = new EmbedBuilder();
         YaTrack track = getTrack(getPosition());
         String trackTitle = "\uD83C\uDFB5   " + track.getTitle() + "  \uD83C\uDFB5";
@@ -113,15 +117,6 @@ public class TrackSearchState extends PlayerState implements BotState {
     private String getFooter() {
         String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "");
         return String.format("(%s/%s)   %s  ", getPosition() + 1 + page * searchResult.getPerPage(), searchResult.getTotal(), Utils.convertTimePeriod(getTrack(getPosition()).getDuration())) + additionalInfo;
-    }
-
-    public void getEmoji(long id) {
-        if (getCurrentTrack().getId() == id) {
-            this.emoji = EMOJI_DISLIKE;
-        } else {
-            this.emoji = EMOJI_LIKE;
-        }
-
     }
 }
 

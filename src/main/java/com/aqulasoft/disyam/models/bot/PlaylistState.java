@@ -2,6 +2,7 @@ package com.aqulasoft.disyam.models.bot;
 
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
+import com.aqulasoft.disyam.service.PlaylistManager;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import lombok.Getter;
@@ -28,13 +29,12 @@ public class PlaylistState extends PlayerState implements BotState {
     private boolean isShuffleOn = false;
     @Getter
     private final Guild guild;
-    private String emoji;
 
     public PlaylistState(YaPlaylist playlist, Message message, Guild guild) {
         this.playlist = playlist;
         this.message = message;
         this.guild = guild;
-        this.emoji = "";
+
     }
 
 
@@ -81,6 +81,10 @@ public class PlaylistState extends PlayerState implements BotState {
 
     private MessageEmbed buildMessage(boolean addReactions, boolean updateTrackInfo) {
         EmbedBuilder builder = new EmbedBuilder();
+        String emoji;
+        if (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())){
+            emoji = EMOJI_DISLIKE;
+        }else emoji = EMOJI_LIKE;
 
         String trackTitle = "";
         String trackAuthor = "";
@@ -124,12 +128,6 @@ public class PlaylistState extends PlayerState implements BotState {
         String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "") + (isShuffleOn ? EMOJI_SHUFFLE : "");
         return String.format("(%s/%s)   %s  ", getPosition() + 1, playlist.getTrackCount(), Utils.convertTimePeriod(getTrack(getPosition()).getDuration())) + additionalInfo;
     }
-    public void getEmoji() {
-        if (getCurrentTrack().getId() == 0) {
-            this.emoji = EMOJI_DISLIKE;
-        } else {
-            this.emoji = EMOJI_LIKE;
-        }
 
     }
-}
+

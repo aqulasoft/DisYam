@@ -33,11 +33,10 @@ public class MessageListener extends ListenerAdapter {
 
     private final CommandManager manager;
     private final Logger log = LoggerFactory.getLogger(MessageListener.class);
-    private final  PlaylistManager playlistManager;
-    public MessageListener(CommandManager manager, PlaylistManager playlistManager) {
+    public MessageListener(CommandManager manager) {
         this.manager = manager;
-        this.playlistManager = playlistManager;
     }
+    private Guild guild;
 
     @Override
     public void onReady(ReadyEvent event) {
@@ -53,7 +52,7 @@ public class MessageListener extends ListenerAdapter {
 
         if (event.isFromType(ChannelType.TEXT)) {
 
-            Guild guild = event.getGuild();
+            this.guild = event.getGuild();
             TextChannel textChannel = event.getTextChannel();
 
             log.info(String.format("(%s)[%s]<%#s>: %s", guild.getName(), textChannel.getName(), author, content));
@@ -140,17 +139,22 @@ public class MessageListener extends ListenerAdapter {
                     });
                     return;
                 case EMOJI_LIKE:
-                    Guild guild = event.getGuild();
-                    // TODO: 17.09.2021 create variable with guild
+                    state.getMessage().removeReaction(EMOJI_LIKE).queue();
+                    state.getMessage().addReaction(EMOJI_DISLIKE).queue();
+                    // TODO: 22.09.2021 update message
                     try {
-                        playlistManager.addTrackToPlaylist(guild.getName(),state);
+                        PlaylistManager.getInstance().addTrackToPlaylist(guild.getName(),state);
                     } catch (PlaylistWrongRevisionException e){
-                        playlistManager.updatePLaylist();
-                        playlistManager.addTrackToPlaylist(guild.getName(),state);
+                        PlaylistManager.getInstance().updatePLaylist();
+                        PlaylistManager.getInstance().addTrackToPlaylist(guild.getName(),state);
                     }
+
+
                     log.info(String.format("[%s]: Liked song in %s", event.getUser().getName(), guild.getName()));
                     return;
                 case EMOJI_DISLIKE:
+                    System.out.println();
+
                     log.info("Dislike");
             }
 
