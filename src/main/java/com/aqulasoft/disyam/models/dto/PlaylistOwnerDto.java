@@ -5,7 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PlaylistOwnerDto {
+public class
+PlaylistOwnerDto {
 
     private int uid;
     private String login;

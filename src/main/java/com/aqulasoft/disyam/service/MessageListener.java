@@ -2,11 +2,13 @@ package com.aqulasoft.disyam.service;
 
 import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicClient;
-import com.aqulasoft.disyam.models.audio.*;
+import com.aqulasoft.disyam.models.audio.PlaylistWrongRevisionException;
+import com.aqulasoft.disyam.models.audio.YaArtist;
+import com.aqulasoft.disyam.models.audio.YaPlaylist;
+import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.*;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -26,16 +28,19 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.awt.*;
 
-import static com.aqulasoft.disyam.audio.YandexMusicClient.*;
+import static com.aqulasoft.disyam.audio.YandexMusicClient.getArtistTracks;
+import static com.aqulasoft.disyam.audio.YandexMusicClient.getPlaylist;
 import static com.aqulasoft.disyam.utils.Consts.*;
 
 public class MessageListener extends ListenerAdapter {
 
     private final CommandManager manager;
     private final Logger log = LoggerFactory.getLogger(MessageListener.class);
+
     public MessageListener(CommandManager manager) {
         this.manager = manager;
     }
+
     private Guild guild;
 
     @Override
@@ -142,28 +147,38 @@ public class MessageListener extends ListenerAdapter {
                     state.getMessage().removeReaction(EMOJI_LIKE).queue();
                     state.getMessage().addReaction(EMOJI_DISLIKE).queue();
                     // TODO: 22.09.2021 update message
-                    try {
-                        PlaylistManager.getInstance().addTrackToPlaylist(guild.getName(),state);
-                    } catch (PlaylistWrongRevisionException e){
-                        PlaylistManager.getInstance().updatePLaylist();
-                        PlaylistManager.getInstance().addTrackToPlaylist(guild.getName(),state);
-                    }
+                    BotState reallyState = BotStateManager.getInstance().getState(guild.getIdLong());
+                    if (reallyState instanceof PlayerState) {
+                        try {
 
+                            PlaylistManager.getInstance().addTrackToPlaylist(guild.getName(), ((PlayerState) reallyState).getCurrentTrack().getId());
+                        } catch (PlaylistWrongRevisionException e) {
+                            PlaylistManager.getInstance().updatePLaylist();
+                            PlaylistManager.getInstance().addTrackToPlaylist(guild.getName(), ((PlayerState) reallyState).getCurrentTrack().getId());
+                        }
+                    }
 
                     log.info(String.format("[%s]: Liked song in %s", event.getUser().getName(), guild.getName()));
                     return;
                 case EMOJI_DISLIKE:
-                    state.getMessage().removeReaction(EMOJI_LIKE).queue();
+                    state.getMessage().removeReaction(EMOJI_DISLIKE).queue();
                     state.getMessage().addReaction(EMOJI_LIKE).queue();
                     BotState realState = BotStateManager.getInstance().getState(guild.getIdLong());
-                    if (realState instanceof TrackSearchState){
+
+                    if (realState instanceof TrackSearchState) {
                         long id = ((TrackSearchState) realState).getCurrentTrack().getId();
-                        PlaylistManager.getInstance().deleteTrackFromPlaylist(id,guild.getName());
+                        try {
+                            PlaylistManager.getInstance().deleteTrackFromPlaylist(id, guild.getName());
+                        } catch (PlaylistWrongRevisionException e) {
+                            PlaylistManager.getInstance().updatePLaylist();
+                            PlaylistManager.getInstance().deleteTrackFromPlaylist(id, guild.getName());
+                        }
+
                     }
 
                     System.out.println();
 
-                    log.info("Dislike");
+                    log.info(String.format("[%s]: Disliked song in %s", event.getUser().getName(), guild.getName()));
             }
 
 

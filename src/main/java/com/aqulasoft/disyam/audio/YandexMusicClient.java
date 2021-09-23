@@ -8,13 +8,11 @@ import com.aqulasoft.disyam.models.bot.OperationInsert;
 import com.aqulasoft.disyam.models.dto.UserPlaylistDto;
 import com.aqulasoft.disyam.models.dto.YaResponseDto;
 import com.aqulasoft.disyam.service.SecretManager;
-//import kong.unirest.*;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.*;
-import lombok.SneakyThrows;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -157,13 +155,11 @@ public class YandexMusicClient {
         String url = String.format("%s/users/%s/playlists/%s/change", baseUrl, SecretManager.get("username"), kind);
         String diff = String.format("[%s]",difference);
         String result;
-        System.out.println(diff);
-        System.out.println(
         result = Unirest.post(url)
                 .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
                 .field("revision", revision)
                 .field("diff", String.valueOf(diff))
-                .asJson().getBody().toString());
+                .asJson().getBody().toString();
         if (result.contains("wrong-revision")){
             throw new PlaylistWrongRevisionException("Unable to get revision");
         }
@@ -180,8 +176,7 @@ public class YandexMusicClient {
 
     }
 
-    @SneakyThrows
-    public static void deleteTrackFromUserPLaylist(int index, int kind, int revision){
+    public static void deleteTrackFromUserPLaylist(int index, int kind, int revision) throws PlaylistWrongRevisionException{
         OperationDelete operationDelete = new OperationDelete(index - 1,index);
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
