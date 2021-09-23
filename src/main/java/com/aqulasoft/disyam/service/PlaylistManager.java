@@ -70,14 +70,16 @@ public class PlaylistManager {
         }
         return false;
     }
-    public void DeleteTrackFromPlaylist(long trackId,String guildName){
+    public void deleteTrackFromPlaylist(long trackId,String guildName){
         this.indexOfPlaylist = 0;
-        List<TracksPlaylistDto> res = playlists.get(guildName).getTracks();
+        UserPlaylistDto userPlaylist = playlists.get(guildName);
+        List<TracksPlaylistDto> res = userPlaylist.getTracks();
         for (TracksPlaylistDto tracksPlaylistDto:res){
             indexOfPlaylist += 1;
 
             if (tracksPlaylistDto.getId() == trackId){
-
+                System.out.println(indexOfPlaylist);
+                YandexMusicClient.deleteTrackFromUserPLaylist(indexOfPlaylist,userPlaylist.getKind(),userPlaylist.getRevision());
             }
 
 

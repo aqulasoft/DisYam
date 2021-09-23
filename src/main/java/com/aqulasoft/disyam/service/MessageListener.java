@@ -153,6 +153,14 @@ public class MessageListener extends ListenerAdapter {
                     log.info(String.format("[%s]: Liked song in %s", event.getUser().getName(), guild.getName()));
                     return;
                 case EMOJI_DISLIKE:
+                    state.getMessage().removeReaction(EMOJI_LIKE).queue();
+                    state.getMessage().addReaction(EMOJI_LIKE).queue();
+                    BotState realState = BotStateManager.getInstance().getState(guild.getIdLong());
+                    if (realState instanceof TrackSearchState){
+                        long id = ((TrackSearchState) realState).getCurrentTrack().getId();
+                        PlaylistManager.getInstance().deleteTrackFromPlaylist(id,guild.getName());
+                    }
+
                     System.out.println();
 
                     log.info("Dislike");

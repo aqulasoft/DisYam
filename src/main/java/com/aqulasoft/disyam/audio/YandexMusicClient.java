@@ -3,7 +3,8 @@ package com.aqulasoft.disyam.audio;
 
 import com.aqulasoft.disyam.models.audio.*;
 import com.aqulasoft.disyam.models.bot.ChannelPlaylistName;
-import com.aqulasoft.disyam.models.bot.Operation;
+import com.aqulasoft.disyam.models.bot.OperationDelete;
+import com.aqulasoft.disyam.models.bot.OperationInsert;
 import com.aqulasoft.disyam.models.dto.UserPlaylistDto;
 import com.aqulasoft.disyam.models.dto.YaResponseDto;
 import com.aqulasoft.disyam.service.SecretManager;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.*;
+import lombok.SneakyThrows;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -142,12 +144,12 @@ public class YandexMusicClient {
         return name;
     }
     public static void addTrackToPlaylist(int kind, long trackId, int albumId, int revision) throws PlaylistWrongRevisionException {
-        Operation operation = new Operation(0,trackId, albumId);
+        OperationInsert operationInsert = new OperationInsert(0,trackId, albumId);
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         String difference;
         try {
-            difference = mapper.writeValueAsString(operation);
+            difference = mapper.writeValueAsString(operationInsert);
         } catch (JsonProcessingException e) {
             log.error(e.getLocalizedMessage());
             return;
@@ -176,6 +178,32 @@ public class YandexMusicClient {
                 .asObject(new GenericType<YaResponseDto<List<UserPlaylistDto>>>() {
                 }).getBody().getResult();
 
+    }
+
+    @SneakyThrows
+    public static void deleteTrackFromUserPLaylist(int index, int kind, int revision){
+        OperationDelete operationDelete = new OperationDelete(index - 1,index);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        String difference;
+        try {
+            difference = mapper.writeValueAsString(operationDelete);
+        } catch (JsonProcessingException e) {
+            log.error(e.getLocalizedMessage());
+            return;
+
+        }
+        String result;
+        String url = String.format("%s/users/%s/playlists/%s/change", baseUrl, SecretManager.get("username"), kind);
+        String diff = String.format("[%s]",difference);
+        result = Unirest.post(url)
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .field("revision", revision)
+                .field("diff", String.valueOf(diff))
+                .asJson().getBody().toString();
+        if (result.contains("wrong-revision")){
+            throw new PlaylistWrongRevisionException("Unable to get revision");
+        }
     }
 
 
