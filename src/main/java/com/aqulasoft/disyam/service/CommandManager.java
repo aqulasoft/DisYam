@@ -22,6 +22,7 @@ public class CommandManager {
         addCommand(new SearchPlaylistCommand());
         addCommand(new SearchArtistCommand());
 
+        addCommand(new PlayServerPlaylist());
         addCommand(new PlayCommand());
         addCommand(new StopCommand());
         addCommand(new PauseCommand());

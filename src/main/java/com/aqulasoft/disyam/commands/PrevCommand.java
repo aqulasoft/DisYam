@@ -10,7 +10,8 @@ import java.util.List;
 
 import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
-public class PrevCommand implements Command {
+public class
+PrevCommand implements Command {
     @Override
     public void handle(List<String> args, GuildMessageReceivedEvent event) {
         TextChannel channel = event.getChannel();

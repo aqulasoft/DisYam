@@ -85,6 +85,11 @@ public class PlaylistManager {
 
             }
     }
+    public String getKind(String guildName){
+        return String.valueOf(playlists.get(guildName).getKind());
+
+    }
+
 
 }
 
