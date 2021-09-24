@@ -24,6 +24,11 @@ public class PlayServerPlaylistCommand implements Command{
         TextChannel channel = event.getChannel();
         if (joinVoice(event, channel)) return;
         YaPlaylist playlist = getPlaylist(SecretManager.get("username"), PlaylistManager.getInstance().getKind(event.getGuild().getName()));
+        if (playlist.getTracks().size() == 0){
+            System.out.println("playlist is empty");
+            event.getChannel().sendMessage("Please add some tracks to your server playlist");
+            return;
+        }
         YaTrack track = playlist.getTrack(0);
         if (track != null) {
             EmbedBuilder builder = new EmbedBuilder();
@@ -37,7 +42,6 @@ public class PlayServerPlaylistCommand implements Command{
                 playerManager.loadAndPlayPlaylist(event.getChannel());
             });
         }
-
     }
 
     @Override
