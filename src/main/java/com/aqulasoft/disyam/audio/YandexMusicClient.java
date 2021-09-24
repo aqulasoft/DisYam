@@ -166,6 +166,7 @@ public class YandexMusicClient {
                 }).getBody().getResult();
 
     }
+
     public static void deleteTrackFromUserPLaylist(int index, int kind, int revision) throws PlaylistWrongRevisionException {
         OperationDelete operationDelete = new OperationDelete(index - 1, index);
         String difference;
