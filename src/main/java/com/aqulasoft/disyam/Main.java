@@ -1,5 +1,6 @@
 package com.aqulasoft.disyam;
 
+import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.dto.UserPlaylistDto;
 import com.aqulasoft.disyam.service.PlaylistManager;
 import org.apache.log4j.Logger;

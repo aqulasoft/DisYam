@@ -144,6 +144,8 @@ public class MessageListener extends ListenerAdapter {
                     state.getMessage().addReaction(EMOJI_DISLIKE).queue();
                     String guildName = event.getGuild().getName();
                     if (state instanceof PlayerState) {
+                        long id = ((PlayerState) state).getCurrentTrack().getId();
+                        if (PlaylistManager.getInstance().isInPlaylist(id, guildName)) return;
                         try {
                             PlaylistManager.getInstance().addTrackToPlaylist(guildName, ((PlayerState) state).getCurrentTrack().getId());
                         } catch (PlaylistWrongRevisionException e) {
@@ -163,6 +165,7 @@ public class MessageListener extends ListenerAdapter {
                     state.getMessage().addReaction(EMOJI_LIKE).queue();
                     if (state instanceof PlayerState) {
                         long id = ((PlayerState) state).getCurrentTrack().getId();
+                        if (!PlaylistManager.getInstance().isInPlaylist(id, serverName)) return;
                         try {
                             PlaylistManager.getInstance().deleteTrackFromPlaylist(id, serverName);
                         } catch (PlaylistWrongRevisionException e) {
@@ -192,7 +195,6 @@ public class MessageListener extends ListenerAdapter {
             handlePlaylistSelect((PlaylistSearchState) state, event);
             return;
         }
-
 
         if (state instanceof ArtistSearchState) {
             handleArtistSelect((ArtistSearchState) state, event);

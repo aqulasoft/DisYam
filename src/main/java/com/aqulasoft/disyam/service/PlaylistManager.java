@@ -30,11 +30,10 @@ public class PlaylistManager {
             tracksPlaylistDto.setId(trackId);
             tracksPlaylistDto.setAlbumId(playlist.getUid());
             tracksPlaylistDto.setTimestamp("2021-09-23T22:13:08+00:00");
-            playlist.getTracks().add(playlist.getTracks().size(), tracksPlaylistDto);
+            playlist.getTracks().add(0, tracksPlaylistDto);
             playlist.setRevision(playlist.getRevision() + 1);
-
         } else {
-            YandexMusicClient.createPlaylist(chnlName);
+            playlists.put(chnlName, YandexMusicClient.createPlaylist(chnlName));
         }
     }
 
@@ -63,16 +62,23 @@ public class PlaylistManager {
     }
 
     public void deleteTrackFromPlaylist(long trackId, String guildName) throws PlaylistWrongRevisionException {
-        UserPlaylistDto userPlaylist = playlists.get(guildName);
-        List<TracksPlaylistDto> res = userPlaylist.getTracks();
+        UserPlaylistDto playlist = playlists.get(guildName);
+        List<TracksPlaylistDto> res = playlist.getTracks();
         int index = 0;
+        Integer deletingIndex = null;
         for (TracksPlaylistDto tracksPlaylistDto : res) {
-            index ++;
+            index++;
             if (tracksPlaylistDto.getId() == trackId) {
-                YandexMusicClient.deleteTrackFromUserPLaylist(index, userPlaylist.getKind(), userPlaylist.getRevision());
-                this.updatePLaylist();
-                return;
+                deletingIndex = index;
+                break;
             }
+        }
+        System.out.println(deletingIndex);
+        if (deletingIndex != null) {
+            YandexMusicClient.deleteTrackFromUserPLaylist(deletingIndex, playlist.getKind(), playlist.getRevision());
+            playlist.getTracks().remove(deletingIndex - 1);
+            playlist.setRevision(playlist.getRevision() + 1);
+
         }
     }
 

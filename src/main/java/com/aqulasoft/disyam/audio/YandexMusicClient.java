@@ -119,20 +119,21 @@ public class YandexMusicClient {
         String url = String.format("%s/users/%s/playlists", baseUrl, SecretManager.get("username"));
         List<UserPlaylistDto> result = Unirest.get(url)
                 .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
-                .queryString("kinds", kinds).asObject(new GenericType<YaResponseDto<List<UserPlaylistDto>>>() {
-                }).getBody().getResult();
+                .queryString("kinds", kinds).asObject(new GenericType<YaResponseDto<List<UserPlaylistDto>>>(){}).getBody().getResult();
         if (result.size() != 0) {
             return result.get(0);
         }
         return null;
     }
 
-    public static void createPlaylist(String name) {
+    public static UserPlaylistDto createPlaylist(String name) {
         String url = String.format("%s/users/%s/playlists/create", baseUrl, SecretManager.get("username"));
-        Unirest.post(url).field("title", name)
+        return Unirest.post(url).field("title", name)
                 .field("visibility", "public")
                 .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
-                .asJson().getBody().toPrettyString();
+                .asObject(new GenericType<YaResponseDto<UserPlaylistDto>>(){})
+                .getBody()
+                .getResult();
     }
 
     public static void addTrackToPlaylist(int kind, long trackId, int albumId, int revision) throws PlaylistWrongRevisionException {
