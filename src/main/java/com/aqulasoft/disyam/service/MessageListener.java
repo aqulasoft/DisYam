@@ -10,7 +10,6 @@ import com.aqulasoft.disyam.models.bot.*;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import lombok.SneakyThrows;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
@@ -41,7 +40,6 @@ public class MessageListener extends ListenerAdapter {
         this.manager = manager;
     }
 
-    private Guild guild;
 
     @Override
     public void onReady(ReadyEvent event) {
@@ -57,10 +55,9 @@ public class MessageListener extends ListenerAdapter {
 
         if (event.isFromType(ChannelType.TEXT)) {
 
-            this.guild = event.getGuild();
             TextChannel textChannel = event.getTextChannel();
 
-            log.info(String.format("(%s)[%s]<%#s>: %s", guild.getName(), textChannel.getName(), author, content));
+            log.info(String.format("(%s)[%s]<%#s>: %s", event.getGuild().getName(), textChannel.getName(), author, content));
         } else if (event.isFromType(ChannelType.PRIVATE)) {
             log.info(String.format("[PRIV]<%#s>: %s", author, content));
         }
@@ -145,50 +142,39 @@ public class MessageListener extends ListenerAdapter {
                 case EMOJI_LIKE:
                     state.getMessage().removeReaction(EMOJI_LIKE).queue();
                     state.getMessage().addReaction(EMOJI_DISLIKE).queue();
+                    String guildName = event.getGuild().getName();
                     if (state instanceof PlayerState) {
                         try {
-                            PlaylistManager.getInstance().addTrackToPlaylist(guild.getName(), ((PlayerState) state).getCurrentTrack().getId());
+                            PlaylistManager.getInstance().addTrackToPlaylist(guildName, ((PlayerState) state).getCurrentTrack().getId());
                         } catch (PlaylistWrongRevisionException e) {
                             PlaylistManager.getInstance().updatePLaylist();
                             try {
-                                PlaylistManager.getInstance().addTrackToPlaylist(guild.getName(), ((PlayerState) state).getCurrentTrack().getId());
+                                PlaylistManager.getInstance().addTrackToPlaylist(guildName, ((PlayerState) state).getCurrentTrack().getId());
                             } catch (PlaylistWrongRevisionException playlistWrongRevisionException) {
                                 playlistWrongRevisionException.printStackTrace();
                             }
                         }
                     }
-                    log.info(String.format("[%s]: Liked song in %s", event.getUser().getName(), guild.getName()));
+                    log.info(String.format("[%s]: Liked song in %s", event.getUser().getName(), guildName));
                     return;
                 case EMOJI_DISLIKE:
+                    String serverName = event.getGuild().getName();
                     state.getMessage().removeReaction(EMOJI_DISLIKE).queue();
                     state.getMessage().addReaction(EMOJI_LIKE).queue();
-                    if (state instanceof TrackSearchState) {
+                    if (state instanceof PlayerState) {
                         long id = ((TrackSearchState) state).getCurrentTrack().getId();
                         try {
-                            PlaylistManager.getInstance().deleteTrackFromPlaylist(id, guild.getName());
+                            PlaylistManager.getInstance().deleteTrackFromPlaylist(id, serverName);
                         } catch (PlaylistWrongRevisionException e) {
                             PlaylistManager.getInstance().updatePLaylist();
                             try {
-                                PlaylistManager.getInstance().deleteTrackFromPlaylist(id, guild.getName());
+                                PlaylistManager.getInstance().deleteTrackFromPlaylist(id, serverName);
                             } catch (PlaylistWrongRevisionException playlistWrongRevisionException) {
                                 playlistWrongRevisionException.printStackTrace();
                             }
                         }
                     }
-                    if (state instanceof PlaylistState){
-                        long id = ((PlaylistState) state).getCurrentTrack().getId();
-                        try {
-                            PlaylistManager.getInstance().deleteTrackFromPlaylist(id, guild.getName());
-                        } catch (PlaylistWrongRevisionException e) {
-                            PlaylistManager.getInstance().updatePLaylist();
-                            try {
-                                PlaylistManager.getInstance().deleteTrackFromPlaylist(id, guild.getName());
-                            } catch (PlaylistWrongRevisionException playlistWrongRevisionException) {
-                                playlistWrongRevisionException.printStackTrace();
-                            }
-                        }
-                    }
-                    log.info(String.format("[%s]: Disliked song in %s", event.getUser().getName(), guild.getName()));
+                    log.info(String.format("[%s]: Disliked song in %s", event.getUser().getName(), serverName));
             }
 
         if (state instanceof SearchPager) {

@@ -15,7 +15,6 @@ SearchPager {
         this.perPage = perPage;
     }
 
-
     public void nextPage() {
         page++;
         if (total / perPage < page) return;

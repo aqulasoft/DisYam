@@ -118,7 +118,6 @@ public class PlaylistState extends PlayerState implements BotState {
             message.removeReaction((reactionEmoji.equals(EMOJI_DISLIKE))? EMOJI_LIKE:EMOJI_DISLIKE).queue();
 
         }
-        System.out.println("sus");
         return builder.build();
     }
 

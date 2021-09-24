@@ -26,13 +26,13 @@ public class PlayServerPlaylistCommand implements Command{
         YaPlaylist playlist = getPlaylist(SecretManager.get("username"), PlaylistManager.getInstance().getKind(event.getGuild().getName()));
         if (playlist.getTracks().size() == 0){
             System.out.println("playlist is empty");
-            event.getChannel().sendMessage("Please add some tracks to your server playlist");
+            channel.sendMessage("Please add some tracks to your server playlist");
             return;
         }
         YaTrack track = playlist.getTrack(0);
         if (track != null) {
             EmbedBuilder builder = new EmbedBuilder();
-            builder.appendDescription("sus");
+            builder.appendDescription("PLease,wait");
             builder.setColor(Color.ORANGE);
             event.getChannel().sendMessage(builder.build()).queue(message -> {
                 PlaylistState state = new PlaylistState(playlist, message, event.getGuild());
