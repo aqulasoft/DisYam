@@ -175,6 +175,19 @@ public class MessageListener extends ListenerAdapter {
                             }
                         }
                     }
+                    if (state instanceof PlaylistState){
+                        long id = ((PlaylistState) state).getCurrentTrack().getId();
+                        try {
+                            PlaylistManager.getInstance().deleteTrackFromPlaylist(id, guild.getName());
+                        } catch (PlaylistWrongRevisionException e) {
+                            PlaylistManager.getInstance().updatePLaylist();
+                            try {
+                                PlaylistManager.getInstance().deleteTrackFromPlaylist(id, guild.getName());
+                            } catch (PlaylistWrongRevisionException playlistWrongRevisionException) {
+                                playlistWrongRevisionException.printStackTrace();
+                            }
+                        }
+                    }
                     log.info(String.format("[%s]: Disliked song in %s", event.getUser().getName(), guild.getName()));
             }
 
