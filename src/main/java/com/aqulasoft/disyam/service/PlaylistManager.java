@@ -52,7 +52,13 @@ public class PlaylistManager {
 
     public boolean isInPlaylist(long trackId, String guildName) {
         this.indexOfPlaylist = 0;
-        List<TracksPlaylistDto> res = playlists.get(guildName).getTracks();
+        UserPlaylistDto playlist = playlists.get(guildName);
+
+        if (playlist == null) {
+            return false;
+        }
+
+        List<TracksPlaylistDto> res = playlist.getTracks();
         for (TracksPlaylistDto tracksPlaylistDto : res) {
             indexOfPlaylist += 1;
             if (tracksPlaylistDto.getId() == trackId) {
