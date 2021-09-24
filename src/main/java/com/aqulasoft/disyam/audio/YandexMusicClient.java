@@ -33,7 +33,9 @@ public class YandexMusicClient {
 
     static Logger log = Logger.getLogger(YandexMusicClient.class);
     static ObjectMapper mapper = new ObjectMapper();
-
+    static {
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+    }
 
     public static String getTrackDownloadLink(long songId) {
 //        log.info(String.format("%s/tracks/%s/download-info", baseUrl, songId));
@@ -62,7 +64,7 @@ public class YandexMusicClient {
     }
 
     public static MultipartBody getAuthRequest(String username, String password) {
-// Json
+
         return Unirest.post(authUrl + "/token")
                 .field("grant_type", "password")
                 .field("client_id", CLIENT_ID)
@@ -135,7 +137,6 @@ public class YandexMusicClient {
 
     public static void addTrackToPlaylist(int kind, long trackId, int albumId, int revision) throws PlaylistWrongRevisionException {
         OperationInsert operationInsert = new OperationInsert(0, trackId, albumId);
-        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         String difference;
         try {
             difference = mapper.writeValueAsString(operationInsert);
@@ -168,7 +169,6 @@ public class YandexMusicClient {
 
     public static void deleteTrackFromUserPLaylist(int index, int kind, int revision) throws PlaylistWrongRevisionException {
         OperationDelete operationDelete = new OperationDelete(index - 1, index);
-        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         String difference;
         try {
             difference = mapper.writeValueAsString(operationDelete);

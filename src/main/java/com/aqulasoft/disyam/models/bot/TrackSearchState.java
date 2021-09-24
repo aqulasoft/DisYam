@@ -91,7 +91,7 @@ public class TrackSearchState extends PlayerState implements BotState {
     }
 
     private MessageEmbed buildMessage(boolean addReactions) {
-        String emoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
+        String reactionEmoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
         EmbedBuilder builder = new EmbedBuilder();
         YaTrack track = getTrack(getPosition());
         String trackTitle = "\uD83C\uDFB5   " + track.getTitle() + "  \uD83C\uDFB5";
@@ -106,7 +106,7 @@ public class TrackSearchState extends PlayerState implements BotState {
             message.addReaction(EMOJI_NEXT).queue();
             message.addReaction(EMOJI_REPEAT_ONE).queue();
             message.addReaction(EMOJI_DOWNLOAD).queue();
-            message.addReaction(emoji).queue();
+            message.addReaction(reactionEmoji).queue();
         }
         return builder.build();
     }

@@ -80,7 +80,7 @@ public class PlaylistState extends PlayerState implements BotState {
 
     private MessageEmbed buildMessage(boolean addReactions, boolean updateTrackInfo) {
         EmbedBuilder builder = new EmbedBuilder();
-        String emoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
+        String reactionEmoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
         String trackTitle = "";
         String trackAuthor = "";
         String footer = "";
@@ -114,7 +114,7 @@ public class PlaylistState extends PlayerState implements BotState {
             message.addReaction(EMOJI_SHUFFLE).queue();
             message.addReaction(EMOJI_REPEAT_ONE).queue();
             message.addReaction(EMOJI_DOWNLOAD).queue();
-            message.addReaction(emoji).queue();
+            message.addReaction(reactionEmoji).queue();
         }
         return builder.build();
     }
