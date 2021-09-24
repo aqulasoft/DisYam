@@ -2,13 +2,10 @@ package com.aqulasoft.disyam.service;
 
 import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.PlaylistWrongRevisionException;
-import com.aqulasoft.disyam.models.bot.BotState;
-import com.aqulasoft.disyam.models.bot.PlayerState;
 import com.aqulasoft.disyam.models.dto.TracksPlaylistDto;
 import com.aqulasoft.disyam.models.dto.UserPlaylistDto;
-import com.aqulasoft.disyam.models.dto.YaResponseDto;
-import kong.unirest.GenericType;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +13,6 @@ import java.util.Map;
 public class PlaylistManager {
     private static PlaylistManager INSTANCE;
     private Map<String, UserPlaylistDto> playlists;
-    private int indexOfPlaylist;
 
     public static synchronized PlaylistManager getInstance() {
         if (INSTANCE == null) {
@@ -51,10 +47,14 @@ public class PlaylistManager {
     }
 
     public boolean isInPlaylist(long trackId, String guildName) {
-        this.indexOfPlaylist = 0;
-        List<TracksPlaylistDto> res = playlists.get(guildName).getTracks();
+        UserPlaylistDto playlist = playlists.get(guildName);
+
+        if (playlist == null) {
+            return false;
+        }
+
+        List<TracksPlaylistDto> res = playlist.getTracks();
         for (TracksPlaylistDto tracksPlaylistDto : res) {
-            indexOfPlaylist += 1;
             if (tracksPlaylistDto.getId() == trackId) {
                 return true;
             }
@@ -63,14 +63,15 @@ public class PlaylistManager {
     }
 
     public void deleteTrackFromPlaylist(long trackId, String guildName) throws PlaylistWrongRevisionException {
-        this.indexOfPlaylist = 0;
         UserPlaylistDto userPlaylist = playlists.get(guildName);
         List<TracksPlaylistDto> res = userPlaylist.getTracks();
+        int index = 0;
         for (TracksPlaylistDto tracksPlaylistDto : res) {
-            indexOfPlaylist += 1;
+            index ++;
             if (tracksPlaylistDto.getId() == trackId) {
-                YandexMusicClient.deleteTrackFromUserPLaylist(indexOfPlaylist, userPlaylist.getKind(), userPlaylist.getRevision());
+                YandexMusicClient.deleteTrackFromUserPLaylist(index, userPlaylist.getKind(), userPlaylist.getRevision());
                 this.updatePLaylist();
+                return;
             }
         }
     }
@@ -79,7 +80,3 @@ public class PlaylistManager {
         return String.valueOf(playlists.get(guildName).getKind());
     }
 }
-
-
-
-
