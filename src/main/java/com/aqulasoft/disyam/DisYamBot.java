@@ -1,9 +1,9 @@
 package com.aqulasoft.disyam;
 
-import com.aqulasoft.disyam.service.BotStateManager;
-import com.aqulasoft.disyam.service.CommandManager;
-import com.aqulasoft.disyam.service.MessageListener;
-import com.aqulasoft.disyam.service.SecretManager;
+import com.aqulasoft.disyam.audio.YandexMusicClient;
+import com.aqulasoft.disyam.models.audio.YaPlaylist;
+import com.aqulasoft.disyam.models.dto.UserPlaylistDto;
+import com.aqulasoft.disyam.service.*;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.MultipartBody;
@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 
 import javax.security.auth.login.LoginException;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,6 +41,7 @@ public class DisYamBot {
             yaToken = resObj.getString("access_token");
             uid = resObj.getString("uid");
             log.info("Got Yandex Auth token: " + yaToken);
+            SecretManager.set("username", username);
             SecretManager.set("YaToken", yaToken);
             SecretManager.set("uid", uid);
         } else {
@@ -54,7 +56,6 @@ public class DisYamBot {
                 SecretManager.set("uid", uid);
             }
         }
-
     }
 
     public void Start() {
@@ -81,5 +82,6 @@ public class DisYamBot {
         } catch (LoginException | InterruptedException e) {
             log.error(e);
         }
+        PlaylistManager.getInstance().updatePLaylist();
     }
 }

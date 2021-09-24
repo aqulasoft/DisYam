@@ -3,6 +3,9 @@ package com.aqulasoft.disyam.models.audio;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import lombok.Getter;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildChannel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +16,11 @@ public class YaPlaylist {
     private String title;
     private YaArtist owner;
     private long duration;
-    //    private Date modified;
     private int trackCount;
     private String description;
     private List<YaTrack> tracks;
     private String descriptionFormatted;
+
 
     public YaPlaylist(JSONObject json) {
         id = json.getLong("kind");
@@ -28,7 +31,6 @@ public class YaPlaylist {
         JSONObject ownerJson = json.getJSONObject("owner");
         owner = new YaArtist(ownerJson.getLong("uid"), ownerJson.getString("name"), ownerJson.getString("login"));
         if (json.has("duration")) duration = json.getLong("duration");
-//        playlist.modified = Date.from(Instant.parse(json.getString("modified")));
         parseTracks(json);
     }
 
@@ -46,6 +48,8 @@ public class YaPlaylist {
             }
         }
     }
+
+
 
     public static YaPlaylist createArtistPlaylist(JSONObject json, YaArtist artist) {
         YaPlaylist playlist = new YaPlaylist();

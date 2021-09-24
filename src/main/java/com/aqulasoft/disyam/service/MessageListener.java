@@ -2,6 +2,7 @@ package com.aqulasoft.disyam.service;
 
 import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicClient;
+import com.aqulasoft.disyam.models.audio.PlaylistWrongRevisionException;
 import com.aqulasoft.disyam.models.audio.YaArtist;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
@@ -39,6 +40,7 @@ public class MessageListener extends ListenerAdapter {
         this.manager = manager;
     }
 
+
     @Override
     public void onReady(ReadyEvent event) {
         log.info(String.format("Logged in as %#s", event.getJDA().getSelfUser()));
@@ -53,10 +55,9 @@ public class MessageListener extends ListenerAdapter {
 
         if (event.isFromType(ChannelType.TEXT)) {
 
-            Guild guild = event.getGuild();
             TextChannel textChannel = event.getTextChannel();
 
-            log.info(String.format("(%s)[%s]<%#s>: %s", guild.getName(), textChannel.getName(), author, content));
+            log.info(String.format("(%s)[%s]<%#s>: %s", event.getGuild().getName(), textChannel.getName(), author, content));
         } else if (event.isFromType(ChannelType.PRIVATE)) {
             log.info(String.format("[PRIV]<%#s>: %s", author, content));
         }
@@ -138,6 +139,42 @@ public class MessageListener extends ListenerAdapter {
                             message.delete().queue();
                     });
                     return;
+                case EMOJI_LIKE:
+                    state.getMessage().removeReaction(EMOJI_LIKE).queue();
+                    state.getMessage().addReaction(EMOJI_DISLIKE).queue();
+                    String guildName = event.getGuild().getName();
+                    if (state instanceof PlayerState) {
+                        try {
+                            PlaylistManager.getInstance().addTrackToPlaylist(guildName, ((PlayerState) state).getCurrentTrack().getId());
+                        } catch (PlaylistWrongRevisionException e) {
+                            PlaylistManager.getInstance().updatePLaylist();
+                            try {
+                                PlaylistManager.getInstance().addTrackToPlaylist(guildName, ((PlayerState) state).getCurrentTrack().getId());
+                            } catch (PlaylistWrongRevisionException playlistWrongRevisionException) {
+                                playlistWrongRevisionException.printStackTrace();
+                            }
+                        }
+                    }
+                    log.info(String.format("[%s]: Liked song in %s", event.getUser().getName(), guildName));
+                    return;
+                case EMOJI_DISLIKE:
+                    String serverName = event.getGuild().getName();
+                    state.getMessage().removeReaction(EMOJI_DISLIKE).queue();
+                    state.getMessage().addReaction(EMOJI_LIKE).queue();
+                    if (state instanceof PlayerState) {
+                        long id = ((TrackSearchState) state).getCurrentTrack().getId();
+                        try {
+                            PlaylistManager.getInstance().deleteTrackFromPlaylist(id, serverName);
+                        } catch (PlaylistWrongRevisionException e) {
+                            PlaylistManager.getInstance().updatePLaylist();
+                            try {
+                                PlaylistManager.getInstance().deleteTrackFromPlaylist(id, serverName);
+                            } catch (PlaylistWrongRevisionException playlistWrongRevisionException) {
+                                playlistWrongRevisionException.printStackTrace();
+                            }
+                        }
+                    }
+                    log.info(String.format("[%s]: Disliked song in %s", event.getUser().getName(), serverName));
             }
 
         if (state instanceof SearchPager) {
@@ -155,6 +192,7 @@ public class MessageListener extends ListenerAdapter {
             handlePlaylistSelect((PlaylistSearchState) state, event);
             return;
         }
+
 
         if (state instanceof ArtistSearchState) {
             handleArtistSelect((ArtistSearchState) state, event);

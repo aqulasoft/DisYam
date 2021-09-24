@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Consts {
-
     public static final String baseUrl = "https://api.music.yandex.net";
     public static final String authUrl = "https://oauth.yandex.ru";
     public static final String CLIENT_ID = "23cabbbdc6cd418abb4b39c32c41195d";
@@ -24,6 +23,8 @@ public class Consts {
     public static final String EMOJI_STOP = "\uD83D\uDEAB";
     public static final String EMOJI_CANCEL = "\uD83D\uDEAB";
     public static final String EMOJI_OK = "✔";
+    public static final String EMOJI_LIKE = "\uD83D\uDD25";
+    public static final String EMOJI_DISLIKE = "❌";
 
     public static final Map<String, String> EMOJI_MAP = new HashMap() {{
         put("1", "1️⃣");

@@ -4,7 +4,8 @@ package com.aqulasoft.disyam.models.bot;
 import lombok.Getter;
 
 @Getter
-public abstract class SearchPager {
+public abstract class
+SearchPager {
     private int page = 0;
     private final int total;
     private final int perPage;
@@ -13,7 +14,6 @@ public abstract class SearchPager {
         this.total = total;
         this.perPage = perPage;
     }
-
 
     public void nextPage() {
         page++;

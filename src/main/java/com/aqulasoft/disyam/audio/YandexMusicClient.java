@@ -1,7 +1,16 @@
 package com.aqulasoft.disyam.audio;
 
+
 import com.aqulasoft.disyam.models.audio.*;
+import com.aqulasoft.disyam.models.bot.OperationDelete;
+import com.aqulasoft.disyam.models.bot.OperationInsert;
+import com.aqulasoft.disyam.models.dto.UserPlaylistDto;
+import com.aqulasoft.disyam.models.dto.YaResponseDto;
 import com.aqulasoft.disyam.service.SecretManager;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.*;
 import org.apache.log4j.Logger;
 
@@ -15,12 +24,18 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.aqulasoft.disyam.utils.Consts.*;
 
 public class YandexMusicClient {
 
+
     static Logger log = Logger.getLogger(YandexMusicClient.class);
+    static ObjectMapper mapper = new ObjectMapper();
+    static {
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+    }
 
     public static String getTrackDownloadLink(long songId) {
 //        log.info(String.format("%s/tracks/%s/download-info", baseUrl, songId));
@@ -49,6 +64,7 @@ public class YandexMusicClient {
     }
 
     public static MultipartBody getAuthRequest(String username, String password) {
+
         return Unirest.post(authUrl + "/token")
                 .field("grant_type", "password")
                 .field("client_id", CLIENT_ID)
@@ -68,7 +84,6 @@ public class YandexMusicClient {
             request.field("x_captcha_answer", answer);
             request.field("x_captcha_key", captchaKey);
             return request.asString().getStatus();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -98,6 +113,80 @@ public class YandexMusicClient {
         JsonNode body = Unirest.get(url).asJson().getBody();
         Unirest.config().reset().enableCookieManagement(true);
         return new YaPlaylist(body.getObject().getJSONObject("playlist"));
+    }
+
+    public static UserPlaylistDto getUserPlaylist(int kinds) {
+        String url = String.format("%s/users/%s/playlists", baseUrl, SecretManager.get("username"));
+        List<UserPlaylistDto> result = Unirest.get(url)
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .queryString("kinds", kinds).asObject(new GenericType<YaResponseDto<List<UserPlaylistDto>>>() {
+                }).getBody().getResult();
+        if (result.size() != 0) {
+            return result.get(0);
+        }
+        return null;
+    }
+
+    public static void createPlaylist(String name) {
+        String url = String.format("%s/users/%s/playlists/create", baseUrl, SecretManager.get("username"));
+        Unirest.post(url).field("title", name)
+                .field("visibility", "public")
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .asJson().getBody().toPrettyString();
+    }
+
+    public static void addTrackToPlaylist(int kind, long trackId, int albumId, int revision) throws PlaylistWrongRevisionException {
+        OperationInsert operationInsert = new OperationInsert(0, trackId, albumId);
+        String difference;
+        try {
+            difference = mapper.writeValueAsString(operationInsert);
+        } catch (JsonProcessingException e) {
+            log.error(e.getLocalizedMessage());
+            return;
+        }
+        String url = String.format("%s/users/%s/playlists/%s/change", baseUrl, SecretManager.get("username"), kind);
+        String diff = String.format("[%s]", difference);
+        String result;
+        result = Unirest.post(url)
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .field("revision", revision)
+                .field("diff", String.valueOf(diff))
+                .asJson().getBody().toString();
+        if (result.contains("wrong-revision")) {
+            throw new PlaylistWrongRevisionException("Unable to get revision");
+        }
+
+    }
+
+    public static List<UserPlaylistDto> getUserPlaylists() {
+        String url = String.format("%s/users/%s/playlists/list", baseUrl, SecretManager.get("username"));
+        return Unirest.get(url)
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .asObject(new GenericType<YaResponseDto<List<UserPlaylistDto>>>() {
+                }).getBody().getResult();
+
+    }
+
+    public static void deleteTrackFromUserPLaylist(int index, int kind, int revision) throws PlaylistWrongRevisionException {
+        OperationDelete operationDelete = new OperationDelete(index - 1, index);
+        String difference;
+        try {
+            difference = mapper.writeValueAsString(operationDelete);
+        } catch (JsonProcessingException e) {
+            log.error(e.getLocalizedMessage());
+            return;
+
+        }
+        String url = String.format("%s/users/%s/playlists/%s/change", baseUrl, SecretManager.get("username"), kind);
+        String diff = String.format("[%s]", difference);
+        String result = Unirest.post(url)
+                .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
+                .field("revision", revision)
+                .field("diff", String.valueOf(diff))
+                .asJson().getBody().toString();
+        if (result.contains("wrong-revision")) {
+            throw new PlaylistWrongRevisionException("Unable to get revision");
+        }
     }
 
     public static YaPlaylist getArtistTracks(YaArtist artist) {
@@ -165,3 +254,4 @@ public class YandexMusicClient {
         return new YaTrackSupplement(res.getBody().getObject().getJSONObject("result"));
     }
 }
+

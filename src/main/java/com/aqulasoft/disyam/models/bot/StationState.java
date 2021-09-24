@@ -4,6 +4,7 @@ import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaStationSequence;
 import com.aqulasoft.disyam.models.audio.YaTrack;
+import com.aqulasoft.disyam.service.PlaylistManager;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -40,6 +41,7 @@ public class StationState extends PlayerState implements BotState {
         YandexMusicClient.sendStationFeedback(String.format("track:%s", sequence.getTrack().getId()), "radioStarted", sequence.getBatchId(), null, null);
         YandexMusicClient.sendStationFeedback(String.format("track:%s", sequence.getTrack().getId()), "trackStarted", sequence.getBatchId(), getCurrentTrack().getId(), 0L);
         YandexMusicClient.playAudio(getCurrentTrack());
+
     }
 
     @Override
@@ -61,6 +63,7 @@ public class StationState extends PlayerState implements BotState {
     public int getTrackCount() {
         return tracks.size() + 1; // +1 to not throw exception
     }
+
 
     @Override
     public void updateMessage(boolean addReactions) {
@@ -94,6 +97,7 @@ public class StationState extends PlayerState implements BotState {
 
     private MessageEmbed buildMessage(boolean addReactions) {
         EmbedBuilder builder = new EmbedBuilder();
+        String reactionEmoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
         YaTrack track = getTrack(getPosition());
         String trackTitle = "\uD83C\uDFB5   " + track.getTitle() + "  \uD83C\uDFB5";
         String trackAuthor = track.getFormattedArtists();
@@ -107,6 +111,7 @@ public class StationState extends PlayerState implements BotState {
             message.addReaction(EMOJI_NEXT).queue();
             message.addReaction(EMOJI_REPEAT_ONE).queue();
             message.addReaction(EMOJI_DOWNLOAD).queue();
+            message.addReaction(reactionEmoji).queue();
         }
         return builder.build();
     }
@@ -117,4 +122,5 @@ public class StationState extends PlayerState implements BotState {
         String stationInfo = String.format("station by track \"%s\" by %s", track.getTitle(), track.getFormattedArtists());
         return String.format("(%s/∞)    %s \n%s", getPosition() + 1, Utils.convertTimePeriod(getTrack(getPosition()).getDuration()) + additionalInfo, stationInfo);
     }
+
 }

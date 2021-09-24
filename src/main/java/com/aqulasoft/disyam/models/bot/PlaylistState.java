@@ -2,6 +2,7 @@ package com.aqulasoft.disyam.models.bot;
 
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
+import com.aqulasoft.disyam.service.PlaylistManager;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import lombok.Getter;
@@ -33,6 +34,7 @@ public class PlaylistState extends PlayerState implements BotState {
         this.playlist = playlist;
         this.message = message;
         this.guild = guild;
+
     }
 
     @Override
@@ -78,7 +80,7 @@ public class PlaylistState extends PlayerState implements BotState {
 
     private MessageEmbed buildMessage(boolean addReactions, boolean updateTrackInfo) {
         EmbedBuilder builder = new EmbedBuilder();
-
+        String reactionEmoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
         String trackTitle = "";
         String trackAuthor = "";
         String footer = "";
@@ -112,6 +114,9 @@ public class PlaylistState extends PlayerState implements BotState {
             message.addReaction(EMOJI_SHUFFLE).queue();
             message.addReaction(EMOJI_REPEAT_ONE).queue();
             message.addReaction(EMOJI_DOWNLOAD).queue();
+            message.addReaction(reactionEmoji).queue();
+            message.removeReaction((reactionEmoji.equals(EMOJI_DISLIKE))? EMOJI_LIKE:EMOJI_DISLIKE).queue();
+
         }
         return builder.build();
     }
@@ -120,4 +125,6 @@ public class PlaylistState extends PlayerState implements BotState {
         String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "") + (isShuffleOn ? EMOJI_SHUFFLE : "");
         return String.format("(%s/%s)   %s  ", getPosition() + 1, playlist.getTrackCount(), Utils.convertTimePeriod(getTrack(getPosition()).getDuration())) + additionalInfo;
     }
-}
+
+    }
+
