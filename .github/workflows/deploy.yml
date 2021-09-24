@@ -1,0 +1,55 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Release + Publish to Docker Hub + deploy to VPS
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+*' # Push events to matching v*, i.e. 1.0, 20.15.10
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'     
+        required: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+    deploy:
+      name: "Release"
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@master
+
+        - name: Configure SSH
+          run: |
+            mkdir -p ~/.ssh/
+            echo "$SSH_KEY" > ~/.ssh/staging.key
+            chmod 600 ~/.ssh/staging.key
+            cat >>~/.ssh/config <<END
+            Host staging
+              HostName $SSH_HOST
+              User $SSH_USER
+              IdentityFile ~/.ssh/staging.key
+              StrictHostKeyChecking no
+            END
+          env:
+            SSH_USER: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+            SSH_KEY: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
+            SSH_HOST: ${{ secrets.RU_DEPLOY_SERVER_HOST }}
+          
+        - name: Deploy to docker container on VPS
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.RU_DEPLOY_SERVER_HOST }}
+            username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+            key: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
+            port: ${{ secrets.DEPLOY_SERVER_PORT }}
+            script: |
+              docker ps
+              docker pull ${{ secrets.DOCKER_HUB_REPO }}
+              docker stop disyam
+              docker rm disyam 
+              docker run --restart always -d --name disyam aqulasoft/disyam ${{ secrets.BOT_TOKEN }} ${{ secrets.YANDEX_MUSIC_USERNAME }} ${{ secrets.YANDEX_MUSIC_PASSWORD }} 
+              docker ps
