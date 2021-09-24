@@ -162,7 +162,7 @@ public class MessageListener extends ListenerAdapter {
                     state.getMessage().removeReaction(EMOJI_DISLIKE).queue();
                     state.getMessage().addReaction(EMOJI_LIKE).queue();
                     if (state instanceof PlayerState) {
-                        long id = ((TrackSearchState) state).getCurrentTrack().getId();
+                        long id = ((PlayerState) state).getCurrentTrack().getId();
                         try {
                             PlaylistManager.getInstance().deleteTrackFromPlaylist(id, serverName);
                         } catch (PlaylistWrongRevisionException e) {
