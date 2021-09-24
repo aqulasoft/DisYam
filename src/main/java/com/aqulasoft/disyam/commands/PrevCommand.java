@@ -21,7 +21,6 @@ PrevCommand implements Command {
         event.getMessage().delete().queue();
     }
 
-
     @Override
     public String getHelp() {
         return "Play previous song\n" +

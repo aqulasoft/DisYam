@@ -78,7 +78,6 @@ public class MessageListener extends ListenerAdapter {
         super.onGuildVoiceLeave(event);
     }
 
-    @SneakyThrows
     @Override
     public void onMessageReactionAdd(@Nonnull MessageReactionAddEvent event) {
         super.onMessageReactionAdd(event);
@@ -146,41 +145,38 @@ public class MessageListener extends ListenerAdapter {
                 case EMOJI_LIKE:
                     state.getMessage().removeReaction(EMOJI_LIKE).queue();
                     state.getMessage().addReaction(EMOJI_DISLIKE).queue();
-                    // TODO: 22.09.2021 update message
-                    BotState reallyState = BotStateManager.getInstance().getState(guild.getIdLong());
-                    if (reallyState instanceof PlayerState) {
+                    if (state instanceof PlayerState) {
                         try {
-
-                            PlaylistManager.getInstance().addTrackToPlaylist(guild.getName(), ((PlayerState) reallyState).getCurrentTrack().getId());
+                            PlaylistManager.getInstance().addTrackToPlaylist(guild.getName(), ((PlayerState) state).getCurrentTrack().getId());
                         } catch (PlaylistWrongRevisionException e) {
                             PlaylistManager.getInstance().updatePLaylist();
-                            PlaylistManager.getInstance().addTrackToPlaylist(guild.getName(), ((PlayerState) reallyState).getCurrentTrack().getId());
+                            try {
+                                PlaylistManager.getInstance().addTrackToPlaylist(guild.getName(), ((PlayerState) state).getCurrentTrack().getId());
+                            } catch (PlaylistWrongRevisionException playlistWrongRevisionException) {
+                                playlistWrongRevisionException.printStackTrace();
+                            }
                         }
                     }
-
                     log.info(String.format("[%s]: Liked song in %s", event.getUser().getName(), guild.getName()));
                     return;
                 case EMOJI_DISLIKE:
                     state.getMessage().removeReaction(EMOJI_DISLIKE).queue();
                     state.getMessage().addReaction(EMOJI_LIKE).queue();
-                    BotState realState = BotStateManager.getInstance().getState(guild.getIdLong());
-
-                    if (realState instanceof TrackSearchState) {
-                        long id = ((TrackSearchState) realState).getCurrentTrack().getId();
+                    if (state instanceof TrackSearchState) {
+                        long id = ((TrackSearchState) state).getCurrentTrack().getId();
                         try {
                             PlaylistManager.getInstance().deleteTrackFromPlaylist(id, guild.getName());
                         } catch (PlaylistWrongRevisionException e) {
                             PlaylistManager.getInstance().updatePLaylist();
-                            PlaylistManager.getInstance().deleteTrackFromPlaylist(id, guild.getName());
+                            try {
+                                PlaylistManager.getInstance().deleteTrackFromPlaylist(id, guild.getName());
+                            } catch (PlaylistWrongRevisionException playlistWrongRevisionException) {
+                                playlistWrongRevisionException.printStackTrace();
+                            }
                         }
-
                     }
-
-                    System.out.println();
-
                     log.info(String.format("[%s]: Disliked song in %s", event.getUser().getName(), guild.getName()));
             }
-
 
         if (state instanceof SearchPager) {
             switch (event.getReactionEmote().getEmoji()) {
@@ -193,7 +189,6 @@ public class MessageListener extends ListenerAdapter {
             }
         }
 
-//        if (state instanceof )
         if (state instanceof PlaylistSearchState) {
             handlePlaylistSelect((PlaylistSearchState) state, event);
             return;

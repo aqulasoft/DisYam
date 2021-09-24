@@ -25,9 +25,7 @@ public class PlaylistManager {
         return INSTANCE;
     }
 
-
     public void addTrackToPlaylist(String chnlName, long trackId) throws PlaylistWrongRevisionException {
-
 
         if (playlists.containsKey(chnlName)) {
             UserPlaylistDto playlist = playlists.get(chnlName);
@@ -47,27 +45,19 @@ public class PlaylistManager {
     public void updatePLaylist() {
         this.playlists = new HashMap<>();
         List<UserPlaylistDto> result = YandexMusicClient.getUserPlaylists();
-
         for (UserPlaylistDto userPlaylistDto : result) {
-//            YandexMusicClient.getUserPlaylist(userPlaylistDto.getKind());
             this.playlists.put(userPlaylistDto.getTitle(), YandexMusicClient.getUserPlaylist(userPlaylistDto.getKind()));
-
         }
-
-
     }
 
     public boolean isInPlaylist(long trackId, String guildName) {
-        // TODO: 23.09.2021 отмапить данные с помощью stream
         this.indexOfPlaylist = 0;
         List<TracksPlaylistDto> res = playlists.get(guildName).getTracks();
         for (TracksPlaylistDto tracksPlaylistDto : res) {
             indexOfPlaylist += 1;
-
             if (tracksPlaylistDto.getId() == trackId) {
                 return true;
             }
-
         }
         return false;
     }
@@ -78,13 +68,10 @@ public class PlaylistManager {
         List<TracksPlaylistDto> res = userPlaylist.getTracks();
         for (TracksPlaylistDto tracksPlaylistDto : res) {
             indexOfPlaylist += 1;
-
             if (tracksPlaylistDto.getId() == trackId) {
                 YandexMusicClient.deleteTrackFromUserPLaylist(indexOfPlaylist, userPlaylist.getKind(), userPlaylist.getRevision());
                 this.updatePLaylist();
             }
-
-
         }
     }
 
@@ -92,8 +79,6 @@ public class PlaylistManager {
         return String.valueOf(playlists.get(guildName).getKind());
 
     }
-
-
 }
 
 

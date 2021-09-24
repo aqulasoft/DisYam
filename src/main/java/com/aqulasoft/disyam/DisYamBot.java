@@ -29,6 +29,7 @@ public class DisYamBot {
     private final String botToken;
 
     static Logger log = Logger.getLogger(DisYamBot.class);
+
     public DisYamBot(String botToken, String username, String password) {
         this.botToken = botToken;
         MultipartBody request = getAuthRequest(username, password);
@@ -40,7 +41,7 @@ public class DisYamBot {
             yaToken = resObj.getString("access_token");
             uid = resObj.getString("uid");
             log.info("Got Yandex Auth token: " + yaToken);
-            SecretManager.set("username",username);
+            SecretManager.set("username", username);
             SecretManager.set("YaToken", yaToken);
             SecretManager.set("uid", uid);
         } else {
@@ -55,10 +56,6 @@ public class DisYamBot {
                 SecretManager.set("uid", uid);
             }
         }
-
-        YaPlaylist a = YandexMusicClient.getPlaylist("475098494","1008");
-
-        log.error(a.getTitle());
     }
 
     public void Start() {

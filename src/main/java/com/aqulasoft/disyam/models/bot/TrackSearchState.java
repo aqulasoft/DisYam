@@ -91,10 +91,7 @@ public class TrackSearchState extends PlayerState implements BotState {
     }
 
     private MessageEmbed buildMessage(boolean addReactions) {
-        String emoji;
-        if (PlaylistManager.getInstance().isInPlaylist(getCurrentTrack().getId(),guild.getName())){
-            emoji = EMOJI_DISLIKE;
-        }else emoji = EMOJI_LIKE;
+        String emoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
         EmbedBuilder builder = new EmbedBuilder();
         YaTrack track = getTrack(getPosition());
         String trackTitle = "\uD83C\uDFB5   " + track.getTitle() + "  \uD83C\uDFB5";

@@ -37,7 +37,6 @@ public class PlaylistState extends PlayerState implements BotState {
 
     }
 
-
     @Override
     public BotStateType getType() {
         return BotStateType.YA_PLAYLIST;
@@ -81,11 +80,7 @@ public class PlaylistState extends PlayerState implements BotState {
 
     private MessageEmbed buildMessage(boolean addReactions, boolean updateTrackInfo) {
         EmbedBuilder builder = new EmbedBuilder();
-        String emoji;
-        if (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())){
-            emoji = EMOJI_DISLIKE;
-        }else emoji = EMOJI_LIKE;
-
+        String emoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
         String trackTitle = "";
         String trackAuthor = "";
         String footer = "";

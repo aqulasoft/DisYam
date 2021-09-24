@@ -97,10 +97,7 @@ public class StationState extends PlayerState implements BotState {
 
     private MessageEmbed buildMessage(boolean addReactions) {
         EmbedBuilder builder = new EmbedBuilder();
-        String emoji;
-        if (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())){
-            emoji = EMOJI_DISLIKE;
-        }else emoji = EMOJI_LIKE;
+        String emoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
         YaTrack track = getTrack(getPosition());
         String trackTitle = "\uD83C\uDFB5   " + track.getTitle() + "  \uD83C\uDFB5";
         String trackAuthor = track.getFormattedArtists();

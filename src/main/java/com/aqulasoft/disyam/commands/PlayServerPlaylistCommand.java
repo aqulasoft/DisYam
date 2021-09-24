@@ -18,7 +18,7 @@ import static com.aqulasoft.disyam.audio.YandexMusicClient.getPlaylist;
 import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 import static com.aqulasoft.disyam.utils.Utils.joinVoice;
 
-public class PlayServerPlaylist implements Command{
+public class PlayServerPlaylistCommand implements Command{
     @Override
     public void handle(List<String> args, GuildMessageReceivedEvent event) {
         TextChannel channel = event.getChannel();
@@ -48,6 +48,6 @@ public class PlayServerPlaylist implements Command{
 
     @Override
     public String getInvoke() {
-        return "favor";
+        return "fav";
     }
 }
