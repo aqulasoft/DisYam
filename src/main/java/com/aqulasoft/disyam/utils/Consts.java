@@ -25,6 +25,8 @@ public class Consts {
     public static final String EMOJI_OK = "✔";
     public static final String EMOJI_LIKE = "\uD83D\uDD25";
     public static final String EMOJI_DISLIKE = "❌";
+    public static final String EMOJI_PREFIX = "\uD83C\uDD7F️";
+    public static final String EMOJI_VOLUME = "\uD83D\uDD08";
 
     public static final Map<String, String> EMOJI_MAP = new HashMap() {{
         put("1", "1️⃣");

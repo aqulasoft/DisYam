@@ -31,6 +31,7 @@ public class CommandManager {
         addCommand(new NextCommand());
         addCommand(new PrevCommand());
 
+        addCommand(new SettingsCommand());
         addCommand(new DownloadCommand());
         addCommand(new RecommendationCommand());
         addCommand(new LyricsCommand());
