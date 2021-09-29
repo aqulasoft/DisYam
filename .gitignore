@@ -12,3 +12,4 @@ buildNumber.properties
 .idea
 .DS_Store
 *.iml
+src/main/resources/settings.db
