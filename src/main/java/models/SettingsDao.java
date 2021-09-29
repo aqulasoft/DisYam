@@ -17,4 +17,6 @@ public class SettingsDao {
     public String prefix;
     @DatabaseField
     public int valueOfVolume;
+    @DatabaseField
+    public long showTrackProgress;
 }

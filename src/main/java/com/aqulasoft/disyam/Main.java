@@ -15,7 +15,11 @@ public class Main {
 //        DbManager dbManager = DbManager.getInstance();
         log.info("Bot created");
         DbManager dbManager = DbManager.getInstance();
-        dbManager.insertSettings("Golden Rain");
+        dbManager.insertSettings("SUS", "!", 100);
+        dbManager.updateSettings("SUS","$", 88,null);
+        System.out.println(dbManager.getSettingsInfo("SUS").getPrefix());
+        System.out.println(dbManager.getSettingsInfo("SUS").getValueOfVolume());
+
 //        disYamBot.Start();
     }
 }
