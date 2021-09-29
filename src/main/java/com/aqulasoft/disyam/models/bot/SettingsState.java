@@ -1,10 +1,6 @@
 package com.aqulasoft.disyam.models.bot;
 
-import com.aqulasoft.disyam.models.audio.YaPlaylist;
-import com.aqulasoft.disyam.models.audio.YaTrack;
-import com.aqulasoft.disyam.service.PlaylistManager;
 import lombok.Getter;
-import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -37,7 +33,6 @@ public class SettingsState {
 
         message.getEmbeds().get(0).getTitle();
         builder.setTitle("Settings");
-        builder.setDescription("private");
         builder.setColor(Color.ORANGE);
         if (addReactions) {
 

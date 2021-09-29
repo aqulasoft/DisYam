@@ -30,7 +30,7 @@ public class PlayServerPlaylistCommand implements Command{
             return;
         }
         YaTrack track = playlist.getTrack(0);
-        if (track != null) {
+        if (track != null){
             EmbedBuilder builder = new EmbedBuilder();
             builder.appendDescription("PLease,wait");
             builder.setColor(Color.ORANGE);

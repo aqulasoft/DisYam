@@ -178,7 +178,12 @@ public class MessageListener extends ListenerAdapter {
                         }
                     }
                     log.info(String.format("[%s]: Disliked song in %s", event.getUser().getName(), serverName));
-            }
+                case EMOJI_PREFIX:
+                    log.info("prefix");
+
+                case EMOJI_VOLUME:
+                    log.info("volume");
+        }
 
         if (state instanceof SearchPager) {
             switch (event.getReactionEmote().getEmoji()) {
