@@ -4,5 +4,4 @@ public enum BotStateType {
     SEARCH_TRACK,
     SEARCH_PLAYLIST,
     YA_PLAYLIST,
-    INFO
 }

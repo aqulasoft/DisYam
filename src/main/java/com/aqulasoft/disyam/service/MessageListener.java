@@ -178,12 +178,25 @@ public class MessageListener extends ListenerAdapter {
                         }
                     }
                     log.info(String.format("[%s]: Disliked song in %s", event.getUser().getName(), serverName));
+                    break;
                 case EMOJI_PREFIX:
+                    EmbedBuilder builder = new EmbedBuilder();
+                    builder.setColor(Color.ORANGE);
+                    builder.setTitle("Settings");
+                    builder.setDescription("Please,enter new value of prefix");
+                    state.getMessage().editMessage(builder.build()).queue();
                     log.info("prefix");
+                    break;
 
                 case EMOJI_VOLUME:
+                    EmbedBuilder embedBuilder= new EmbedBuilder();
+                    embedBuilder.setColor(Color.ORANGE);
+                    embedBuilder.setTitle("Settings");
+                    embedBuilder.setDescription("Please,enter new value of volume");
+                    state.getMessage().editMessage(embedBuilder.build()).queue();
                     log.info("volume");
-        }
+                    break;
+            }
 
         if (state instanceof SearchPager) {
             switch (event.getReactionEmote().getEmoji()) {
