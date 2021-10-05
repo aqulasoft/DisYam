@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @DatabaseTable(tableName = "settings")
 public class SettingsDao {
-    @DatabaseField(id = true)
+    @DatabaseField
     public String guildName;
     @DatabaseField
     public String prefix;
@@ -20,4 +20,6 @@ public class SettingsDao {
     public Integer valueOfVolume;
     @DatabaseField
     public long showTrackProgress;
+    @DatabaseField(generatedId = true, allowGeneratedIdInsert = true)
+    private Integer id;
 }

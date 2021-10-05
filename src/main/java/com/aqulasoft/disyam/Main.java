@@ -10,7 +10,8 @@ public class Main {
         final String token = args[0];
         final String username = args[1];
         final String password = args[2];
-        DbManager dbManager = DbManager.getInstance();
+//        DbManager dbManager = DbManager.getInstance();
+//        dbManager.insertSettings("Golden rain","!",60, 0L);
         DisYamBot disYamBot = new DisYamBot(token, username, password);
         log.info("Bot created");
         disYamBot.Start();

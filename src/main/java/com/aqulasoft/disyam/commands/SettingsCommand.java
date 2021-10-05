@@ -20,7 +20,7 @@ public class SettingsCommand implements Command {
         event.getChannel().sendMessage(builder.build()).queue(message -> {
             SettingsState settingsState = new SettingsState(message, event.getGuild());
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), settingsState, false);
-            settingsState.updateMessage(true);
+            settingsState.updateMessage(true,null);
         });
     }
 

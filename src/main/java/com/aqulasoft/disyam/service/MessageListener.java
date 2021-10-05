@@ -1,5 +1,6 @@
 package com.aqulasoft.disyam.service;
 
+import Db.DbManager;
 import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.PlaylistWrongRevisionException;
@@ -8,6 +9,7 @@ import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.*;
 import com.aqulasoft.disyam.utils.BotStateType;
+import com.aqulasoft.disyam.utils.SettingsStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -52,6 +54,40 @@ public class MessageListener extends ListenerAdapter {
         User author = event.getAuthor();
         Message message = event.getMessage();
         String content = message.getContentDisplay();
+        BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
+        DbManager dbManager = DbManager.getInstance();
+
+        if (state instanceof SettingsState) {
+            if (((SettingsState) state).getStateType() == null) {
+                return;
+            }
+            if (((SettingsState) state).getStateType().equals(SettingsStateType.PREFIX_STATE_TYPE)) {
+                if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
+                    dbManager.insertSettings(event.getGuild().getName(), content, null, 0L);
+                }
+                System.out.println(content);
+                if (dbManager.getSettingsInfo(event.getGuild().getName()).get(0) != null) {
+                    dbManager.updateSettings(event.getGuild().getName(), content, null, 0L);
+                }
+                log.info(String.format("[%s] update prefix %s in %s",event.getAuthor().getName(),content,event.getGuild().getName()));
+                ((SettingsState) state).setSettingsType(null);
+            } else if (((SettingsState) state).getStateType().equals(SettingsStateType.VOLUME_STATE_TYPE)) {
+                if (Integer.parseInt(content) > 100 && Integer.parseInt(content) < 0 ){
+                    event.getTextChannel().sendMessage("Please enter value in [0,100]").queue();
+                    return;
+                }
+                if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
+                    dbManager.insertSettings(event.getGuild().getName(), null, Integer.valueOf(content), null);
+                }
+                if (dbManager.getSettingsInfo(event.getGuild().getName()).get(0) != null) {
+                    dbManager.updateSettings(event.getGuild().getName(), null, Integer.valueOf(content), null);
+                }
+                ((SettingsState) state).setSettingsType(null);
+                log.info(String.format("[%s] update volume %s in %s",event.getAuthor().getName(),content,event.getGuild().getName()));
+
+            }
+        }
+
 
         if (event.isFromType(ChannelType.TEXT)) {
 
@@ -180,21 +216,18 @@ public class MessageListener extends ListenerAdapter {
                     log.info(String.format("[%s]: Disliked song in %s", event.getUser().getName(), serverName));
                     break;
                 case EMOJI_PREFIX:
-                    EmbedBuilder builder = new EmbedBuilder();
-                    builder.setColor(Color.ORANGE);
-                    builder.setTitle("Settings");
-                    builder.setDescription("Please,enter new value of prefix");
-                    state.getMessage().editMessage(builder.build()).queue();
-                    log.info("prefix");
+                    if (state instanceof SettingsState) {
+                        ((SettingsState) state).updateMessage(true, "prefix");
+                        ((SettingsState) state).setSettingsType("prefix");
+                    }
                     break;
 
                 case EMOJI_VOLUME:
-                    EmbedBuilder embedBuilder= new EmbedBuilder();
-                    embedBuilder.setColor(Color.ORANGE);
-                    embedBuilder.setTitle("Settings");
-                    embedBuilder.setDescription("Please,enter new value of volume");
-                    state.getMessage().editMessage(embedBuilder.build()).queue();
-                    log.info("volume");
+                    if (state instanceof SettingsState) {
+                        ((SettingsState) state).updateMessage(true, "volume");
+                        ((SettingsState) state).setSettingsType("volume");
+
+                    }
                     break;
             }
 

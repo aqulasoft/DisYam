@@ -3,13 +3,15 @@ package Db;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
-import com.j256.ormlite.stmt.query.In;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import models.SettingsDao;
 import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class DbManager {
     private ConnectionSource connection;
@@ -37,25 +39,29 @@ public class DbManager {
         }
     }
 
-    public void insertSettings(String guildName,String prefix, Integer valueOfVolume) {
+    public void insertSettings(String guildName, String prefix, Integer valueOfVolume, Long progress) {
         SettingsDao settingsDao = new SettingsDao();
         settingsDao.setGuildName(guildName);
         settingsDao.setPrefix(prefix);
         settingsDao.setValueOfVolume(valueOfVolume);
-        settingsDao.setShowTrackProgress(10);
+        settingsDao.setShowTrackProgress(progress);
         try {
             Dao<SettingsDao, String> stringDao = DaoManager.createDao(connection, SettingsDao.class);
             stringDao.create(settingsDao);
-            stringDao.queryForId(guildName);
         } catch (SQLException e) {
             log.error(e);
         }
     }
 
-    public SettingsDao getSettingsInfo(String guildName) {
+    public List<SettingsDao> getSettingsInfo(String guildName) {
         Dao<SettingsDao, String> settingsDaos = DaoManager.lookupDao(connection, SettingsDao.class);
+        if (settingsDaos == null)return null;
+        Where<SettingsDao, String> daoStringWhere = settingsDaos.queryBuilder().where();
         try {
-            return settingsDaos.queryForId(guildName);
+            daoStringWhere.eq("guildName", guildName);
+            PreparedQuery<SettingsDao> preparedQuery = settingsDaos.queryBuilder().prepare();
+            List<SettingsDao> settingsDaoList = settingsDaos.query(preparedQuery);
+            return settingsDaoList;
         } catch (SQLException e) {
             log.error(e);
         }
@@ -65,8 +71,10 @@ public class DbManager {
 
     public void updateSettings(String guildName, String prefix, Integer valueOfVolume, Long progress) {
         Dao<SettingsDao, String> settingsManager = DaoManager.lookupDao(connection, SettingsDao.class);
-        SettingsDao settingsDao = getSettingsInfo(guildName);
-        if (settingsDao == null)return;
+        List<SettingsDao>settingsDaos = getSettingsInfo(guildName);
+        if (settingsDaos.size() == 0)return;
+        SettingsDao settingsDao = settingsDaos.get(0);
+        if (settingsDao == null) return;
         if (valueOfVolume != null) {
             settingsDao.setValueOfVolume(valueOfVolume);
         }
@@ -78,7 +86,5 @@ public class DbManager {
         } catch (SQLException e) {
             log.error(e);
         }
-
-
     }
 }
