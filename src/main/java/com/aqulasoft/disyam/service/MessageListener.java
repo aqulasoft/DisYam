@@ -70,6 +70,7 @@ public class MessageListener extends ListenerAdapter {
                     dbManager.updateSettings(event.getGuild().getName(), content, null, 0L);
                 }
                 log.info(String.format("[%s] update prefix %s in %s",event.getAuthor().getName(),content,event.getGuild().getName()));
+                ((SettingsState) state).updateMessage(false,true,null);
                 ((SettingsState) state).setSettingsType(null);
             } else if (((SettingsState) state).getStateType().equals(SettingsStateType.VOLUME_STATE_TYPE)) {
                 if (Integer.parseInt(content) > 100 && Integer.parseInt(content) < 0 ){
@@ -82,6 +83,7 @@ public class MessageListener extends ListenerAdapter {
                 if (dbManager.getSettingsInfo(event.getGuild().getName()).get(0) != null) {
                     dbManager.updateSettings(event.getGuild().getName(), null, Integer.valueOf(content), null);
                 }
+                ((SettingsState) state).updateMessage(false,true,null);
                 ((SettingsState) state).setSettingsType(null);
                 log.info(String.format("[%s] update volume %s in %s",event.getAuthor().getName(),content,event.getGuild().getName()));
 
@@ -217,14 +219,14 @@ public class MessageListener extends ListenerAdapter {
                     break;
                 case EMOJI_PREFIX:
                     if (state instanceof SettingsState) {
-                        ((SettingsState) state).updateMessage(true, "prefix");
+                        ((SettingsState) state).updateMessage(true, true,"prefix");
                         ((SettingsState) state).setSettingsType("prefix");
                     }
                     break;
 
                 case EMOJI_VOLUME:
                     if (state instanceof SettingsState) {
-                        ((SettingsState) state).updateMessage(true, "volume");
+                        ((SettingsState) state).updateMessage(true, true,"volume");
                         ((SettingsState) state).setSettingsType("volume");
 
                     }

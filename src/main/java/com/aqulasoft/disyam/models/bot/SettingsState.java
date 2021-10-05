@@ -57,18 +57,30 @@ public class SettingsState implements BotState {
     }
 
 
-    public void updateMessage(boolean addReactions, String value) {
-        message.editMessage(buildMessage(addReactions)).queue(m -> {
-            message = m;
-        });
-        if (value != null) {
+    public void updateMessage(boolean addReactions, Boolean bool, String name) {
+        if (!bool) {
             message.editMessage(buildMessage(addReactions)).queue(m -> {
-                EmbedBuilder builder = new EmbedBuilder();
-                builder.setColor(Color.ORANGE);
-                builder.setTitle(value);
-                builder.setDescription(String.format("Please,enter new value of %s", value));
                 message = m;
             });
+        }
+        else {
+            EmbedBuilder builder = new EmbedBuilder();
+            builder.setColor(Color.ORANGE);
+            List<SettingsDao> value = DbManager.getInstance().getSettingsInfo(guild.getName());
+            builder.setTitle("Settings");
+            if (value == null || name != null) {
+                builder.setDescription(String.format("Please,enter new value of %s", name));
+            }else {
+                SettingsDao settingsDao = value.get(0);
+                if (settingsDao.getPrefix() != null & settingsDao.getValueOfVolume() != null){
+                    builder.setDescription(String.format("prefix is %s\nvolume is %s",settingsDao.getPrefix(),settingsDao.getValueOfVolume()));
+                }else if (settingsDao.getPrefix() != null){
+                    builder.setDescription(String.format("prefix is %S",settingsDao.getPrefix()));
+                }else if (settingsDao.getValueOfVolume() != null){
+                    builder.setDescription(String.format("volume is %s",settingsDao.getValueOfVolume()));
+                }
+            }
+            message.editMessage(builder.build()).queue();
 
         }
     }
@@ -87,16 +99,11 @@ public class SettingsState implements BotState {
                 builder.setDescription("you don't have bot settings yet");
             } else {
                 if (!info.getPrefix().equals("") & info.getValueOfVolume() != null) {
-                    daoMap.put("prefix", info.getPrefix());
-                    daoMap.put("volume", String.valueOf(info.getValueOfVolume()));
-                    String mapAsString = daoMap.keySet().stream()
-                            .map(key -> key + "=" + daoMap.get(key))
-                            .collect(Collectors.joining("\n", "", ""));
-                    builder.setDescription(mapAsString);
+                    builder.setDescription(String.format("prefix is { %s } \nvolume is { %s }",info.getPrefix(),info.getValueOfVolume()));
                 } else if (!info.getPrefix().equals("") & info.getValueOfVolume() == null) {
-                    builder.setDescription("prefix" + info.getPrefix());
+                    builder.setDescription("prefix is " + info.getPrefix());
                 } else {
-                    builder.setDescription("volume" + (info.getValueOfVolume()));
+                    builder.setDescription("volume is " + info.getValueOfVolume());
                 }
             }
         } else {
