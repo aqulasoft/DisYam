@@ -59,6 +59,7 @@ public class DisYamBot {
     }
 
     public void Start() {
+        SettingsManager.set("prefix","!");
         CommandManager commandManager = new CommandManager();
         MessageListener messageListener = new MessageListener(commandManager);
 

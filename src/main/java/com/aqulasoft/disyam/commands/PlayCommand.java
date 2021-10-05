@@ -5,6 +5,7 @@ import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.PlaylistState;
 import com.aqulasoft.disyam.service.BotStateManager;
+import com.aqulasoft.disyam.service.SettingsManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -17,7 +18,6 @@ import java.util.regex.Pattern;
 
 import static com.aqulasoft.disyam.audio.YandexMusicClient.getPlaylist;
 import static com.aqulasoft.disyam.utils.Consts.PLAYLIST_URL_REGEX;
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 import static com.aqulasoft.disyam.utils.Utils.joinVoice;
 
 public class PlayCommand implements Command {
@@ -70,7 +70,7 @@ public class PlayCommand implements Command {
     @Override
     public String getHelp() {
         return "Play Yandex playlist by url\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <Yandex playlist url>`";
+                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + " <Yandex playlist url>`";
     }
 
     @Override

@@ -2,13 +2,12 @@ package com.aqulasoft.disyam.commands;
 
 
 import com.aqulasoft.disyam.audio.PlayerManager;
+import com.aqulasoft.disyam.service.SettingsManager;
 import com.aqulasoft.disyam.utils.Utils;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.List;
-
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
 public class
 PrevCommand implements Command {
@@ -24,7 +23,7 @@ PrevCommand implements Command {
     @Override
     public String getHelp() {
         return "Play previous song\n" +
-                "Usage: `" + PREFIX + getInvoke() + "`";
+                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + "`";
     }
 
     @Override

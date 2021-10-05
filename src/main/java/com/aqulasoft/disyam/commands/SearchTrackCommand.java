@@ -5,6 +5,7 @@ import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.models.bot.TrackSearchState;
 import com.aqulasoft.disyam.service.BotStateManager;
+import com.aqulasoft.disyam.service.SettingsManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -12,7 +13,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.awt.*;
 import java.util.List;
 
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 import static com.aqulasoft.disyam.utils.Utils.joinVoice;
 
 public class SearchTrackCommand implements Command {
@@ -47,7 +47,7 @@ public class SearchTrackCommand implements Command {
     @Override
     public String getHelp() {
         return "Search a song\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <song name>`";
+                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + " <song name>`";
     }
 
     @Override

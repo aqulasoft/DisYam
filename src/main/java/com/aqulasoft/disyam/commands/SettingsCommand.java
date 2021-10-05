@@ -3,13 +3,12 @@ package com.aqulasoft.disyam.commands;
 import com.aqulasoft.disyam.models.bot.BotState;
 import com.aqulasoft.disyam.models.bot.SettingsState;
 import com.aqulasoft.disyam.service.BotStateManager;
+import com.aqulasoft.disyam.service.SettingsManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.awt.*;
 import java.util.List;
-
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
 public class SettingsCommand implements Command {
     @Override
@@ -27,7 +26,7 @@ public class SettingsCommand implements Command {
     @Override
     public String getHelp() {
         return "Shows your bot server settings\n" +
-                "Usage: `" + PREFIX + getInvoke() + "`";
+                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + "`";
     }
 
     @Override

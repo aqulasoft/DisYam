@@ -4,6 +4,7 @@ import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.YaSearchResult;
 import com.aqulasoft.disyam.models.bot.PlaylistSearchState;
 import com.aqulasoft.disyam.service.BotStateManager;
+import com.aqulasoft.disyam.service.SettingsManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -11,7 +12,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.awt.*;
 import java.util.List;
 
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 import static com.aqulasoft.disyam.utils.Utils.joinVoice;
 
 public class SearchPlaylistCommand implements Command {
@@ -42,7 +42,7 @@ public class SearchPlaylistCommand implements Command {
     @Override
     public String getHelp() {
         return "Search playlists\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <playlist name>`";
+                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + " <playlist name>`";
     }
 
     @Override

@@ -1,11 +1,10 @@
 package com.aqulasoft.disyam.commands;
 
 import com.aqulasoft.disyam.audio.PlayerManager;
+import com.aqulasoft.disyam.service.SettingsManager;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.List;
-
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
 public class ResumeCommand implements Command {
     @Override
@@ -17,7 +16,7 @@ public class ResumeCommand implements Command {
     @Override
     public String getHelp() {
         return "Resume playing\n" +
-                "Usage: `" + PREFIX + getInvoke() + "`";
+                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + "`";
     }
 
     @Override

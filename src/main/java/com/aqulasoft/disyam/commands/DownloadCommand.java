@@ -1,13 +1,12 @@
 package com.aqulasoft.disyam.commands;
 
 import com.aqulasoft.disyam.audio.YandexMusicClient;
+import com.aqulasoft.disyam.service.SettingsManager;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.utils.AttachmentOption;
 
 import java.util.List;
-
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
 public class DownloadCommand implements Command {
 
@@ -31,7 +30,7 @@ public class DownloadCommand implements Command {
     @Override
     public String getHelp() {
         return "Download a song\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <Yandex song url>`";
+                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + " <Yandex song url>`";
     }
 
     @Override

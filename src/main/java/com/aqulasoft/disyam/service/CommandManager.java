@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
+
 
 public class CommandManager {
 
@@ -55,7 +55,7 @@ public class CommandManager {
     public void handleCommand(GuildMessageReceivedEvent event) {
 
         final String[] split = event.getMessage().getContentRaw().replaceFirst(
-                "(?i)" + Pattern.quote(PREFIX), "").split("\\s+");
+                "(?i)" + Pattern.quote(SettingsManager.get("prefix")), "").split("\\s+");
         final String invoke = split[0].toLowerCase();
 
         if (invoke.equals("help")) {

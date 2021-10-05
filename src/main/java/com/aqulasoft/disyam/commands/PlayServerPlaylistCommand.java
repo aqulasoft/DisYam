@@ -7,6 +7,7 @@ import com.aqulasoft.disyam.models.bot.PlaylistState;
 import com.aqulasoft.disyam.service.BotStateManager;
 import com.aqulasoft.disyam.service.PlaylistManager;
 import com.aqulasoft.disyam.service.SecretManager;
+import com.aqulasoft.disyam.service.SettingsManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -15,7 +16,6 @@ import java.awt.*;
 import java.util.List;
 
 import static com.aqulasoft.disyam.audio.YandexMusicClient.getPlaylist;
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 import static com.aqulasoft.disyam.utils.Utils.joinVoice;
 
 public class PlayServerPlaylistCommand implements Command{
@@ -47,7 +47,7 @@ public class PlayServerPlaylistCommand implements Command{
     @Override
     public String getHelp() {
         return "Play your server playlist\n" +
-                "Usage: `" + PREFIX + getInvoke() + "`";
+                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + "`";
     }
 
     @Override

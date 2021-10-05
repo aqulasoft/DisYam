@@ -4,6 +4,7 @@ import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.BotState;
 import com.aqulasoft.disyam.models.bot.PlayerState;
 import com.aqulasoft.disyam.service.BotStateManager;
+import com.aqulasoft.disyam.service.SettingsManager;
 import com.aqulasoft.disyam.utils.Utils;
 import com.google.common.base.Strings;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.aqulasoft.disyam.utils.Consts.EMOJI_OK;
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
 public class QueueInfoCommand implements Command {
 
@@ -43,7 +43,7 @@ public class QueueInfoCommand implements Command {
     @Override
     public String getHelp() {
         return "Get current playlists queue info\n" +
-                "Usage: `" + PREFIX + getInvoke() + "`";
+                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + "`";
     }
 
     @Override

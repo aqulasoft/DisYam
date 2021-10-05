@@ -68,6 +68,7 @@ public class MessageListener extends ListenerAdapter {
                 System.out.println(content);
                 if (dbManager.getSettingsInfo(event.getGuild().getName()).get(0) != null) {
                     dbManager.updateSettings(event.getGuild().getName(), content, null, 0L);
+                    SettingsManager.set("prefix",content);
                 }
                 log.info(String.format("[%s] update prefix %s in %s",event.getAuthor().getName(),content,event.getGuild().getName()));
                 ((SettingsState) state).updateMessage(false,true,null);
@@ -295,7 +296,7 @@ public class MessageListener extends ListenerAdapter {
 
         String rw = event.getMessage().getContentRaw();
 
-        if (rw.equalsIgnoreCase(PREFIX + "shutdown")) {
+        if (rw.equalsIgnoreCase(SettingsManager.get("prefix") + "shutdown")) {
             shutdown(event.getJDA());
             return;
         }
@@ -322,7 +323,7 @@ public class MessageListener extends ListenerAdapter {
 //            channel.sendMessage("builder.build()").queue();
 //        }
 
-        if (!event.getAuthor().isBot() && !event.getMessage().isWebhookMessage() && rw.startsWith(PREFIX)) {
+        if (!event.getAuthor().isBot() && !event.getMessage().isWebhookMessage() && rw.startsWith(SettingsManager.get("prefix"))) {
             manager.handleCommand(event);
             log.info("HANDLE");
         }
