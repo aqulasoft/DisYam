@@ -17,4 +17,7 @@ public class SettingsManager {
     public static void clear() {
         data.clear();
     }
+
+    public static int size(){return data.size();}
+
 }

@@ -1,5 +1,6 @@
 package com.aqulasoft.disyam.audio;
 
+import com.aqulasoft.disyam.service.SettingsManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -20,21 +21,21 @@ public class PlayerManager {
 
     private PlayerManager() {
         this.musicManagers = new HashMap<>();
-
         this.playerManager = new DefaultAudioPlayerManager();
         AudioSourceManagers.registerRemoteSources(playerManager);
         AudioSourceManagers.registerLocalSource(playerManager);
+
     }
 
     public synchronized GuildMusicManager getGuildMusicManager(Guild guild) {
         long guildId = guild.getIdLong();
         GuildMusicManager musicManager = musicManagers.get(guildId);
-
         if (musicManager == null) {
             musicManager = new GuildMusicManager(playerManager, guildId);
+            musicManager.player.setVolume(Integer.parseInt(SettingsManager.get("volume")));
             musicManagers.put(guildId, musicManager);
         }
-
+        musicManager.player.setVolume(Integer.parseInt(SettingsManager.get("volume")));
         guild.getAudioManager().setSendingHandler(musicManager.getSendHandler());
 
         return musicManager;
@@ -85,7 +86,6 @@ public class PlayerManager {
                 channel.sendMessage("Could not play: " + exception.getMessage()).queue();
             }
         });
-
     }
 
     private void play(GuildMusicManager musicManager, AudioTrack track) {

@@ -85,6 +85,7 @@ public class MessageListener extends ListenerAdapter {
                     dbManager.updateSettings(event.getGuild().getName(), null, Integer.valueOf(content), null);
                 }
                 ((SettingsState) state).updateMessage(false,true,null);
+                SettingsManager.set("volume",content);
                 ((SettingsState) state).setSettingsType(null);
                 log.info(String.format("[%s] update volume %s in %s",event.getAuthor().getName(),content,event.getGuild().getName()));
 
