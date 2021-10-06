@@ -50,48 +50,15 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-
         User author = event.getAuthor();
         Message message = event.getMessage();
         String content = message.getContentDisplay();
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
-        DbManager dbManager = DbManager.getInstance();
 
         if (state instanceof SettingsState) {
-            if (((SettingsState) state).getStateType() == null) {
-                return;
-            }
-            if (((SettingsState) state).getStateType().equals(SettingsStateType.PREFIX_STATE_TYPE)) {
-                if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
-                    dbManager.insertSettings(event.getGuild().getName(), content, null, 0L);
-                }
-                System.out.println(content);
-                if (dbManager.getSettingsInfo(event.getGuild().getName()).get(0) != null) {
-                    dbManager.updateSettings(event.getGuild().getName(), content, null, 0L);
-                    SettingsManager.set("prefix",content);
-                }
-                log.info(String.format("[%s] update prefix %s in %s",event.getAuthor().getName(),content,event.getGuild().getName()));
-                ((SettingsState) state).updateMessage(false,true,null);
-                ((SettingsState) state).setSettingsType(null);
-            } else if (((SettingsState) state).getStateType().equals(SettingsStateType.VOLUME_STATE_TYPE)) {
-                if (Integer.parseInt(content) > 100 && Integer.parseInt(content) < 0 ){
-                    event.getTextChannel().sendMessage("Please enter value in [0,100]").queue();
-                    return;
-                }
-                if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
-                    dbManager.insertSettings(event.getGuild().getName(), null, Integer.valueOf(content), null);
-                }
-                if (dbManager.getSettingsInfo(event.getGuild().getName()).get(0) != null) {
-                    dbManager.updateSettings(event.getGuild().getName(), null, Integer.valueOf(content), null);
-                }
-                ((SettingsState) state).updateMessage(false,true,null);
-                SettingsManager.set("volume",content);
-                ((SettingsState) state).setSettingsType(null);
-                log.info(String.format("[%s] update volume %s in %s",event.getAuthor().getName(),content,event.getGuild().getName()));
-
-            }
+            SettingsManager.InsertSettings((SettingsState) state,event,content);
+            message.delete().queue();
         }
-
 
         if (event.isFromType(ChannelType.TEXT)) {
 
@@ -221,14 +188,14 @@ public class MessageListener extends ListenerAdapter {
                     break;
                 case EMOJI_PREFIX:
                     if (state instanceof SettingsState) {
-                        ((SettingsState) state).updateMessage(true, true,"prefix");
+                        ((SettingsState) state).updateMessage(true, true, "prefix");
                         ((SettingsState) state).setSettingsType("prefix");
                     }
                     break;
 
                 case EMOJI_VOLUME:
                     if (state instanceof SettingsState) {
-                        ((SettingsState) state).updateMessage(true, true,"volume");
+                        ((SettingsState) state).updateMessage(true, true, "volume");
                         ((SettingsState) state).setSettingsType("volume");
 
                     }
@@ -294,7 +261,7 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-
+        SettingsManager.checkAndInsertSettings(event.getGuild().getName());
         String rw = event.getMessage().getContentRaw();
 
         if (rw.equalsIgnoreCase(SettingsManager.get("prefix") + "shutdown")) {

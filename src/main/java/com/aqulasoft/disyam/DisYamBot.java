@@ -59,10 +59,6 @@ public class DisYamBot {
     }
 
     public void Start() {
-        if (SettingsManager.size() == 0) {
-            SettingsManager.set("prefix", "!");
-            SettingsManager.set("volume", "100");
-        }
         CommandManager commandManager = new CommandManager();
         MessageListener messageListener = new MessageListener(commandManager);
 
