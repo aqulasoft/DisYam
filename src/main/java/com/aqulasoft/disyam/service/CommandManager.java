@@ -55,11 +55,11 @@ public class CommandManager {
     public void handleCommand(GuildMessageReceivedEvent event) {
 
         final String[] split = event.getMessage().getContentRaw().replaceFirst(
-                "(?i)" + Pattern.quote(SettingsManager.get("prefix")), "").split("\\s+");
+                "(?i)" + Pattern.quote(SettingsManager.get(event.getGuild().getName()).get("prefix")), "").split("\\s+");
         final String invoke = split[0].toLowerCase();
 
         if (invoke.equals("help")) {
-            showHelp(event.getChannel());
+            showHelp(event.getChannel(),SettingsManager.get(event.getGuild().getName()).get("prefix"));
             return;
         }
 
@@ -69,11 +69,11 @@ public class CommandManager {
         }
     }
 
-    private void showHelp(TextChannel channel) {
+    private void showHelp(TextChannel channel,String prefix) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.addField("developed by aqulasoft.com", "https://github.com/aqulasoft/DisYam", false);
         commands.keySet().forEach(cmd -> {
-            builder.addField(commands.get(cmd).getInvoke(), commands.get(cmd).getHelp(), false);
+            builder.addField(commands.get(cmd).getInvoke(), commands.get(cmd).getHelp(prefix), false);
         });
         channel.sendMessage(builder.build()).queue();
     }

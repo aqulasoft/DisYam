@@ -4,10 +4,7 @@ import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.PlaylistState;
-import com.aqulasoft.disyam.service.BotStateManager;
-import com.aqulasoft.disyam.service.PlaylistManager;
-import com.aqulasoft.disyam.service.SecretManager;
-import com.aqulasoft.disyam.service.SettingsManager;
+import com.aqulasoft.disyam.service.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -45,9 +42,9 @@ public class PlayServerPlaylistCommand implements Command{
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Play your server playlist\n" +
-                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + "`";
+                "Usage: `" + prefix + getInvoke() + "`";
     }
 
     @Override

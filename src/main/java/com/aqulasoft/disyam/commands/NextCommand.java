@@ -2,7 +2,6 @@ package com.aqulasoft.disyam.commands;
 
 
 import com.aqulasoft.disyam.audio.PlayerManager;
-import com.aqulasoft.disyam.service.SettingsManager;
 import com.aqulasoft.disyam.utils.Utils;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -21,8 +20,8 @@ public class NextCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
-        return "Play next song\n" + "Usage: `" + SettingsManager.get("prefix") + getInvoke() + "`";
+    public String getHelp(String prefix) {
+        return "Play next song\n" + "Usage: `" + prefix + getInvoke() + "`";
     }
 
     @Override

@@ -8,7 +8,7 @@ public interface Command {
 
     void handle(List<String> args, GuildMessageReceivedEvent event);
 
-    String getHelp();
+    String getHelp(String prefix);
 
     String getInvoke();
 }

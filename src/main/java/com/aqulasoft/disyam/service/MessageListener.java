@@ -1,6 +1,5 @@
 package com.aqulasoft.disyam.service;
 
-import Db.DbManager;
 import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.audio.YandexMusicClient;
 import com.aqulasoft.disyam.models.audio.PlaylistWrongRevisionException;
@@ -9,7 +8,6 @@ import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.*;
 import com.aqulasoft.disyam.utils.BotStateType;
-import com.aqulasoft.disyam.utils.SettingsStateType;
 import com.aqulasoft.disyam.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -56,8 +54,7 @@ public class MessageListener extends ListenerAdapter {
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
 
         if (state instanceof SettingsState) {
-            SettingsManager.InsertSettings((SettingsState) state,event,content);
-            message.delete().queue();
+            SettingsManager.InsertSettings((SettingsState) state,event,message);
         }
 
         if (event.isFromType(ChannelType.TEXT)) {
@@ -246,6 +243,7 @@ public class MessageListener extends ListenerAdapter {
         if (track != null) {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setColor(Color.ORANGE);
+
             builder.setDescription("Loading...");
             event.getChannel().sendMessage(builder.build()).queue(message -> {
                 PlaylistState playlistState = new PlaylistState(playlist, message, event.getGuild());
@@ -264,7 +262,7 @@ public class MessageListener extends ListenerAdapter {
         SettingsManager.checkAndInsertSettings(event.getGuild().getName());
         String rw = event.getMessage().getContentRaw();
 
-        if (rw.equalsIgnoreCase(SettingsManager.get("prefix") + "shutdown")) {
+        if (rw.equalsIgnoreCase(SettingsManager.get(event.getGuild().getName()) + "shutdown")) {
             shutdown(event.getJDA());
             return;
         }
@@ -291,10 +289,11 @@ public class MessageListener extends ListenerAdapter {
 //            channel.sendMessage("builder.build()").queue();
 //        }
 
-        if (!event.getAuthor().isBot() && !event.getMessage().isWebhookMessage() && rw.startsWith(SettingsManager.get("prefix"))) {
+        if (!event.getAuthor().isBot() && !event.getMessage().isWebhookMessage() && rw.startsWith(SettingsManager.get(event.getGuild().getName()).get("prefix"))) {
             manager.handleCommand(event);
             log.info("HANDLE");
         }
+
     }
 
     private void shutdown(JDA jda) {

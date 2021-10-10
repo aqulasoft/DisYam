@@ -8,7 +8,6 @@ import com.aqulasoft.disyam.models.bot.BotState;
 import com.aqulasoft.disyam.models.bot.PlayerState;
 import com.aqulasoft.disyam.models.bot.StationState;
 import com.aqulasoft.disyam.service.BotStateManager;
-import com.aqulasoft.disyam.service.SettingsManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
@@ -38,9 +37,9 @@ public class RecommendationCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Start radio by track\n" +
-                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + "`";
+                "Usage: `" + prefix + getInvoke() + "`";
     }
 
     @Override

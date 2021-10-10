@@ -1,4 +1,4 @@
-package Db;
+package com.aqulasoft.disyam.Db;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -7,7 +7,7 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import models.SettingsDao;
+import com.aqulasoft.disyam.Db.models.SettingsDao;
 import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
@@ -53,15 +53,10 @@ public class DbManager {
         }
     }
 
-    public List<SettingsDao> getSettingsInfo(String guildName) {
+    public SettingsDao getSettingsInfo(String guildName) {
         Dao<SettingsDao, String> settingsDaos = DaoManager.lookupDao(connection, SettingsDao.class);
-        if (settingsDaos == null)return null;
-        Where<SettingsDao, String> daoStringWhere = settingsDaos.queryBuilder().where();
         try {
-            daoStringWhere.eq("guildName", guildName);
-            PreparedQuery<SettingsDao> preparedQuery = settingsDaos.queryBuilder().prepare();
-            List<SettingsDao> settingsDaoList = settingsDaos.query(preparedQuery);
-            return settingsDaoList;
+            return settingsDaos.queryForId(guildName);
         } catch (SQLException e) {
             log.error(e);
         }
@@ -71,10 +66,8 @@ public class DbManager {
 
     public void updateSettings(String guildName, String prefix, Integer valueOfVolume, Long progress) {
         Dao<SettingsDao, String> settingsManager = DaoManager.lookupDao(connection, SettingsDao.class);
-        List<SettingsDao>settingsDaos = getSettingsInfo(guildName);
-        if (settingsDaos.size() == 0)return;
-        SettingsDao settingsDao = settingsDaos.get(0);
-        if (settingsDao == null) return;
+        SettingsDao settingsDao = getSettingsInfo(guildName);
+        if (settingsDao == null)return;
         if (valueOfVolume != null) {
             settingsDao.setValueOfVolume(valueOfVolume);
         }

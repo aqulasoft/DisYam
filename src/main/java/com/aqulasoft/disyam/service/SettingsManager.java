@@ -1,22 +1,23 @@
 package com.aqulasoft.disyam.service;
 
-import Db.DbManager;
+import com.aqulasoft.disyam.Db.DbManager;
 import com.aqulasoft.disyam.models.bot.SettingsState;
 import com.aqulasoft.disyam.utils.SettingsStateType;
-import models.SettingsDao;
+import com.aqulasoft.disyam.Db.models.SettingsDao;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class SettingsManager {
-    private static final Map<String, String> data = new HashMap<>();
+    private static final Map<String, Map<String, String>> data = new HashMap<>();
 
-    public static void set(String key, String value) {
+    public static void set(String key, Map<String, String> value) {
         data.put(key, value);
     }
 
-    public static String get(String key) {
+    public static Map<String, String> get(String key) {
         return data.get(key);
     }
 
@@ -28,49 +29,71 @@ public class SettingsManager {
         return data.size();
     }
 
-    public static void InsertSettings(SettingsState state, MessageReceivedEvent event, String content) {
+    public static void InsertSettings(SettingsState state, MessageReceivedEvent event, Message message) {
+        String content = message.getContentDisplay();
         DbManager dbManager = DbManager.getInstance();
         if (state.getStateType() == null) {
             return;
         }
         if (state.getStateType().equals(SettingsStateType.PREFIX_STATE_TYPE)) {
+            if (content.length() > 1){
+                state.updateMessage(true,true,"prefixException");
+                message.delete().queue();
+                return;
+            }
             if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
                 dbManager.insertSettings(event.getGuild().getName(), content, null, 0L);
             }
             System.out.println(content);
-            if (dbManager.getSettingsInfo(event.getGuild().getName()).get(0) != null) {
+            if (dbManager.getSettingsInfo(event.getGuild().getName()) != null) {
                 dbManager.updateSettings(event.getGuild().getName(), content, null, 0L);
-                SettingsManager.set("prefix", content);
+                Map<String, String> map = new HashMap<>();
+                map.put("prefix", content);
+                SettingsManager.set(event.getGuild().getName(), map);
             }
             state.updateMessage(false, true, null);
             state.setSettingsType(null);
+            message.delete().queue();
         } else if (state.getStateType().equals(SettingsStateType.VOLUME_STATE_TYPE)) {
-            if (Integer.parseInt(content) > 100 && Integer.parseInt(content) < 0) {
-                event.getTextChannel().sendMessage("Please enter value in [0,100]").queue();
-                return;
+            try {
+                if (Integer.parseInt(content) > 200 || Integer.parseInt(content) < 0) {
+                    state.updateMessage(true,true,"volumeException");
+                    message.delete().queue();
+                    return;
+                }
+            }catch (NumberFormatException e){
+                state.updateMessage(true,true,"volumeException");
+                message.delete().queue();
             }
             if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
                 dbManager.insertSettings(event.getGuild().getName(), null, Integer.valueOf(content), null);
             }
-            if (dbManager.getSettingsInfo(event.getGuild().getName()).get(0) != null) {
+            if (dbManager.getSettingsInfo(event.getGuild().getName()) != null) {
                 dbManager.updateSettings(event.getGuild().getName(), null, Integer.valueOf(content), null);
+                state.updateMessage(false, true, null);
+                Map<String, String> map = new HashMap<>();
+                map.put("volume", content);
+                SettingsManager.set(event.getGuild().getName(), map);
             }
-            state.updateMessage(false, true, null);
-            SettingsManager.set("volume", content);
             state.setSettingsType(null);
-
+            message.delete().queue();
         }
     }
-    public static void checkAndInsertSettings(String guildName){
+
+    public static void checkAndInsertSettings(String guildName) {
         DbManager dbManager = DbManager.getInstance();
-        if (SettingsManager.get("prefix") == null){
-            if (dbManager.getSettingsInfo(guildName)== null){
-                SettingsManager.set("prefix","!");
-                SettingsManager.set("volume", String.valueOf(100));
-            }else{
-                SettingsDao settingsDao = dbManager.getSettingsInfo(guildName).get(0);
-                SettingsManager.set("prefix",settingsDao.getPrefix());
-                SettingsManager.set("volume", String.valueOf(settingsDao.getValueOfVolume()));
+        if (SettingsManager.get(guildName) == null) {
+            if (dbManager.getSettingsInfo(guildName)== null) {
+                Map<String, String> map = new HashMap<>();
+                map.put("prefix", "!");
+                map.put("volume", String.valueOf(100));
+                SettingsManager.set(guildName, map);
+            } else {
+                SettingsDao settingsDao = dbManager.getSettingsInfo(guildName);
+                Map<String, String> map = new HashMap<>();
+                map.put("prefix", settingsDao.getPrefix());
+                map.put("volume", String.valueOf(settingsDao.getValueOfVolume()));
+                SettingsManager.set(guildName, map);
             }
         }
     }

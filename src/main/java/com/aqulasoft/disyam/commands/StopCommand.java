@@ -3,7 +3,6 @@ package com.aqulasoft.disyam.commands;
 
 import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.service.BotStateManager;
-import com.aqulasoft.disyam.service.SettingsManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -28,9 +27,9 @@ public class StopCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Stop and clear queue\n" +
-                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + "`";
+                "Usage: `" + prefix + getInvoke() + "`";
     }
 
     @Override

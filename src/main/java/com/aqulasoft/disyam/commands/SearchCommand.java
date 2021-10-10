@@ -7,7 +7,6 @@ import com.aqulasoft.disyam.models.bot.ArtistSearchState;
 import com.aqulasoft.disyam.models.bot.PlaylistSearchState;
 import com.aqulasoft.disyam.models.bot.TrackSearchState;
 import com.aqulasoft.disyam.service.BotStateManager;
-import com.aqulasoft.disyam.service.SettingsManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -61,9 +60,9 @@ public class SearchCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Search best\n" +
-                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + " <text>`";
+                "Usage: `" + prefix + getInvoke() + " <text>`";
     }
 
     @Override

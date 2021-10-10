@@ -6,7 +6,6 @@ import com.aqulasoft.disyam.models.audio.YaTrackSupplement;
 import com.aqulasoft.disyam.models.bot.BotState;
 import com.aqulasoft.disyam.models.bot.PlayerState;
 import com.aqulasoft.disyam.service.BotStateManager;
-import com.aqulasoft.disyam.service.SettingsManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -43,9 +42,9 @@ public class LyricsCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Get current song lyrics\n" +
-                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + "`";
+                "Usage: `" + prefix + getInvoke() + "`";
     }
 
     @Override

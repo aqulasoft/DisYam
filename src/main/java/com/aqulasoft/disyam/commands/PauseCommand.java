@@ -1,7 +1,6 @@
 package com.aqulasoft.disyam.commands;
 
 import com.aqulasoft.disyam.audio.PlayerManager;
-import com.aqulasoft.disyam.service.SettingsManager;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.List;
@@ -14,9 +13,9 @@ public class PauseCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Pause\n" +
-                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + "`";
+                "Usage: `" + prefix + getInvoke() + "`";
     }
 
     @Override

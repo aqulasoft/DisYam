@@ -5,7 +5,6 @@ import com.aqulasoft.disyam.models.audio.YaPlaylist;
 import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.PlaylistState;
 import com.aqulasoft.disyam.service.BotStateManager;
-import com.aqulasoft.disyam.service.SettingsManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -68,9 +67,9 @@ public class PlayCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Play Yandex playlist by url\n" +
-                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + " <Yandex playlist url>`";
+                "Usage: `" + prefix + getInvoke() + " <Yandex playlist url>`";
     }
 
     @Override

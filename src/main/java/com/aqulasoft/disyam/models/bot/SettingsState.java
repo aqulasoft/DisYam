@@ -1,10 +1,10 @@
 package com.aqulasoft.disyam.models.bot;
 
-import Db.DbManager;
+import com.aqulasoft.disyam.Db.DbManager;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.SettingsStateType;
 import lombok.Getter;
-import models.SettingsDao;
+import com.aqulasoft.disyam.Db.models.SettingsDao;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -14,7 +14,6 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.aqulasoft.disyam.utils.Consts.*;
 
@@ -62,22 +61,28 @@ public class SettingsState implements BotState {
             message.editMessage(buildMessage(addReactions)).queue(m -> {
                 message = m;
             });
-        }
-        else {
+        } else {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setColor(Color.ORANGE);
-            List<SettingsDao> value = DbManager.getInstance().getSettingsInfo(guild.getName());
+            SettingsDao settingsDao = DbManager.getInstance().getSettingsInfo(guild.getName());
             builder.setTitle("Settings");
-            if (value == null || name != null) {
-                builder.setDescription(String.format("Please,enter new value of %s", name));
-            }else {
-                SettingsDao settingsDao = value.get(0);
-                if (settingsDao.getPrefix() != null & settingsDao.getValueOfVolume() != null){
-                    builder.setDescription(String.format("prefix is %s\nvolume is %s",settingsDao.getPrefix(),settingsDao.getValueOfVolume()));
-                }else if (settingsDao.getPrefix() != null){
-                    builder.setDescription(String.format("prefix is %S",settingsDao.getPrefix()));
-                }else if (settingsDao.getValueOfVolume() != null){
-                    builder.setDescription(String.format("volume is %s",settingsDao.getValueOfVolume()));
+
+            if (settingsDao == null || name != null) {
+                if (name.equals("volumeException")){
+                    builder.setDescription("PLease, enter value of volume in range { 0 , 200 }");
+                }else if (name.equals("prefixException")){
+                    builder.setDescription("Sorry, but the prefix must be one character");
+                }
+                else {
+                    builder.setDescription(String.format("Please,enter new value of %s", name));
+                }
+            } else {
+                if (settingsDao.getPrefix() != null & settingsDao.getValueOfVolume() != null) {
+                    builder.setDescription(String.format("prefix is %s\nvolume is %s", settingsDao.getPrefix(), settingsDao.getValueOfVolume()));
+                } else if (settingsDao.getPrefix() != null) {
+                    builder.setDescription(String.format("prefix is %S", settingsDao.getPrefix()));
+                } else if (settingsDao.getValueOfVolume() != null) {
+                    builder.setDescription(String.format("volume is %s", settingsDao.getValueOfVolume()));
                 }
             }
             message.editMessage(builder.build()).queue();
@@ -92,19 +97,14 @@ public class SettingsState implements BotState {
         message.getEmbeds().get(0).getTitle();
         builder.setTitle("Settings");
         builder.setColor(Color.ORANGE);
-        List<SettingsDao> settingsDaoList = dbManager.getSettingsInfo(guild.getName());
-        if (settingsDaoList != null) {
-            SettingsDao info = settingsDaoList.get(0);
-            if (info == null) {
-                builder.setDescription("you don't have bot settings yet");
+        SettingsDao settingsDao = dbManager.getSettingsInfo(guild.getName());
+        if (settingsDao != null) {
+            if (!settingsDao.getPrefix().equals("") & settingsDao.getValueOfVolume() != null) {
+                builder.setDescription(String.format("prefix is { %s } \nvolume is { %s }", settingsDao.getPrefix(), settingsDao.getValueOfVolume()));
+            } else if (!settingsDao.getPrefix().equals("") & settingsDao.getValueOfVolume() == null) {
+                builder.setDescription("prefix is " + settingsDao.getPrefix());
             } else {
-                if (!info.getPrefix().equals("") & info.getValueOfVolume() != null) {
-                    builder.setDescription(String.format("prefix is { %s } \nvolume is { %s }",info.getPrefix(),info.getValueOfVolume()));
-                } else if (!info.getPrefix().equals("") & info.getValueOfVolume() == null) {
-                    builder.setDescription("prefix is " + info.getPrefix());
-                } else {
-                    builder.setDescription("volume is " + info.getValueOfVolume());
-                }
+                builder.setDescription("volume is " + settingsDao.getValueOfVolume());
             }
         } else {
             builder.setDescription("you don't have bot settings yet");

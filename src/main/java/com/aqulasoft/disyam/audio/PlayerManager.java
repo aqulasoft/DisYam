@@ -32,12 +32,11 @@ public class PlayerManager {
         GuildMusicManager musicManager = musicManagers.get(guildId);
         if (musicManager == null) {
             musicManager = new GuildMusicManager(playerManager, guildId);
-            musicManager.player.setVolume(Integer.parseInt(SettingsManager.get("volume")));
+            musicManager.player.setVolume(Integer.parseInt((SettingsManager.get(guild.getName())).get("volume")));
             musicManagers.put(guildId, musicManager);
         }
-        musicManager.player.setVolume(Integer.parseInt(SettingsManager.get("volume")));
+        musicManager.player.setVolume(Integer.parseInt(SettingsManager.get(guild.getName()).get("volume")));
         guild.getAudioManager().setSendingHandler(musicManager.getSendHandler());
-
         return musicManager;
     }
 

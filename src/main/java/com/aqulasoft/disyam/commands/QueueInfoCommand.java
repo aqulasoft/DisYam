@@ -4,7 +4,6 @@ import com.aqulasoft.disyam.models.audio.YaTrack;
 import com.aqulasoft.disyam.models.bot.BotState;
 import com.aqulasoft.disyam.models.bot.PlayerState;
 import com.aqulasoft.disyam.service.BotStateManager;
-import com.aqulasoft.disyam.service.SettingsManager;
 import com.aqulasoft.disyam.utils.Utils;
 import com.google.common.base.Strings;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -41,9 +40,9 @@ public class QueueInfoCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Get current playlists queue info\n" +
-                "Usage: `" + SettingsManager.get("prefix") + getInvoke() + "`";
+                "Usage: `" + prefix + getInvoke() + "`";
     }
 
     @Override
