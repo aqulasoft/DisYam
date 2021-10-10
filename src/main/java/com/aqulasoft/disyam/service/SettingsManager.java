@@ -44,7 +44,6 @@ public class SettingsManager {
             if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
                 dbManager.insertSettings(event.getGuild().getName(), content, null, 0L);
             }
-            System.out.println(content);
             if (dbManager.getSettingsInfo(event.getGuild().getName()) != null) {
                 dbManager.updateSettings(event.getGuild().getName(), content, null, 0L);
                 Map<String, String> map = new HashMap<>();

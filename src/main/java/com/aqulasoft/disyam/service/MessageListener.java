@@ -261,8 +261,8 @@ public class MessageListener extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         SettingsManager.checkAndInsertSettings(event.getGuild().getName());
         String rw = event.getMessage().getContentRaw();
-
-        if (rw.equalsIgnoreCase(SettingsManager.get(event.getGuild().getName()) + "shutdown")) {
+        log.info(SettingsManager.get(event.getGuild().getName()).get("prefix"));
+        if (rw.equalsIgnoreCase(SettingsManager.get(event.getGuild().getName()).get("prefix") + "shutdown")) {
             shutdown(event.getJDA());
             return;
         }
@@ -289,7 +289,7 @@ public class MessageListener extends ListenerAdapter {
 //            channel.sendMessage("builder.build()").queue();
 //        }
 
-        if (!event.getAuthor().isBot() && !event.getMessage().isWebhookMessage() && rw.startsWith(SettingsManager.get(event.getGuild().getName()).get("prefix"))) {
+        if (!event.getAuthor().isBot() && !event.getMessage().isWebhookMessage() && rw.startsWith((SettingsManager.get(event.getGuild().getName())).get("prefix"))) {
             manager.handleCommand(event);
             log.info("HANDLE");
         }
