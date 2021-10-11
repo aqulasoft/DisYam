@@ -54,7 +54,7 @@ public class MessageListener extends ListenerAdapter {
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
 
         if (state instanceof SettingsState) {
-            SettingsManager.InsertSettings((SettingsState) state,event,message);
+            SettingsManager.InsertSettings((SettingsState) state, event, message);
         }
 
         if (event.isFromType(ChannelType.TEXT)) {
@@ -266,34 +266,10 @@ public class MessageListener extends ListenerAdapter {
             shutdown(event.getJDA());
             return;
         }
-
-//        if (rw.equalsIgnoreCase("!queue")) {
-//            TextChannel channel = event.getChannel();
-//            PlayerManager playerManager = PlayerManager.getInstance();
-//            GuildMusicManager musicManager = playerManager.getGuildMusicManager(event.getGuild());
-//            BlockingQueue<AudioTrack> queue = musicManager.scheduler.getQueue();
-//
-//            if (queue.isEmpty()) {
-//                channel.sendMessage("The queue is empty").queue();
-//
-//                return;
-//            }
-//
-//            int trackCount = Math.min(queue.size(), 20);
-//            List<AudioTrack> tracks = new ArrayList<>(queue);
-//            for (int i = 0; i < trackCount; i++) {
-//                AudioTrack track = tracks.get(i);
-//                AudioTrackInfo info = track.getInfo();
-//            }
-//
-//            channel.sendMessage("builder.build()").queue();
-//        }
-
         if (!event.getAuthor().isBot() && !event.getMessage().isWebhookMessage() && rw.startsWith((SettingsManager.get(event.getGuild().getName())).get("prefix"))) {
             manager.handleCommand(event);
             log.info("HANDLE");
         }
-
     }
 
     private void shutdown(JDA jda) {

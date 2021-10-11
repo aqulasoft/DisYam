@@ -69,20 +69,24 @@ public class SettingsState implements BotState {
 
             if (settingsDao == null || name != null) {
                 if (name.equals("volumeException")){
-                    builder.setDescription("PLease, enter value of volume in range { 0 , 200 }");
+                    builder.setDescription("**PLease, enter value of volume in range { 0 , 200 }**");
                 }else if (name.equals("prefixException")){
-                    builder.setDescription("Sorry, but the prefix must be one character");
+                    builder.setDescription("**Sorry, but the prefix must be one character**");
                 }
                 else {
-                    builder.setDescription(String.format("Please,enter new value of %s", name));
+                    if(name.equals("prefix")){
+                        builder.setDescription(String.format("**%s Please,enter new value of %s**",EMOJI_PREFIX, name));
+                    }else if (name.equals("volume")){
+                        builder.setDescription(String.format("**%s Please,enter new value of %s**",EMOJI_VOLUME, name));
+                    }
                 }
             } else {
                 if (settingsDao.getPrefix() != null & settingsDao.getValueOfVolume() != null) {
-                    builder.setDescription(String.format("prefix is %s\nvolume is %s", settingsDao.getPrefix(), settingsDao.getValueOfVolume()));
+                    builder.setDescription(String.format("**%s Prefix: %s\n%s Volume: %s**",EMOJI_PREFIX, settingsDao.getPrefix(),EMOJI_VOLUME, settingsDao.getValueOfVolume()));
                 } else if (settingsDao.getPrefix() != null) {
-                    builder.setDescription(String.format("prefix is %S", settingsDao.getPrefix()));
+                    builder.setDescription(String.format("**%s Prefix: %s**",EMOJI_PREFIX, settingsDao.getPrefix()));
                 } else if (settingsDao.getValueOfVolume() != null) {
-                    builder.setDescription(String.format("volume is %s", settingsDao.getValueOfVolume()));
+                    builder.setDescription(String.format("**%s Volume: %s**",EMOJI_VOLUME, settingsDao.getValueOfVolume()));
                 }
             }
             message.editMessage(builder.build()).queue();
@@ -93,21 +97,20 @@ public class SettingsState implements BotState {
     private MessageEmbed buildMessage(boolean addReactions) {
         EmbedBuilder builder = new EmbedBuilder();
         DbManager dbManager = DbManager.getInstance();
-        Map<String, String> daoMap = new HashMap<>();
         message.getEmbeds().get(0).getTitle();
         builder.setTitle("Settings");
         builder.setColor(Color.ORANGE);
         SettingsDao settingsDao = dbManager.getSettingsInfo(guild.getName());
         if (settingsDao != null) {
             if (!settingsDao.getPrefix().equals("") & settingsDao.getValueOfVolume() != null) {
-                builder.setDescription(String.format("prefix is { %s } \nvolume is { %s }", settingsDao.getPrefix(), settingsDao.getValueOfVolume()));
+                builder.setDescription(String.format("**%s Prefix:%s** \n**%s Volume: %s**",EMOJI_PREFIX, settingsDao.getPrefix(),EMOJI_VOLUME, settingsDao.getValueOfVolume()));
             } else if (!settingsDao.getPrefix().equals("") & settingsDao.getValueOfVolume() == null) {
-                builder.setDescription("prefix is " + settingsDao.getPrefix());
+                builder.setDescription(String.format("%s Prefix: %s",EMOJI_PREFIX ,settingsDao.getPrefix()));
             } else {
-                builder.setDescription("volume is " + settingsDao.getValueOfVolume());
+                builder.setDescription(String.format("%s Volume: %s ",EMOJI_VOLUME,settingsDao.getValueOfVolume()));
             }
         } else {
-            builder.setDescription("you don't have bot settings yet");
+            builder.setDescription("**You don't have bot settings yet**");
         }
         if (addReactions) {
             message.addReaction(EMOJI_PREFIX).queue();
