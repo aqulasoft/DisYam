@@ -41,6 +41,13 @@ public class BotStateManager {
         }
         botStates.put(guildId, state);
     }
+    public PlayerState getPlayerState(long guildId){
+        BotState botState = botStates.get(guildId);
+        if (botState instanceof PlayerState){
+            return (PlayerState) botState;
+        }
+        return null;
+    }
 
     public BotState getState(long guildId) {
         return botStates.get(guildId);

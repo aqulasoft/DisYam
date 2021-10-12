@@ -1,6 +1,7 @@
 package com.aqulasoft.disyam.service;
 
 import com.aqulasoft.disyam.Db.DbManager;
+import com.aqulasoft.disyam.models.bot.SettingsData;
 import com.aqulasoft.disyam.models.bot.SettingsState;
 import com.aqulasoft.disyam.utils.SettingsStateType;
 import com.aqulasoft.disyam.Db.models.SettingsDao;
@@ -11,13 +12,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SettingsManager {
-    private static final Map<String, Map<String, String>> data = new HashMap<>();
+    private static final Map<String, SettingsData> data = new HashMap<>();
 
-    public static void set(String key, Map<String, String> value) {
+    public static void set(String key, SettingsData value) {
         data.put(key, value);
     }
 
-    public static Map<String, String> get(String key) {
+    public static SettingsData get(String key) {
         return data.get(key);
     }
 
@@ -43,19 +44,20 @@ public class SettingsManager {
             }
             if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
                 dbManager.insertSettings(event.getGuild().getName(), content, null, 0L);
+                SettingsData settingsData = SettingsManager.get(event.getGuild().getName());
+                settingsData.setPrefix(content);
             }
             if (dbManager.getSettingsInfo(event.getGuild().getName()) != null) {
                 dbManager.updateSettings(event.getGuild().getName(), content, null, 0L);
-                Map<String, String> map = new HashMap<>();
-                map.put("prefix", content);
-                SettingsManager.set(event.getGuild().getName(), map);
+                SettingsData settingsData = SettingsManager.get(event.getGuild().getName());
+                settingsData.setPrefix(content);
             }
             state.updateMessage(false, true, null);
             state.setSettingsType(null);
             message.delete().queue();
         } else if (state.getStateType().equals(SettingsStateType.VOLUME_STATE_TYPE)) {
             try {
-                if (Integer.parseInt(content) > 200 || Integer.parseInt(content) < 0) {
+                if (Integer.parseInt(content) > 100 || Integer.parseInt(content) < 0) {
                     state.updateMessage(true,true,"volumeException");
                     message.delete().queue();
                     return;
@@ -66,13 +68,14 @@ public class SettingsManager {
             }
             if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
                 dbManager.insertSettings(event.getGuild().getName(), null, Integer.valueOf(content), null);
+                SettingsData settingsData = SettingsManager.get(event.getGuild().getName());
+                settingsData.setVolume(Integer.valueOf(content));
             }
             if (dbManager.getSettingsInfo(event.getGuild().getName()) != null) {
                 dbManager.updateSettings(event.getGuild().getName(), null, Integer.valueOf(content), null);
                 state.updateMessage(false, true, null);
-                Map<String, String> map = new HashMap<>();
-                map.put("volume", content);
-                SettingsManager.set(event.getGuild().getName(), map);
+                SettingsData settingsData = SettingsManager.get(event.getGuild().getName());
+                settingsData.setVolume(Integer.valueOf(content));
             }
             state.setSettingsType(null);
             message.delete().queue();
@@ -82,18 +85,16 @@ public class SettingsManager {
     public static void checkAndInsertSettings(String guildName) {
         DbManager dbManager = DbManager.getInstance();
         if (SettingsManager.get(guildName) == null) {
+            SettingsData settingsData = new SettingsData();
             if (dbManager.getSettingsInfo(guildName)== null) {
-                Map<String, String> map = new HashMap<>();
-                map.put("prefix", "!");
-                map.put("volume", String.valueOf(100));
-                SettingsManager.set(guildName, map);
+                settingsData.setPrefix("!");
+                settingsData.setVolume(100);
             } else {
                 SettingsDao settingsDao = dbManager.getSettingsInfo(guildName);
-                Map<String, String> map = new HashMap<>();
-                map.put("prefix", settingsDao.getPrefix());
-                map.put("volume", String.valueOf(settingsDao.getValueOfVolume()));
-                SettingsManager.set(guildName, map);
+                settingsData.setPrefix(settingsDao.getPrefix());
+                settingsData.setVolume(settingsDao.getValueOfVolume());
             }
+            SettingsManager.set(guildName,settingsData);
         }
     }
 }

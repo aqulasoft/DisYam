@@ -1,5 +1,7 @@
 package com.aqulasoft.disyam.commands;
 
+import com.aqulasoft.disyam.models.bot.BotState;
+import com.aqulasoft.disyam.models.bot.PlayerState;
 import com.aqulasoft.disyam.models.bot.SettingsState;
 import com.aqulasoft.disyam.service.BotStateManager;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,7 +17,8 @@ public class SettingsCommand implements Command {
         builder.appendDescription("please wait");
         builder.setColor(Color.ORANGE);
         event.getChannel().sendMessage(builder.build()).queue(message -> {
-            SettingsState settingsState = new SettingsState(message, event.getGuild());
+            PlayerState state = BotStateManager.getInstance().getPlayerState(event.getGuild().getIdLong());
+            SettingsState settingsState = new SettingsState(message, event.getGuild(),state);
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), settingsState, false);
             settingsState.updateMessage(true, false, null);
         });

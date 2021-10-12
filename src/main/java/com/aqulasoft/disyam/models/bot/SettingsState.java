@@ -11,9 +11,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static com.aqulasoft.disyam.utils.Consts.*;
 
@@ -24,11 +21,13 @@ public class SettingsState implements BotState {
     private final Guild guild;
     @Getter
     public SettingsStateType stateType;
+    @Getter
+    public PlayerState state;
 
-    public SettingsState(Message message, Guild guild) {
+    public SettingsState(Message message, Guild guild, PlayerState state) {
         this.message = message;
         this.guild = guild;
-
+        this.state = state;
     }
 
     @Override
@@ -55,7 +54,6 @@ public class SettingsState implements BotState {
 
     }
 
-
     public void updateMessage(boolean addReactions, Boolean bool, String name) {
         if (!bool) {
             message.editMessage(buildMessage(addReactions)).queue(m -> {
@@ -69,7 +67,7 @@ public class SettingsState implements BotState {
 
             if (settingsDao == null || name != null) {
                 if (name.equals("volumeException")){
-                    builder.setDescription("**PLease, enter value of volume in range { 0 , 200 }**");
+                    builder.setDescription("**Please, enter value of volume in range 0 100**");
                 }else if (name.equals("prefixException")){
                     builder.setDescription("**Sorry, but the prefix must be one character**");
                 }
@@ -115,6 +113,7 @@ public class SettingsState implements BotState {
         if (addReactions) {
             message.addReaction(EMOJI_PREFIX).queue();
             message.addReaction(EMOJI_VOLUME).queue();
+            message.addReaction(EMOJI_DONE).queue();
         }
         return builder.build();
     }
