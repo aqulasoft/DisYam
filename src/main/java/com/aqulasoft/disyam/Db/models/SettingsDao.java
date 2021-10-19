@@ -18,5 +18,5 @@ public class SettingsDao {
     @DatabaseField
     public Integer valueOfVolume;
     @DatabaseField
-    public long showTrackProgress;
+    public Boolean showTrackProgress;
 }

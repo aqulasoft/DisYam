@@ -39,7 +39,7 @@ public class DbManager {
         }
     }
 
-    public void insertSettings(String guildName, String prefix, Integer valueOfVolume, Long progress) {
+    public void insertSettings(String guildName, String prefix, Integer valueOfVolume, Boolean progress) {
         SettingsDao settingsDao = new SettingsDao();
         settingsDao.setGuildName(guildName);
         settingsDao.setPrefix(prefix);
@@ -64,7 +64,7 @@ public class DbManager {
         return null;
     }
 
-    public void updateSettings(String guildName, String prefix, Integer valueOfVolume, Long progress) {
+    public void updateSettings(String guildName, String prefix, Integer valueOfVolume, Boolean progress) {
         Dao<SettingsDao, String> settingsManager = DaoManager.lookupDao(connection, SettingsDao.class);
         SettingsDao settingsDao = getSettingsInfo(guildName);
         if (settingsDao == null)return;
@@ -73,6 +73,9 @@ public class DbManager {
         }
         if (prefix != null) {
             settingsDao.setPrefix(prefix);
+        }
+        if(progress != null){
+            settingsDao.setShowTrackProgress(progress);
         }
         try {
             settingsManager.update(settingsDao);

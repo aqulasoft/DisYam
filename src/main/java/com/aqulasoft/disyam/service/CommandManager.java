@@ -62,6 +62,9 @@ public class CommandManager {
             showHelp(event.getChannel(),SettingsManager.get(event.getGuild().getName()).getPrefix());
             return;
         }
+        if (invoke.equals("settings")){
+            event.getMessage().delete().queue();
+        }
 
         if (commands.containsKey(invoke)) {
             final List<String> args = Arrays.asList(split).subList(1, split.length);

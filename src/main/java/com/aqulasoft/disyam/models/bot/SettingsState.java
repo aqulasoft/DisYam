@@ -50,6 +50,8 @@ public class SettingsState implements BotState {
             stateType = SettingsStateType.PREFIX_STATE_TYPE;
         } else if (value.equals("volume")) {
             stateType = SettingsStateType.VOLUME_STATE_TYPE;
+        } else if (value.equals("status")) {
+            stateType = SettingsStateType.STATUS_STATE_TYPE;
         }
 
     }
@@ -66,25 +68,36 @@ public class SettingsState implements BotState {
             builder.setTitle("Settings");
 
             if (settingsDao == null || name != null) {
-                if (name.equals("volumeException")){
+                if (name.equals("volumeException")) {
                     builder.setDescription("**Please, enter value of volume in range 0 100**");
-                }else if (name.equals("prefixException")){
+                } else if (name.equals("prefixException")) {
                     builder.setDescription("**Sorry, but the prefix must be one character**");
-                }
-                else {
-                    if(name.equals("prefix")){
-                        builder.setDescription(String.format("**%s Please,enter new value of %s**",EMOJI_PREFIX, name));
-                    }else if (name.equals("volume")){
-                        builder.setDescription(String.format("**%s Please,enter new value of %s**",EMOJI_VOLUME, name));
+                } else {
+                    if (name.equals("prefix")) {
+                        builder.setDescription(String.format("**%s Please,enter new value of %s**", EMOJI_PREFIX, name));
+                    } else if (name.equals("volume")) {
+                        builder.setDescription(String.format("**%s Please,enter new value of %s**", EMOJI_VOLUME, name));
+                    } else if (name.equals("status")) {
+                        builder.setDescription(String.format("**%s Please,enter on or off track status**", EMOJI_STATUS));
                     }
                 }
             } else {
-                if (settingsDao.getPrefix() != null & settingsDao.getValueOfVolume() != null) {
-                    builder.setDescription(String.format("**%s Prefix: %s\n%s Volume: %s**",EMOJI_PREFIX, settingsDao.getPrefix(),EMOJI_VOLUME, settingsDao.getValueOfVolume()));
-                } else if (settingsDao.getPrefix() != null) {
-                    builder.setDescription(String.format("**%s Prefix: %s**",EMOJI_PREFIX, settingsDao.getPrefix()));
-                } else if (settingsDao.getValueOfVolume() != null) {
-                    builder.setDescription(String.format("**%s Volume: %s**",EMOJI_VOLUME, settingsDao.getValueOfVolume()));
+                if (settingsDao.getPrefix() != null & settingsDao.getValueOfVolume() != null & settingsDao.getShowTrackProgress() != null) {
+                    String status;
+                    if (settingsDao.getShowTrackProgress()) {
+                        status = "on";
+                    } else {
+                        status = "off";
+                    }
+                    builder.setDescription(String.format("**%s Prefix: %s\n%s Volume: %s\n%s TrackStatus: %s**", EMOJI_PREFIX, settingsDao.getPrefix(), EMOJI_VOLUME, settingsDao.getValueOfVolume(), EMOJI_STATUS, status));
+                } else if (settingsDao.getPrefix() != null & settingsDao.getValueOfVolume() != null & settingsDao.getShowTrackProgress() == null) {
+                    builder.setDescription(String.format("**%s Prefix: %s\n%s Volume: %s**", EMOJI_PREFIX, settingsDao.getPrefix(),EMOJI_VOLUME,settingsDao.getValueOfVolume()));
+                } else if (settingsDao.getValueOfVolume() != null & settingsDao.getShowTrackProgress() != null & settingsDao.getPrefix() == null) {
+                    builder.setDescription(String.format("**%s Volume: %s\n%s TrackStatus: %s**", EMOJI_VOLUME, settingsDao.getValueOfVolume(),EMOJI_STATUS,settingsDao.getShowTrackProgress()));
+                }else if(settingsDao.getPrefix() != null & settingsDao.getShowTrackProgress()!= null & settingsDao.getValueOfVolume() == null){
+                    builder.setDescription(String.format("**%s Prefix: %s\n%s TrackStatus: %s**", EMOJI_PREFIX,settingsDao.getPrefix(),EMOJI_STATUS,settingsDao.getShowTrackProgress()));
+                }else if(settingsDao.getPrefix() == null & settingsDao.getShowTrackProgress()!= null & settingsDao.getValueOfVolume() == null){
+                    builder.setDescription(String.format("**%s TrackStatus: %s**",EMOJI_STATUS,settingsDao.getShowTrackProgress()));
                 }
             }
             message.editMessage(builder.build()).queue();
@@ -101,11 +114,11 @@ public class SettingsState implements BotState {
         SettingsDao settingsDao = dbManager.getSettingsInfo(guild.getName());
         if (settingsDao != null) {
             if (!settingsDao.getPrefix().equals("") & settingsDao.getValueOfVolume() != null) {
-                builder.setDescription(String.format("**%s Prefix:%s** \n**%s Volume: %s**",EMOJI_PREFIX, settingsDao.getPrefix(),EMOJI_VOLUME, settingsDao.getValueOfVolume()));
+                builder.setDescription(String.format("**%s Prefix:%s** \n**%s Volume: %s**", EMOJI_PREFIX, settingsDao.getPrefix(), EMOJI_VOLUME, settingsDao.getValueOfVolume()));
             } else if (!settingsDao.getPrefix().equals("") & settingsDao.getValueOfVolume() == null) {
-                builder.setDescription(String.format("%s Prefix: %s",EMOJI_PREFIX ,settingsDao.getPrefix()));
+                builder.setDescription(String.format("%s Prefix: %s", EMOJI_PREFIX, settingsDao.getPrefix()));
             } else {
-                builder.setDescription(String.format("%s Volume: %s ",EMOJI_VOLUME,settingsDao.getValueOfVolume()));
+                builder.setDescription(String.format("%s Volume: %s ", EMOJI_VOLUME, settingsDao.getValueOfVolume()));
             }
         } else {
             builder.setDescription("**You don't have bot settings yet**");
@@ -113,6 +126,7 @@ public class SettingsState implements BotState {
         if (addReactions) {
             message.addReaction(EMOJI_PREFIX).queue();
             message.addReaction(EMOJI_VOLUME).queue();
+            message.addReaction(EMOJI_STATUS).queue();
             message.addReaction(EMOJI_DONE).queue();
         }
         return builder.build();

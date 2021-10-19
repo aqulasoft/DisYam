@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.aqulasoft.disyam.audio.YandexMusicClient.getArtistTracks;
 import static com.aqulasoft.disyam.audio.YandexMusicClient.getPlaylist;
@@ -197,18 +198,22 @@ public class MessageListener extends ListenerAdapter {
 
                     }
                     break;
+                case EMOJI_STATUS:
+                    if (state instanceof SettingsState) {
+                        ((SettingsState) state).updateMessage(true, true, "status");
+                        ((SettingsState) state).setSettingsType("status");
+
+                    }
+                    break;
                 case EMOJI_DONE:
-                    if (state instanceof SettingsState){
-                        state.getMessage().delete().queue();
+                    if (state instanceof SettingsState) {
                         PlayerState playerState = ((SettingsState) state).getState();
+                        if (playerState == null) {
+                            state.getMessage().delete().queue();
+                            return;
+                        }
+                        state.getMessage().delete().queue();
                         BotStateManager.getInstance().setState(event.getGuild().getIdLong(), (BotState) playerState, false);
-//                        EmbedBuilder builder = new EmbedBuilder();
-//                        builder.setDescription("Loading...");
-//                        builder.setColor(Color.ORANGE);
-//                        event.getChannel().sendMessage(builder.build()).queue(message -> {
-//                            BotStateManager.getInstance().setState(event.getGuild().getIdLong(), (BotState) playerState, false);
-//                            playerState.updateMessage(true);
-//                        });
                     }
             }
 
@@ -266,6 +271,7 @@ public class MessageListener extends ListenerAdapter {
                 playlistState.updateMessage(true);
                 PlayerManager playerManager = PlayerManager.getInstance();
                 playerManager.loadAndPlayPlaylist(event.getTextChannel());
+
             });
         }
     }

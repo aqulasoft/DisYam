@@ -13,12 +13,13 @@ import java.util.List;
 public class SettingsCommand implements Command {
     @Override
     public void handle(List<String> args, GuildMessageReceivedEvent event) {
+
         EmbedBuilder builder = new EmbedBuilder();
         builder.appendDescription("please wait");
         builder.setColor(Color.ORANGE);
         event.getChannel().sendMessage(builder.build()).queue(message -> {
             PlayerState state = BotStateManager.getInstance().getPlayerState(event.getGuild().getIdLong());
-            SettingsState settingsState = new SettingsState(message, event.getGuild(),state);
+            SettingsState settingsState = new SettingsState(message, event.getGuild(), state);
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), settingsState, false);
             settingsState.updateMessage(true, false, null);
         });

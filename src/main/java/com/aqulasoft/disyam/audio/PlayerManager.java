@@ -98,4 +98,12 @@ public class PlayerManager {
 
         return INSTANCE;
     }
+
+    public long updateStatus(Guild guild) {
+        GuildMusicManager musicManager = getGuildMusicManager(guild);
+        if (musicManager.player.getPlayingTrack() != null) {
+            return musicManager.player.getPlayingTrack().getPosition();
+        }
+        return 0;
+    }
 }

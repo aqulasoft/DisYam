@@ -37,18 +37,18 @@ public class SettingsManager {
             return;
         }
         if (state.getStateType().equals(SettingsStateType.PREFIX_STATE_TYPE)) {
-            if (content.length() > 1){
-                state.updateMessage(true,true,"prefixException");
+            if (content.length() > 1) {
+                state.updateMessage(true, true, "prefixException");
                 message.delete().queue();
                 return;
             }
             if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
-                dbManager.insertSettings(event.getGuild().getName(), content, null, 0L);
+                dbManager.insertSettings(event.getGuild().getName(), content, null, null);
                 SettingsData settingsData = SettingsManager.get(event.getGuild().getName());
                 settingsData.setPrefix(content);
             }
             if (dbManager.getSettingsInfo(event.getGuild().getName()) != null) {
-                dbManager.updateSettings(event.getGuild().getName(), content, null, 0L);
+                dbManager.updateSettings(event.getGuild().getName(), content, null, null);
                 SettingsData settingsData = SettingsManager.get(event.getGuild().getName());
                 settingsData.setPrefix(content);
             }
@@ -58,12 +58,12 @@ public class SettingsManager {
         } else if (state.getStateType().equals(SettingsStateType.VOLUME_STATE_TYPE)) {
             try {
                 if (Integer.parseInt(content) > 100 || Integer.parseInt(content) < 0) {
-                    state.updateMessage(true,true,"volumeException");
+                    state.updateMessage(true, true, "volumeException");
                     message.delete().queue();
                     return;
                 }
-            }catch (NumberFormatException e){
-                state.updateMessage(true,true,"volumeException");
+            } catch (NumberFormatException e) {
+                state.updateMessage(true, true, "volumeException");
                 message.delete().queue();
             }
             if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
@@ -79,6 +79,26 @@ public class SettingsManager {
             }
             state.setSettingsType(null);
             message.delete().queue();
+        } else if (state.getStateType().equals(SettingsStateType.STATUS_STATE_TYPE)) {
+            boolean status;
+            if (content.equals("on")) {
+                status = true;
+            } else if (content.equals("off")) {
+                status = false;
+            } else return;// TODO: 19.10.2021 сделать обновление о том что надо ввести именно on или off
+            if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
+                dbManager.insertSettings(event.getGuild().getName(), null, null, status);
+                SettingsData settingsData = SettingsManager.get(event.getGuild().getName());
+                settingsData.setStatus("on");
+            }
+            if (dbManager.getSettingsInfo(event.getGuild().getName()) != null) {
+                dbManager.updateSettings(event.getGuild().getName(), null, null, status);
+                state.updateMessage(false, true, null);
+                SettingsData settingsData = SettingsManager.get(event.getGuild().getName());
+                settingsData.setStatus("on");
+            }
+            state.setSettingsType(null);
+            message.delete().queue();
         }
     }
 
@@ -86,7 +106,7 @@ public class SettingsManager {
         DbManager dbManager = DbManager.getInstance();
         if (SettingsManager.get(guildName) == null) {
             SettingsData settingsData = new SettingsData();
-            if (dbManager.getSettingsInfo(guildName)== null) {
+            if (dbManager.getSettingsInfo(guildName) == null) {
                 settingsData.setPrefix("!");
                 settingsData.setVolume(100);
             } else {
@@ -94,7 +114,7 @@ public class SettingsManager {
                 settingsData.setPrefix(settingsDao.getPrefix());
                 settingsData.setVolume(settingsDao.getValueOfVolume());
             }
-            SettingsManager.set(guildName,settingsData);
+            SettingsManager.set(guildName, settingsData);
         }
     }
 }
