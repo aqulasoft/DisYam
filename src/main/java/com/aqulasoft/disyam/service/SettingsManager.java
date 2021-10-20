@@ -85,7 +85,10 @@ public class SettingsManager {
                 status = true;
             } else if (content.equals("off")) {
                 status = false;
-            } else return;// TODO: 19.10.2021 сделать обновление о том что надо ввести именно on или off
+            } else{
+                state.updateMessage(false,true,"statusTypeException");
+                message.delete().queue();
+                return;}
             if (dbManager.getSettingsInfo(event.getGuild().getName()) == null) {
                 dbManager.insertSettings(event.getGuild().getName(), null, null, status);
                 SettingsData settingsData = SettingsManager.get(event.getGuild().getName());

@@ -44,6 +44,7 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onReady(ReadyEvent event) {
+//        new SettingsThread("settings").start();
         log.info(String.format("Logged in as %#s", event.getJDA().getSelfUser()));
     }
 

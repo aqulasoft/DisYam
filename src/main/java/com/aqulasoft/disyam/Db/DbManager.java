@@ -83,4 +83,7 @@ public class DbManager {
             log.error(e);
         }
     }
+    public void getAddedGuilds(){
+
+    }
 }

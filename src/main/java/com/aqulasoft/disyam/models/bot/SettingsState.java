@@ -68,37 +68,40 @@ public class SettingsState implements BotState {
             builder.setTitle("Settings");
 
             if (settingsDao == null || name != null) {
-                if (name.equals("volumeException")) {
-                    builder.setDescription("**Please, enter value of volume in range 0 100**");
-                } else if (name.equals("prefixException")) {
-                    builder.setDescription("**Sorry, but the prefix must be one character**");
-                } else {
-                    if (name.equals("prefix")) {
-                        builder.setDescription(String.format("**%s Please,enter new value of %s**", EMOJI_PREFIX, name));
-                    } else if (name.equals("volume")) {
-                        builder.setDescription(String.format("**%s Please,enter new value of %s**", EMOJI_VOLUME, name));
-                    } else if (name.equals("status")) {
-                        builder.setDescription(String.format("**%s Please,enter on or off track status**", EMOJI_STATUS));
-                    }
+                switch (name) {
+                    case "volumeException":
+                        builder.setDescription("**Please, enter value of volume in range 0 100**");
+                        break;
+                    case "prefixException":
+                        builder.setDescription("**Sorry, but the prefix must be one character**");
+                        break;
+                    case "statusTypeException":
+                        builder.setDescription("**Please, enter on or off**");
+                        break;
+                    default:
+                        switch (name) {
+                            case "prefix":
+                                builder.setDescription(String.format("**%s Please,enter new value of %s**", EMOJI_PREFIX, name));
+                                break;
+                            case "volume":
+                                builder.setDescription(String.format("**%s Please,enter new value of %s**", EMOJI_VOLUME, name));
+                                break;
+                            case "status":
+                                builder.setDescription(String.format("**%s Please,enter on or off track status**", EMOJI_STATUS));
+                                break;
+                        }
+                        break;
                 }
             } else {
-                if (settingsDao.getPrefix() != null & settingsDao.getValueOfVolume() != null & settingsDao.getShowTrackProgress() != null) {
-                    String status;
+                String status;
+                if (settingsDao.getShowTrackProgress() != null) {
                     if (settingsDao.getShowTrackProgress()) {
                         status = "on";
-                    } else {
+                    } else{
                         status = "off";
                     }
-                    builder.setDescription(String.format("**%s Prefix: %s\n%s Volume: %s\n%s TrackStatus: %s**", EMOJI_PREFIX, settingsDao.getPrefix(), EMOJI_VOLUME, settingsDao.getValueOfVolume(), EMOJI_STATUS, status));
-                } else if (settingsDao.getPrefix() != null & settingsDao.getValueOfVolume() != null & settingsDao.getShowTrackProgress() == null) {
-                    builder.setDescription(String.format("**%s Prefix: %s\n%s Volume: %s**", EMOJI_PREFIX, settingsDao.getPrefix(),EMOJI_VOLUME,settingsDao.getValueOfVolume()));
-                } else if (settingsDao.getValueOfVolume() != null & settingsDao.getShowTrackProgress() != null & settingsDao.getPrefix() == null) {
-                    builder.setDescription(String.format("**%s Volume: %s\n%s TrackStatus: %s**", EMOJI_VOLUME, settingsDao.getValueOfVolume(),EMOJI_STATUS,settingsDao.getShowTrackProgress()));
-                }else if(settingsDao.getPrefix() != null & settingsDao.getShowTrackProgress()!= null & settingsDao.getValueOfVolume() == null){
-                    builder.setDescription(String.format("**%s Prefix: %s\n%s TrackStatus: %s**", EMOJI_PREFIX,settingsDao.getPrefix(),EMOJI_STATUS,settingsDao.getShowTrackProgress()));
-                }else if(settingsDao.getPrefix() == null & settingsDao.getShowTrackProgress()!= null & settingsDao.getValueOfVolume() == null){
-                    builder.setDescription(String.format("**%s TrackStatus: %s**",EMOJI_STATUS,settingsDao.getShowTrackProgress()));
-                }
+                }else status = null;
+                builder.setDescription(String.format("**%s Volume: %s\n%s Prefix: %s\n%s ShowTrackStatus: %s**", EMOJI_PREFIX, settingsDao.getPrefix(), EMOJI_VOLUME, settingsDao.getValueOfVolume(), EMOJI_STATUS, status));
             }
             message.editMessage(builder.build()).queue();
 
@@ -113,13 +116,23 @@ public class SettingsState implements BotState {
         builder.setColor(Color.ORANGE);
         SettingsDao settingsDao = dbManager.getSettingsInfo(guild.getName());
         if (settingsDao != null) {
-            if (!settingsDao.getPrefix().equals("") & settingsDao.getValueOfVolume() != null) {
-                builder.setDescription(String.format("**%s Prefix:%s** \n**%s Volume: %s**", EMOJI_PREFIX, settingsDao.getPrefix(), EMOJI_VOLUME, settingsDao.getValueOfVolume()));
-            } else if (!settingsDao.getPrefix().equals("") & settingsDao.getValueOfVolume() == null) {
-                builder.setDescription(String.format("%s Prefix: %s", EMOJI_PREFIX, settingsDao.getPrefix()));
-            } else {
-                builder.setDescription(String.format("%s Volume: %s ", EMOJI_VOLUME, settingsDao.getValueOfVolume()));
-            }
+            String status;
+            if (settingsDao.getShowTrackProgress() != null) {
+                if (settingsDao.getShowTrackProgress()) {
+                    status = "on";
+                } else {
+                    status = "off";
+                }
+            } else status = null;
+            builder.setDescription(String.format("**%s Volume: %s\n%s Prefix: %s\n%s ShowTrackStatus: %s**", EMOJI_PREFIX, settingsDao.getPrefix(), EMOJI_VOLUME, settingsDao.getValueOfVolume(), EMOJI_STATUS, status));
+
+//            if (!settingsDao.getPrefix().equals("") & settingsDao.getValueOfVolume() != null) {
+//                builder.setDescription(String.format("**%s Prefix:%s** \n**%s Volume: %s**", EMOJI_PREFIX, settingsDao.getPrefix(), EMOJI_VOLUME, settingsDao.getValueOfVolume()));
+//            } else if (!settingsDao.getPrefix().equals("") & settingsDao.getValueOfVolume() == null) {
+//                builder.setDescription(String.format("%s Prefix: %s", EMOJI_PREFIX, settingsDao.getPrefix()));
+//            } else {
+//                builder.setDescription(String.format("%s Volume: %s ", EMOJI_VOLUME, settingsDao.getValueOfVolume()));
+//            }
         } else {
             builder.setDescription("**You don't have bot settings yet**");
         }
