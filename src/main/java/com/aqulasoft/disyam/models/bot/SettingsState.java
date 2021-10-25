@@ -124,15 +124,7 @@ public class SettingsState implements BotState {
                     status = "off";
                 }
             } else status = null;
-            builder.setDescription(String.format("**%s Volume: %s\n%s Prefix: %s\n%s ShowTrackStatus: %s**", EMOJI_PREFIX, settingsDao.getPrefix(), EMOJI_VOLUME, settingsDao.getValueOfVolume(), EMOJI_STATUS, status));
-
-//            if (!settingsDao.getPrefix().equals("") & settingsDao.getValueOfVolume() != null) {
-//                builder.setDescription(String.format("**%s Prefix:%s** \n**%s Volume: %s**", EMOJI_PREFIX, settingsDao.getPrefix(), EMOJI_VOLUME, settingsDao.getValueOfVolume()));
-//            } else if (!settingsDao.getPrefix().equals("") & settingsDao.getValueOfVolume() == null) {
-//                builder.setDescription(String.format("%s Prefix: %s", EMOJI_PREFIX, settingsDao.getPrefix()));
-//            } else {
-//                builder.setDescription(String.format("%s Volume: %s ", EMOJI_VOLUME, settingsDao.getValueOfVolume()));
-//            }
+            builder.setDescription(String.format("**%s Prefix: %s\n%s Volume: %s\n%s ShowTrackStatus: %s**", EMOJI_PREFIX, settingsDao.getPrefix(), EMOJI_VOLUME, settingsDao.getValueOfVolume(), EMOJI_STATUS, status));
         } else {
             builder.setDescription("**You don't have bot settings yet**");
         }

@@ -16,7 +16,6 @@ public class SettingsThread extends Thread {
         DbManager dbManager = DbManager.getInstance();
         while (true) {
             for (SettingsDao settingsDao : dbManager.getAddedGuilds()) {
-                System.out.println(settingsDao.getGuildId());
                 if (settingsDao.getShowTrackProgress()) {
                     PlayerState state = BotStateManager.getInstance().getPlayerState(settingsDao.getGuildId());
                     if (state != null) {
@@ -27,7 +26,7 @@ public class SettingsThread extends Thread {
                     }
                 }
                 try {
-                    SettingsThread.sleep(1000);
+                    SettingsThread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
