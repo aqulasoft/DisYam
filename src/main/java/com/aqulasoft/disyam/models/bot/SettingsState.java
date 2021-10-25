@@ -46,12 +46,16 @@ public class SettingsState implements BotState {
             return;
         }
 
-        if (value.equals("prefix")) {
-            stateType = SettingsStateType.PREFIX_STATE_TYPE;
-        } else if (value.equals("volume")) {
-            stateType = SettingsStateType.VOLUME_STATE_TYPE;
-        } else if (value.equals("status")) {
-            stateType = SettingsStateType.STATUS_STATE_TYPE;
+        switch (value) {
+            case "prefix":
+                stateType = SettingsStateType.PREFIX_STATE_TYPE;
+                break;
+            case "volume":
+                stateType = SettingsStateType.VOLUME_STATE_TYPE;
+                break;
+            case "status":
+                stateType = SettingsStateType.STATUS_STATE_TYPE;
+                break;
         }
 
     }
@@ -69,43 +73,41 @@ public class SettingsState implements BotState {
 
             if (settingsDao == null || name != null) {
                 switch (name) {
-                    case "volumeException":
+                    case "volumeError":
                         builder.setDescription("**Please, enter value of volume in range 0 100**");
                         break;
-                    case "prefixException":
+                    case "prefixError":
                         builder.setDescription("**Sorry, but the prefix must be one character**");
                         break;
-                    case "statusTypeException":
+                    case "statusTypeError":
                         builder.setDescription("**Please, enter on or off**");
                         break;
-                    default:
-                        switch (name) {
-                            case "prefix":
-                                builder.setDescription(String.format("**%s Please,enter new value of %s**", EMOJI_PREFIX, name));
-                                break;
-                            case "volume":
-                                builder.setDescription(String.format("**%s Please,enter new value of %s**", EMOJI_VOLUME, name));
-                                break;
-                            case "status":
-                                builder.setDescription(String.format("**%s Please,enter on or off track status**", EMOJI_STATUS));
-                                break;
-                        }
+                    case "prefix":
+                        builder.setDescription(String.format("**%s Please,enter new value of %s**", EMOJI_PREFIX, name));
                         break;
+                    case "volume":
+                        builder.setDescription(String.format("**%s Please,enter new value of %s**", EMOJI_VOLUME, name));
+                        break;
+                    case "status":
+                        builder.setDescription(String.format("**%s Please,enter on or off track status**", EMOJI_STATUS));
+                        break;
+
                 }
             } else {
                 String status;
                 if (settingsDao.getShowTrackProgress() != null) {
                     if (settingsDao.getShowTrackProgress()) {
                         status = "on";
-                    } else{
+                    } else {
                         status = "off";
                     }
-                }else status = null;
+                } else status = null;
                 builder.setDescription(String.format("**%s Volume: %s\n%s Prefix: %s\n%s ShowTrackStatus: %s**", EMOJI_PREFIX, settingsDao.getPrefix(), EMOJI_VOLUME, settingsDao.getValueOfVolume(), EMOJI_STATUS, status));
             }
             message.editMessage(builder.build()).queue();
 
         }
+
     }
 
     private MessageEmbed buildMessage(boolean addReactions) {

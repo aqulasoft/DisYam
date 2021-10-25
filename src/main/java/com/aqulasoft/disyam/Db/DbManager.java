@@ -1,5 +1,6 @@
 package com.aqulasoft.disyam.Db;
 
+import com.aqulasoft.disyam.models.bot.SettingsOptional;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
@@ -10,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public class DbManager {
     private ConnectionSource connection;
@@ -52,38 +54,35 @@ public class DbManager {
     }
 
     public SettingsDao getSettingsInfo(Long guildId) {
-        Dao<SettingsDao, Long> settingsDaos = DaoManager.lookupDao(connection, SettingsDao.class);
+        Dao<SettingsDao, Long> settingsDao = DaoManager.lookupDao(connection, SettingsDao.class);
         try {
-            return settingsDaos.queryForId(guildId);
+            return settingsDao.queryForId(guildId);
         } catch (SQLException e) {
             log.error(e);
         }
         return null;
     }
 
-    public void updateSettings(Long guildId, String prefix, Integer valueOfVolume, Boolean progress) {
+    public void updateSettings(SettingsOptional settingsOptional, long guildId) {
         Dao<SettingsDao, String> settingsManager = DaoManager.lookupDao(connection, SettingsDao.class);
         SettingsDao settingsDao = getSettingsInfo(guildId);
-        if (settingsDao == null)return;
-        if (valueOfVolume != null) {
-            settingsDao.setValueOfVolume(valueOfVolume);
-        }
-        if (prefix != null) {
-            settingsDao.setPrefix(prefix);
-        }
-        if(progress != null){
-            settingsDao.setShowTrackProgress(progress);
-        }
+        Optional<String> prefix= settingsOptional.getPrefix();
+        prefix.ifPresent(settingsDao::setPrefix);
+        Optional<Integer> volume = settingsOptional.getVolume();
+        volume.ifPresent(settingsDao::setValueOfVolume);
+        Optional<Boolean> showTrackPosition = settingsOptional.getShowTrackPosition();
+        showTrackPosition.ifPresent(settingsDao::setShowTrackProgress);
         try {
             settingsManager.update(settingsDao);
         } catch (SQLException e) {
             log.error(e);
         }
     }
-    public List<SettingsDao> getAddedGuilds(){
-        Dao<SettingsDao, String> settingsDaos = DaoManager.lookupDao(connection, SettingsDao.class);
+
+    public List<SettingsDao> getAddedGuilds() {
+        Dao<SettingsDao, String> settingsDao = DaoManager.lookupDao(connection, SettingsDao.class);
         try {
-            return settingsDaos.queryForAll();
+            return settingsDao.queryForAll();
         } catch (SQLException e) {
             e.printStackTrace();
         }

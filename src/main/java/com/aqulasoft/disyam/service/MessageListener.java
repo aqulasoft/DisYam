@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
-import java.util.concurrent.TimeUnit;
 
 import static com.aqulasoft.disyam.audio.YandexMusicClient.getArtistTracks;
 import static com.aqulasoft.disyam.audio.YandexMusicClient.getPlaylist;
@@ -56,7 +55,7 @@ public class MessageListener extends ListenerAdapter {
         BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
 
         if (state instanceof SettingsState) {
-            SettingsManager.InsertSettings((SettingsState) state, event, message);
+            SettingsManager.insertSettings((SettingsState) state, event, message);
         }
 
         if (event.isFromType(ChannelType.TEXT)) {
