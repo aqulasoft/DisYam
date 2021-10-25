@@ -19,10 +19,10 @@ abstract public class PlayerState {
         return isRepeatOneOn;
     }
 
-    public void setRepeatOneOn(boolean repeatOneOn) {
-        isRepeatOneOn = repeatOneOn;
-        updateMessage(false);
-    }
+//    public void setRepeatOneOn(boolean repeatOneOn) {
+//        isRepeatOneOn = repeatOneOn;
+//        updateMessage(false);
+//    }
 
     public boolean isPaused() {
         return isPaused;
@@ -30,12 +30,12 @@ abstract public class PlayerState {
 
     public void setPaused(boolean paused) {
         isPaused = paused;
-        updateMessage(false);
+        updateMessage(false, "0");
     }
 
     public void updateRepeatOne() {
         isRepeatOneOn = !isRepeatOneOn;
-        updateMessage(false);
+        updateMessage(false,"0");
     }
 
     public int prev() {
@@ -73,7 +73,7 @@ abstract public class PlayerState {
         return getTrack(position);
     }
 
-    public abstract void updateMessage(boolean addReactions);
+    public abstract void updateMessage(boolean addReactions,String position);
 
     public abstract List<YaTrack> getTracks();
 

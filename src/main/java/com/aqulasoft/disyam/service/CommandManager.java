@@ -55,11 +55,11 @@ public class CommandManager {
     public void handleCommand(GuildMessageReceivedEvent event) {
 
         final String[] split = event.getMessage().getContentRaw().replaceFirst(
-                "(?i)" + Pattern.quote(SettingsManager.get(event.getGuild().getName()).getPrefix()), "").split("\\s+");
+                "(?i)" + Pattern.quote(SettingsManager.get(event.getGuild().getIdLong()).getPrefix()), "").split("\\s+");
         final String invoke = split[0].toLowerCase();
 
         if (invoke.equals("help")) {
-            showHelp(event.getChannel(),SettingsManager.get(event.getGuild().getName()).getPrefix());
+            showHelp(event.getChannel(),SettingsManager.get(event.getGuild().getIdLong()).getPrefix());
             return;
         }
         if (invoke.equals("settings")){

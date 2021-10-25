@@ -64,7 +64,7 @@ public class SettingsState implements BotState {
         } else {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setColor(Color.ORANGE);
-            SettingsDao settingsDao = DbManager.getInstance().getSettingsInfo(guild.getName());
+            SettingsDao settingsDao = DbManager.getInstance().getSettingsInfo(guild.getIdLong());
             builder.setTitle("Settings");
 
             if (settingsDao == null || name != null) {
@@ -114,7 +114,7 @@ public class SettingsState implements BotState {
         message.getEmbeds().get(0).getTitle();
         builder.setTitle("Settings");
         builder.setColor(Color.ORANGE);
-        SettingsDao settingsDao = dbManager.getSettingsInfo(guild.getName());
+        SettingsDao settingsDao = dbManager.getSettingsInfo(guild.getIdLong());
         if (settingsDao != null) {
             String status;
             if (settingsDao.getShowTrackProgress() != null) {

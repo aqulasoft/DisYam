@@ -55,8 +55,8 @@ public class TrackSearchState extends PlayerState implements BotState {
     }
 
     @Override
-    public void updateMessage(boolean b) {
-        updateSearchMsg(b);
+    public void updateMessage(boolean b,String position) {
+        updateSearchMsg(b,position);
     }
 
     @Override
@@ -84,13 +84,13 @@ public class TrackSearchState extends PlayerState implements BotState {
         return super.getPosition() - page * searchResult.getPerPage();
     }
 
-    public void updateSearchMsg(boolean addReactions) {
-        message.editMessage(buildMessage(addReactions)).queue(m -> {
+    public void updateSearchMsg(boolean addReactions,String position) {
+        message.editMessage(buildMessage(addReactions,position)).queue(m -> {
             message = m;
         });
     }
 
-    private MessageEmbed buildMessage(boolean addReactions) {
+    private MessageEmbed buildMessage(boolean addReactions,String position) {
         String reactionEmoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
         EmbedBuilder builder = new EmbedBuilder();
         YaTrack track = getTrack(getPosition());
@@ -99,7 +99,7 @@ public class TrackSearchState extends PlayerState implements BotState {
         builder.setTitle(trackTitle);
         builder.setDescription(trackAuthor);
         builder.setColor(Color.GREEN);
-        builder.setFooter(getFooter());
+        builder.setFooter(getFooter(position));
         if (addReactions) {
             message.addReaction(EMOJI_PREVIOUS).queue();
             message.addReaction(EMOJI_PLAY_PAUSE).queue();
@@ -111,9 +111,9 @@ public class TrackSearchState extends PlayerState implements BotState {
         return builder.build();
     }
 
-    private String getFooter() {
+    private String getFooter(String position) {
         String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "");
-        return String.format("(%s/%s)   %s  ", getPosition() + 1 + page * searchResult.getPerPage(), searchResult.getTotal(), Utils.convertTimePeriod(getTrack(getPosition()).getDuration())) + additionalInfo;
+        return String.format("(%s/%s)   (%s/%s)  %s ", getPosition() + 1 + page * searchResult.getPerPage(), searchResult.getTotal(), position, Utils.convertTimePeriod(getTrack(getPosition()).getDuration()) ,additionalInfo);
     }
 }
 

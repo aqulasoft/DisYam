@@ -1,6 +1,7 @@
 package com.aqulasoft.disyam;
 
 
+import com.aqulasoft.disyam.service.SettingsThread;
 import org.apache.log4j.Logger;
 
 
@@ -10,6 +11,7 @@ public class Main {
         final String token = args[0];
         final String username = args[1];
         final String password = args[2];
+        new SettingsThread("settings").start();
         DisYamBot disYamBot = new DisYamBot(token, username, password);
         log.info("Bot created");
         disYamBot.Start();

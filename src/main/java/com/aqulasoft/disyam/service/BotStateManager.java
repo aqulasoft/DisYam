@@ -74,7 +74,7 @@ public class BotStateManager {
                     prevState.getMessage().delete().queue();
                     prevState.setMessage(curState.getMessage());
                     botStates.put(guildId, prevState);
-                    ((PlayerState) prevState).updateMessage(true);
+                    ((PlayerState) prevState).updateMessage(true, "0");
                 });
             } else {
                 curState.getMessage().delete().queue();

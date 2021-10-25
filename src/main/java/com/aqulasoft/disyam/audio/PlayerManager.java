@@ -32,10 +32,10 @@ public class PlayerManager {
         GuildMusicManager musicManager = musicManagers.get(guildId);
         if (musicManager == null) {
             musicManager = new GuildMusicManager(playerManager, guildId);
-            musicManager.player.setVolume((SettingsManager.get(guild.getName())).getVolume());
+            musicManager.player.setVolume((SettingsManager.get(guild.getIdLong())).getVolume());
             musicManagers.put(guildId, musicManager);
         }
-        musicManager.player.setVolume(SettingsManager.get(guild.getName()).getVolume());
+        musicManager.player.setVolume(SettingsManager.get(guild.getIdLong()).getVolume());
         guild.getAudioManager().setSendingHandler(musicManager.getSendHandler());
         return musicManager;
     }
@@ -87,6 +87,13 @@ public class PlayerManager {
         });
     }
 
+    public Long getPosition(long guildId){
+        GuildMusicManager musicManager = musicManagers.get(guildId);
+        if (musicManager == null){
+            return null;
+        }
+        return musicManager.player.getPlayingTrack().getPosition();
+    }
     private void play(GuildMusicManager musicManager, AudioTrack track) {
         musicManager.scheduler.queue(track);
     }

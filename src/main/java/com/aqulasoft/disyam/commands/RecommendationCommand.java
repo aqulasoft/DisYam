@@ -29,7 +29,7 @@ public class RecommendationCommand implements Command {
             event.getChannel().sendMessage(builder.build()).queue(message -> {
                 StationState newState = new StationState(seq, message, event.getGuild());
                 BotStateManager.getInstance().setState(event.getGuild().getIdLong(), newState, false);
-                ((PlayerState) newState).updateMessage(true);
+                ((PlayerState) newState).updateMessage(true,"0");
                 PlayerManager playerManager = PlayerManager.getInstance();
                 playerManager.loadAndPlayPlaylist(event.getChannel());
             });

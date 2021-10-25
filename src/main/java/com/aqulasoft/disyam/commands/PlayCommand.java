@@ -59,7 +59,7 @@ public class PlayCommand implements Command {
             event.getChannel().sendMessage(builder.build()).queue(message -> {
                 PlaylistState state = new PlaylistState(playlist, message, event.getGuild());
                 BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);
-                state.updateMessage(true);
+                state.updateMessage(true,"0");
                 PlayerManager playerManager = PlayerManager.getInstance();
                 playerManager.loadAndPlayPlaylist(event.getChannel());
             });

@@ -12,7 +12,7 @@ import lombok.Setter;
 @DatabaseTable(tableName = "settings")
 public class SettingsDao {
     @DatabaseField(id = true)
-    public String guildName;
+    public Long guildId;
     @DatabaseField
     public String prefix;
     @DatabaseField

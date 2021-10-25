@@ -3,8 +3,6 @@ package com.aqulasoft.disyam.Db;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.aqulasoft.disyam.Db.models.SettingsDao;
@@ -39,9 +37,9 @@ public class DbManager {
         }
     }
 
-    public void insertSettings(String guildName, String prefix, Integer valueOfVolume, Boolean progress) {
+    public void insertSettings(Long guildId, String prefix, Integer valueOfVolume, Boolean progress) {
         SettingsDao settingsDao = new SettingsDao();
-        settingsDao.setGuildName(guildName);
+        settingsDao.setGuildId(guildId);
         settingsDao.setPrefix(prefix);
         settingsDao.setValueOfVolume(valueOfVolume);
         settingsDao.setShowTrackProgress(progress);
@@ -53,20 +51,19 @@ public class DbManager {
         }
     }
 
-    public SettingsDao getSettingsInfo(String guildName) {
-        Dao<SettingsDao, String> settingsDaos = DaoManager.lookupDao(connection, SettingsDao.class);
+    public SettingsDao getSettingsInfo(Long guildId) {
+        Dao<SettingsDao, Long> settingsDaos = DaoManager.lookupDao(connection, SettingsDao.class);
         try {
-            return settingsDaos.queryForId(guildName);
+            return settingsDaos.queryForId(guildId);
         } catch (SQLException e) {
             log.error(e);
         }
-
         return null;
     }
 
-    public void updateSettings(String guildName, String prefix, Integer valueOfVolume, Boolean progress) {
+    public void updateSettings(Long guildId, String prefix, Integer valueOfVolume, Boolean progress) {
         Dao<SettingsDao, String> settingsManager = DaoManager.lookupDao(connection, SettingsDao.class);
-        SettingsDao settingsDao = getSettingsInfo(guildName);
+        SettingsDao settingsDao = getSettingsInfo(guildId);
         if (settingsDao == null)return;
         if (valueOfVolume != null) {
             settingsDao.setValueOfVolume(valueOfVolume);
@@ -83,7 +80,13 @@ public class DbManager {
             log.error(e);
         }
     }
-    public void getAddedGuilds(){
-
+    public List<SettingsDao> getAddedGuilds(){
+        Dao<SettingsDao, String> settingsDaos = DaoManager.lookupDao(connection, SettingsDao.class);
+        try {
+            return settingsDaos.queryForAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

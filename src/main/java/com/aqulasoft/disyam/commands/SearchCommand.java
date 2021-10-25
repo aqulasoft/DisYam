@@ -40,7 +40,7 @@ public class SearchCommand implements Command {
                 case "track":
                     TrackSearchState trackState = new TrackSearchState(searchResult, message, event.getGuild());
                     BotStateManager.getInstance().setState(event.getGuild().getIdLong(), trackState, false);
-                    trackState.updateMessage(true);
+                    trackState.updateMessage(true,"0");
                     PlayerManager playerManager = PlayerManager.getInstance();
                     playerManager.loadAndPlayPlaylist(event.getChannel());
                     break;

@@ -114,7 +114,7 @@ public class MessageListener extends ListenerAdapter {
                     break;
                 case EMOJI_SHUFFLE:
                     if (state.getType() == BotStateType.YA_PLAYLIST && state instanceof PlayerState) {
-                        ((PlaylistState) state).updateShuffle();
+                        ((PlaylistState) state).updateShuffle("0");
                         log.info(String.format("[%s]: shuffle", username));
                     }
                     break;
@@ -269,7 +269,7 @@ public class MessageListener extends ListenerAdapter {
                 state.getMessage().delete().queue();
                 BotStateManager.getInstance().setState(event.getGuild().getIdLong(), playlistState, false);
 
-                playlistState.updateMessage(true);
+                playlistState.updateMessage(true,"0");
                 PlayerManager playerManager = PlayerManager.getInstance();
                 playerManager.loadAndPlayPlaylist(event.getTextChannel());
 
@@ -279,14 +279,14 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-        SettingsManager.checkAndInsertSettings(event.getGuild().getName());
+        SettingsManager.checkAndInsertSettings(event.getGuild().getIdLong());
         String rw = event.getMessage().getContentRaw();
-        log.info(SettingsManager.get(event.getGuild().getName()).getPrefix());
-        if (rw.equalsIgnoreCase(SettingsManager.get(event.getGuild().getName()).getPrefix() + "shutdown")) {
+        log.info(SettingsManager.get(event.getGuild().getIdLong()).getPrefix());
+        if (rw.equalsIgnoreCase(SettingsManager.get(event.getGuild().getIdLong()).getPrefix() + "shutdown")) {
             shutdown(event.getJDA());
             return;
         }
-        if (!event.getAuthor().isBot() && !event.getMessage().isWebhookMessage() && rw.startsWith(SettingsManager.get(event.getGuild().getName()).getPrefix())) {
+        if (!event.getAuthor().isBot() && !event.getMessage().isWebhookMessage() && rw.startsWith(SettingsManager.get(event.getGuild().getIdLong()).getPrefix())) {
             manager.handleCommand(event);
             log.info("HANDLE");
         }

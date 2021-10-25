@@ -47,6 +47,7 @@ public class PlaylistState extends PlayerState implements BotState {
         return shuffledTracks != null ? shuffledTracks.get(pos) : playlist.getTrack(pos);
     }
 
+
     @Override
     public List<YaTrack> getTracks() {
         return shuffledTracks != null ? shuffledTracks : playlist.getTracks();
@@ -56,20 +57,20 @@ public class PlaylistState extends PlayerState implements BotState {
     public int getTrackCount() {
         return getTracks().size();
     }
-
-    public void updateMessage(boolean addReactions) {
-        updateMessage(addReactions, true);
+    @Override
+    public void updateMessage(boolean addReactions,String position) {
+        updateMessage(addReactions, true,position);
     }
 
-    public void updateMessage(boolean addReactions, boolean updateTrackInfo) {
-        message.editMessage(buildMessage(addReactions, updateTrackInfo)).queue(m -> {
+    public void updateMessage(boolean addReactions, boolean updateTrackInfo,String position) {
+        message.editMessage(buildMessage(addReactions, updateTrackInfo,position)).queue(m -> {
             message = m;
         });
     }
 
-    public void updateShuffle() {
+    public void updateShuffle(String position) {
         isShuffleOn = !isShuffleOn;
-        updateMessage(false, false);
+        updateMessage(false,false,position);
         if (isShuffleOn) {
             shuffledTracks = new ArrayList<>(playlist.getTracks());
             Collections.shuffle(shuffledTracks);
@@ -78,7 +79,7 @@ public class PlaylistState extends PlayerState implements BotState {
         }
     }
 
-    private MessageEmbed buildMessage(boolean addReactions, boolean updateTrackInfo) {
+    private MessageEmbed buildMessage(boolean addReactions, boolean updateTrackInfo, String position) {
         EmbedBuilder builder = new EmbedBuilder();
         String reactionEmoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
         String trackTitle = "";
@@ -89,7 +90,7 @@ public class PlaylistState extends PlayerState implements BotState {
             YaTrack track = getTrack(getPosition());
             trackTitle = "\uD83C\uDFB5   " + track.getTitle() + "  \uD83C\uDFB5";
             trackAuthor = track.getFormattedArtists();
-            footer = getFooter();
+            footer = getFooter(position);
         } else if (message.getEmbeds().size() > 0) {
             MessageEmbed prevMsg = message.getEmbeds().get(0);
             trackTitle = prevMsg.getTitle();
@@ -121,9 +122,9 @@ public class PlaylistState extends PlayerState implements BotState {
         return builder.build();
     }
 
-    String getFooter() {
+    String getFooter(String position) {
         String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "") + (isShuffleOn ? EMOJI_SHUFFLE : "");
-        return String.format("(%s/%s)   %s  ", getPosition() + 1, playlist.getTrackCount(), Utils.convertTimePeriod(getTrack(getPosition()).getDuration())) + additionalInfo;
+        return String.format("(%s/%s)  (%s/%s) %s ", getPosition() + 1, playlist.getTrackCount(), position, Utils.convertTimePeriod(getTrack(getPosition()).getDuration()) , additionalInfo);
     }
 
     }
