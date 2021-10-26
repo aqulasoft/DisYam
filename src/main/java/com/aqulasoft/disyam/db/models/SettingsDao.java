@@ -1,4 +1,4 @@
-package com.aqulasoft.disyam.Db.models;
+package com.aqulasoft.disyam.db.models;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;

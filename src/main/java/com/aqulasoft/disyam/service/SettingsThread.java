@@ -1,7 +1,7 @@
 package com.aqulasoft.disyam.service;
 
-import com.aqulasoft.disyam.Db.DbManager;
-import com.aqulasoft.disyam.Db.models.SettingsDao;
+import com.aqulasoft.disyam.db.DbManager;
+import com.aqulasoft.disyam.db.models.SettingsDao;
 import com.aqulasoft.disyam.audio.PlayerManager;
 import com.aqulasoft.disyam.models.bot.PlayerState;
 import com.aqulasoft.disyam.utils.Utils;
