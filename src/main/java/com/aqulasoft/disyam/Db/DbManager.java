@@ -16,7 +16,7 @@ import java.util.List;
 public class DbManager {
     private ConnectionSource connection;
     private static DbManager instance = null;
-    private static final String CON_STR = String.format("jdbc:sqlite:%s/src/main/resources/settings.db", Paths.get("").toAbsolutePath());
+    private static final String CON_STR = "jdbc:sqlite:resources/settings.db";
     static Logger log = Logger.getLogger(DbManager.class);
 
 
