@@ -15,13 +15,10 @@ import static com.aqulasoft.disyam.utils.Utils.joinVoice;
 
 public class SearchPlaylistCommand implements Command {
     public SearchPlaylistCommand() {
-
     }
-
     @Override
     public void handle(List<String> args, GuildMessageReceivedEvent event) {
         TextChannel channel = event.getChannel();
-
         if (args.isEmpty()) {
             channel.sendMessage("Please provide some arguments").queue();
             return;
@@ -31,6 +28,7 @@ public class SearchPlaylistCommand implements Command {
         YaSearchResult searchResult = YandexMusicClient.search(String.join(" ", args), "playlist", 0, 9);
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.ORANGE);
+        builder.setDescription("Loading...");
         event.getChannel().sendMessage(builder.build()).queue(message -> {
             PlaylistSearchState state = new PlaylistSearchState(searchResult, message, event.getGuild());
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);
