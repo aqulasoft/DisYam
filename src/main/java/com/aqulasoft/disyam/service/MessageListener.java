@@ -43,7 +43,7 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onReady(ReadyEvent event) {
-//        new SettingsThread("settings").start();
+        new SettingsThread("settings").start();
         log.info(String.format("Logged in as %#s", event.getJDA().getSelfUser()));
     }
 
@@ -261,13 +261,11 @@ public class MessageListener extends ListenerAdapter {
         if (track != null) {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setColor(Color.ORANGE);
-
             builder.setDescription("Loading...");
             event.getChannel().sendMessage(builder.build()).queue(message -> {
                 PlaylistState playlistState = new PlaylistState(playlist, message, event.getGuild());
                 state.getMessage().delete().queue();
                 BotStateManager.getInstance().setState(event.getGuild().getIdLong(), playlistState, false);
-
                 playlistState.updateMessage(true,"0");
                 PlayerManager playerManager = PlayerManager.getInstance();
                 playerManager.loadAndPlayPlaylist(event.getTextChannel());

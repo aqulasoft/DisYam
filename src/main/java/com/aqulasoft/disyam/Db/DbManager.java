@@ -9,14 +9,14 @@ import com.j256.ormlite.table.TableUtils;
 import com.aqulasoft.disyam.Db.models.SettingsDao;
 import org.apache.log4j.Logger;
 
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 public class DbManager {
     private ConnectionSource connection;
     private static DbManager instance = null;
-    private static final String CON_STR = "jdbc:sqlite:C:/Projects/DisYam/src/main/resources/settings.db";
+    private static final String CON_STR = String.format("jdbc:sqlite:%s/src/main/resources/settings.db", Paths.get("").toAbsolutePath());
     static Logger log = Logger.getLogger(DbManager.class);
 
 
@@ -66,12 +66,9 @@ public class DbManager {
     public void updateSettings(SettingsOptional settingsOptional, long guildId) {
         Dao<SettingsDao, String> settingsManager = DaoManager.lookupDao(connection, SettingsDao.class);
         SettingsDao settingsDao = getSettingsInfo(guildId);
-        Optional<String> prefix= settingsOptional.getPrefix();
-        prefix.ifPresent(settingsDao::setPrefix);
-        Optional<Integer> volume = settingsOptional.getVolume();
-        volume.ifPresent(settingsDao::setValueOfVolume);
-        Optional<Boolean> showTrackPosition = settingsOptional.getShowTrackPosition();
-        showTrackPosition.ifPresent(settingsDao::setShowTrackProgress);
+        settingsOptional.getPrefix().ifPresent(settingsDao::setPrefix);
+        settingsOptional.getVolume().ifPresent(settingsDao::setValueOfVolume);
+        settingsOptional.getShowTrackPosition().ifPresent(settingsDao::setShowTrackProgress);
         try {
             settingsManager.update(settingsDao);
         } catch (SQLException e) {

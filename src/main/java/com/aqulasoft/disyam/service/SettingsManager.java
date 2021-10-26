@@ -41,12 +41,10 @@ public class SettingsManager {
                     message.delete().queue();
                     return;
                 }
-
                 SettingsOptional settingsOptional = new SettingsOptional();
                 settingsOptional.setPrefix(Optional.of(content));
                 dbManager.updateSettings(settingsOptional, guildId);
-                SettingsData settingsData = SettingsManager.get(guildId);
-                settingsData.setPrefix(content);
+                SettingsManager.get(guildId).setPrefix(content);
                 state.updateMessage(false, true, null);
                 state.setSettingsType(null);
                 message.delete().queue();
@@ -64,11 +62,12 @@ public class SettingsManager {
                     message.delete().queue();
                 }
                 SettingsOptional settingsOptional = new SettingsOptional();
-                settingsOptional.setVolume(Optional.of(Integer.valueOf(content)));
+                Integer volume = Integer.parseInt(content);
+                settingsOptional.setVolume(Optional.of(volume));
                 dbManager.updateSettings(settingsOptional, guildId);
                 state.updateMessage(false, true, null);
-                SettingsData settingsData = SettingsManager.get(guildId);
-                settingsData.setVolume(Integer.valueOf(content));
+                SettingsManager.get(guildId).setVolume(volume);
+                ;
                 state.setSettingsType(null);
                 message.delete().queue();
                 break;
@@ -88,8 +87,7 @@ public class SettingsManager {
                 settingsOptional.setShowTrackPosition(Optional.of(status));
                 dbManager.updateSettings(settingsOptional, guildId);
                 state.updateMessage(false, true, null);
-                SettingsData settingsData = SettingsManager.get(guildId);
-                settingsData.setStatus("on");
+                SettingsManager.get(guildId).setStatus("on");
                 state.setSettingsType(null);
                 message.delete().queue();
             }

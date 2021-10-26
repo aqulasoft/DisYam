@@ -19,10 +19,10 @@ abstract public class PlayerState {
         return isRepeatOneOn;
     }
 
-//    public void setRepeatOneOn(boolean repeatOneOn) {
-//        isRepeatOneOn = repeatOneOn;
-//        updateMessage(false);
-//    }
+    public void setRepeatOneOn(boolean repeatOneOn) {
+        isRepeatOneOn = repeatOneOn;
+        updateMessage(false,"0");
+    }
 
     public boolean isPaused() {
         return isPaused;
