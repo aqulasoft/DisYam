@@ -10,7 +10,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 
-
 public class CommandManager {
 
     private final Map<String, Command> commands = new LinkedHashMap<>();
@@ -59,10 +58,10 @@ public class CommandManager {
         final String invoke = split[0].toLowerCase();
 
         if (invoke.equals("help")) {
-            showHelp(event.getChannel(),SettingsManager.get(event.getGuild().getIdLong()).getPrefix());
+            showHelp(event.getChannel(), SettingsManager.get(event.getGuild().getIdLong()).getPrefix());
             return;
         }
-        if (invoke.equals("settings")){
+        if (invoke.equals("settings")) {
             event.getMessage().delete().queue();
         }
 
@@ -72,7 +71,7 @@ public class CommandManager {
         }
     }
 
-    private void showHelp(TextChannel channel,String prefix) {
+    private void showHelp(TextChannel channel, String prefix) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.addField("developed by aqulasoft.com", "https://github.com/aqulasoft/DisYam", false);
         commands.keySet().forEach(cmd -> {

@@ -21,7 +21,7 @@ public class SettingsThread extends Thread {
                     if (state != null) {
                         PlayerManager playerManager = PlayerManager.getInstance();
                         String milliseconds = Utils.convertTimePeriod(playerManager.getPosition(settingsDao.getGuildId()));
-                        state.updateMessage(true, String.format("%s",milliseconds));
+                        state.updateMessage(true, String.format("%s", milliseconds));
                     }
                 }
                 try {

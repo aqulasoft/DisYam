@@ -55,8 +55,8 @@ public class TrackSearchState extends PlayerState implements BotState {
     }
 
     @Override
-    public void updateMessage(boolean b,String position) {
-        updateSearchMsg(b,position);
+    public void updateMessage(boolean b, String position) {
+        updateSearchMsg(b, position);
     }
 
     @Override
@@ -84,13 +84,13 @@ public class TrackSearchState extends PlayerState implements BotState {
         return super.getPosition() - page * searchResult.getPerPage();
     }
 
-    public void updateSearchMsg(boolean addReactions,String position) {
-        message.editMessage(buildMessage(addReactions,position)).queue(m -> {
+    public void updateSearchMsg(boolean addReactions, String position) {
+        message.editMessage(buildMessage(addReactions, position)).queue(m -> {
             message = m;
         });
     }
 
-    private MessageEmbed buildMessage(boolean addReactions,String position) {
+    private MessageEmbed buildMessage(boolean addReactions, String position) {
         String reactionEmoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
         EmbedBuilder builder = new EmbedBuilder();
         YaTrack track = getTrack(getPosition());
@@ -113,7 +113,7 @@ public class TrackSearchState extends PlayerState implements BotState {
 
     private String getFooter(String position) {
         String additionalInfo = (isPaused() ? "⏸ " : "▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "");
-        return String.format("(%s/%s)   (%s/%s)  %s ", getPosition() + 1 + page * searchResult.getPerPage(), searchResult.getTotal(), position, Utils.convertTimePeriod(getTrack(getPosition()).getDuration()) ,additionalInfo);
+        return String.format("(%s/%s)   (%s/%s)  %s ", getPosition() + 1 + page * searchResult.getPerPage(), searchResult.getTotal(), position, Utils.convertTimePeriod(getTrack(getPosition()).getDuration()), additionalInfo);
     }
 }
 

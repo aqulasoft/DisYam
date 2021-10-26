@@ -87,13 +87,14 @@ public class PlayerManager {
         });
     }
 
-    public Long getPosition(long guildId){
+    public Long getPosition(long guildId) {
         GuildMusicManager musicManager = musicManagers.get(guildId);
-        if (musicManager == null){
+        if (musicManager == null) {
             return null;
         }
         return musicManager.player.getPlayingTrack().getPosition();
     }
+
     private void play(GuildMusicManager musicManager, AudioTrack track) {
         musicManager.scheduler.queue(track);
     }

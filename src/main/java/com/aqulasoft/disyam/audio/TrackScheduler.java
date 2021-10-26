@@ -115,7 +115,7 @@ public class TrackScheduler extends AudioEventAdapter {
             public void trackLoaded(AudioTrack track) {
                 log.info(String.format("Playing %s by %s", yaTrack.getTitle(), yaTrack.getFormattedArtists()));
                 player.startTrack(track, false);
-                state.updateMessage(true,"0");
+                state.updateMessage(true, "0");
             }
 
             @Override

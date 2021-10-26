@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Optional;
+
 @Getter
 @Setter
 public class SettingsOptional {
@@ -11,7 +12,7 @@ public class SettingsOptional {
     Optional<Integer> volume;
     Optional<Boolean> showTrackPosition;
 
-    public SettingsOptional(){
+    public SettingsOptional() {
 
         prefix = Optional.empty();
         volume = Optional.empty();

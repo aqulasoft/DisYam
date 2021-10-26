@@ -33,12 +33,12 @@ public class YandexMusicClient {
 
     static Logger log = Logger.getLogger(YandexMusicClient.class);
     static ObjectMapper mapper = new ObjectMapper();
+
     static {
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     }
 
     public static String getTrackDownloadLink(long songId) {
-//        log.info(String.format("%s/tracks/%s/download-info", baseUrl, songId));
         GetRequest request = Unirest.get(String.format("%s/tracks/%s/download-info", baseUrl, songId)).header("Authorization", "OAuth " + SecretManager.get("YaToken"));
         String res = request.asJson().getBody().getObject().getJSONArray("result").getJSONObject(0).getString("downloadInfoUrl");
         byte[] body = Unirest.get(res).header("Authorization", "OAuth " + SecretManager.get("YaToken")).asBytes().getBody();
@@ -119,7 +119,8 @@ public class YandexMusicClient {
         String url = String.format("%s/users/%s/playlists", baseUrl, SecretManager.get("username"));
         List<UserPlaylistDto> result = Unirest.get(url)
                 .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
-                .queryString("kinds", kinds).asObject(new GenericType<YaResponseDto<List<UserPlaylistDto>>>(){}).getBody().getResult();
+                .queryString("kinds", kinds).asObject(new GenericType<YaResponseDto<List<UserPlaylistDto>>>() {
+                }).getBody().getResult();
         if (result.size() != 0) {
             return result.get(0);
         }
@@ -131,7 +132,8 @@ public class YandexMusicClient {
         return Unirest.post(url).field("title", name)
                 .field("visibility", "public")
                 .header("Authorization", "OAuth " + SecretManager.get("YaToken"))
-                .asObject(new GenericType<YaResponseDto<UserPlaylistDto>>(){})
+                .asObject(new GenericType<YaResponseDto<UserPlaylistDto>>() {
+                })
                 .getBody()
                 .getResult();
     }

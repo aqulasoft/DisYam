@@ -266,7 +266,7 @@ public class MessageListener extends ListenerAdapter {
                 PlaylistState playlistState = new PlaylistState(playlist, message, event.getGuild());
                 state.getMessage().delete().queue();
                 BotStateManager.getInstance().setState(event.getGuild().getIdLong(), playlistState, false);
-                playlistState.updateMessage(true,"0");
+                playlistState.updateMessage(true, "0");
                 PlayerManager playerManager = PlayerManager.getInstance();
                 playerManager.loadAndPlayPlaylist(event.getTextChannel());
 
