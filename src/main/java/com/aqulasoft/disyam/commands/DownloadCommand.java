@@ -7,8 +7,6 @@ import net.dv8tion.jda.api.utils.AttachmentOption;
 
 import java.util.List;
 
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
-
 public class DownloadCommand implements Command {
 
     public DownloadCommand() {
@@ -29,9 +27,9 @@ public class DownloadCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Download a song\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <Yandex song url>`";
+                "Usage: `" + prefix + getInvoke() + " <Yandex song url>`";
     }
 
     @Override

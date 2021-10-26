@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.awt.*;
 import java.util.List;
 
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
 public class RecommendationCommand implements Command {
 
@@ -30,7 +29,7 @@ public class RecommendationCommand implements Command {
             event.getChannel().sendMessage(builder.build()).queue(message -> {
                 StationState newState = new StationState(seq, message, event.getGuild());
                 BotStateManager.getInstance().setState(event.getGuild().getIdLong(), newState, false);
-                ((PlayerState) newState).updateMessage(true);
+                ((PlayerState) newState).updateMessage(true,"0");
                 PlayerManager playerManager = PlayerManager.getInstance();
                 playerManager.loadAndPlayPlaylist(event.getChannel());
             });
@@ -38,9 +37,9 @@ public class RecommendationCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Start radio by track\n" +
-                "Usage: `" + PREFIX + getInvoke() + "`";
+                "Usage: `" + prefix + getInvoke() + "`";
     }
 
     @Override

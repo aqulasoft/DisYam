@@ -1,5 +1,6 @@
 package com.aqulasoft.disyam.audio;
 
+import com.aqulasoft.disyam.service.SettingsManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -20,23 +21,22 @@ public class PlayerManager {
 
     private PlayerManager() {
         this.musicManagers = new HashMap<>();
-
         this.playerManager = new DefaultAudioPlayerManager();
         AudioSourceManagers.registerRemoteSources(playerManager);
         AudioSourceManagers.registerLocalSource(playerManager);
+
     }
 
     public synchronized GuildMusicManager getGuildMusicManager(Guild guild) {
         long guildId = guild.getIdLong();
         GuildMusicManager musicManager = musicManagers.get(guildId);
-
         if (musicManager == null) {
             musicManager = new GuildMusicManager(playerManager, guildId);
+            musicManager.player.setVolume((SettingsManager.get(guild.getIdLong())).getVolume());
             musicManagers.put(guildId, musicManager);
         }
-
+        musicManager.player.setVolume(SettingsManager.get(guild.getIdLong()).getVolume());
         guild.getAudioManager().setSendingHandler(musicManager.getSendHandler());
-
         return musicManager;
     }
 
@@ -85,7 +85,14 @@ public class PlayerManager {
                 channel.sendMessage("Could not play: " + exception.getMessage()).queue();
             }
         });
+    }
 
+    public Long getPosition(long guildId) {
+        GuildMusicManager musicManager = musicManagers.get(guildId);
+        if (musicManager == null) {
+            return null;
+        }
+        return musicManager.player.getPlayingTrack().getPosition();
     }
 
     private void play(GuildMusicManager musicManager, AudioTrack track) {
@@ -98,5 +105,13 @@ public class PlayerManager {
         }
 
         return INSTANCE;
+    }
+
+    public long updateStatus(Guild guild) {
+        GuildMusicManager musicManager = getGuildMusicManager(guild);
+        if (musicManager.player.getPlayingTrack() != null) {
+            return musicManager.player.getPlayingTrack().getPosition();
+        }
+        return 0;
     }
 }

@@ -50,7 +50,6 @@ public class YaPlaylist {
     }
 
 
-
     public static YaPlaylist createArtistPlaylist(JSONObject json, YaArtist artist) {
         YaPlaylist playlist = new YaPlaylist();
         playlist.owner = artist;

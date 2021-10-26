@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.aqulasoft.disyam.utils.Consts.EMOJI_OK;
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
 public class QueueInfoCommand implements Command {
 
@@ -41,9 +40,9 @@ public class QueueInfoCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Get current playlists queue info\n" +
-                "Usage: `" + PREFIX + getInvoke() + "`";
+                "Usage: `" + prefix + getInvoke() + "`";
     }
 
     @Override

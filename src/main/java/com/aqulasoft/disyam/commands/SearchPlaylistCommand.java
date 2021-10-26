@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.awt.*;
 import java.util.List;
 
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 import static com.aqulasoft.disyam.utils.Utils.joinVoice;
 
 public class SearchPlaylistCommand implements Command {
@@ -40,9 +39,9 @@ public class SearchPlaylistCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Search playlists\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <playlist name>`";
+                "Usage: `" + prefix + getInvoke() + " <playlist name>`";
     }
 
     @Override

@@ -14,7 +14,6 @@ public class YaAlbum {
     private String genre;
     private final String title;
     private int trackCount;
-    //    private Date releaseDate;
     private final List<String> labels;
     private final List<YaArtist> artists;
 

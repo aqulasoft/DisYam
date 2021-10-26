@@ -8,8 +8,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.List;
 
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
-
 public class NextCommand implements Command {
     @Override
     public void handle(List<String> args, GuildMessageReceivedEvent event) {
@@ -22,8 +20,8 @@ public class NextCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
-        return "Play next song\n" + "Usage: `" + PREFIX + getInvoke() + "`";
+    public String getHelp(String prefix) {
+        return "Play next song\n" + "Usage: `" + prefix + getInvoke() + "`";
     }
 
     @Override

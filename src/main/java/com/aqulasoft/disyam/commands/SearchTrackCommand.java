@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.awt.*;
 import java.util.List;
 
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 import static com.aqulasoft.disyam.utils.Utils.joinVoice;
 
 public class SearchTrackCommand implements Command {
@@ -38,16 +37,16 @@ public class SearchTrackCommand implements Command {
         event.getChannel().sendMessage(builder.build()).queue(message -> {
             TrackSearchState state = new TrackSearchState(searchResult, message, event.getGuild());
             BotStateManager.getInstance().setState(event.getGuild().getIdLong(), state, false);
-            state.updateSearchMsg(true);
+            state.updateSearchMsg(true, "0");
             PlayerManager playerManager = PlayerManager.getInstance();
             playerManager.loadAndPlayPlaylist(event.getChannel());
         });
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Search a song\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <song name>`";
+                "Usage: `" + prefix + getInvoke() + " <song name>`";
     }
 
     @Override

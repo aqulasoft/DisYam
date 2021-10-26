@@ -42,6 +42,14 @@ public class BotStateManager {
         botStates.put(guildId, state);
     }
 
+    public PlayerState getPlayerState(long guildId) {
+        BotState botState = botStates.get(guildId);
+        if (botState instanceof PlayerState) {
+            return (PlayerState) botState;
+        }
+        return null;
+    }
+
     public BotState getState(long guildId) {
         return botStates.get(guildId);
     }
@@ -67,7 +75,7 @@ public class BotStateManager {
                     prevState.getMessage().delete().queue();
                     prevState.setMessage(curState.getMessage());
                     botStates.put(guildId, prevState);
-                    ((PlayerState) prevState).updateMessage(true);
+                    ((PlayerState) prevState).updateMessage(true, "0");
                 });
             } else {
                 curState.getMessage().delete().queue();

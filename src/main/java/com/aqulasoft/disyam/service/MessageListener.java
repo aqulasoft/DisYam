@@ -43,15 +43,20 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onReady(ReadyEvent event) {
+        new SettingsThread("settings").start();
         log.info(String.format("Logged in as %#s", event.getJDA().getSelfUser()));
     }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-
         User author = event.getAuthor();
         Message message = event.getMessage();
         String content = message.getContentDisplay();
+        BotState state = BotStateManager.getInstance().getState(event.getGuild().getIdLong());
+
+        if (state instanceof SettingsState) {
+            SettingsManager.insertSettings((SettingsState) state, event, message);
+        }
 
         if (event.isFromType(ChannelType.TEXT)) {
 
@@ -108,7 +113,7 @@ public class MessageListener extends ListenerAdapter {
                     break;
                 case EMOJI_SHUFFLE:
                     if (state.getType() == BotStateType.YA_PLAYLIST && state instanceof PlayerState) {
-                        ((PlaylistState) state).updateShuffle();
+                        ((PlaylistState) state).updateShuffle("0");
                         log.info(String.format("[%s]: shuffle", username));
                     }
                     break;
@@ -178,6 +183,38 @@ public class MessageListener extends ListenerAdapter {
                         }
                     }
                     log.info(String.format("[%s]: Disliked song in %s", event.getUser().getName(), serverName));
+                    break;
+                case EMOJI_PREFIX:
+                    if (state instanceof SettingsState) {
+                        ((SettingsState) state).updateMessage(true, true, "prefix");
+                        ((SettingsState) state).setSettingsType("prefix");
+                    }
+                    break;
+
+                case EMOJI_VOLUME:
+                    if (state instanceof SettingsState) {
+                        ((SettingsState) state).updateMessage(true, true, "volume");
+                        ((SettingsState) state).setSettingsType("volume");
+
+                    }
+                    break;
+                case EMOJI_STATUS:
+                    if (state instanceof SettingsState) {
+                        ((SettingsState) state).updateMessage(true, true, "status");
+                        ((SettingsState) state).setSettingsType("status");
+
+                    }
+                    break;
+                case EMOJI_DONE:
+                    if (state instanceof SettingsState) {
+                        PlayerState playerState = ((SettingsState) state).getState();
+                        if (playerState == null) {
+                            state.getMessage().delete().queue();
+                            return;
+                        }
+                        state.getMessage().delete().queue();
+                        BotStateManager.getInstance().setState(event.getGuild().getIdLong(), (BotState) playerState, false);
+                    }
             }
 
         if (state instanceof SearchPager) {
@@ -229,47 +266,24 @@ public class MessageListener extends ListenerAdapter {
                 PlaylistState playlistState = new PlaylistState(playlist, message, event.getGuild());
                 state.getMessage().delete().queue();
                 BotStateManager.getInstance().setState(event.getGuild().getIdLong(), playlistState, false);
-
-                playlistState.updateMessage(true);
+                playlistState.updateMessage(true, "0");
                 PlayerManager playerManager = PlayerManager.getInstance();
                 playerManager.loadAndPlayPlaylist(event.getTextChannel());
+
             });
         }
     }
 
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-
+        SettingsManager.checkAndInsertSettings(event.getGuild().getIdLong());
         String rw = event.getMessage().getContentRaw();
-
-        if (rw.equalsIgnoreCase(PREFIX + "shutdown")) {
+        log.info(SettingsManager.get(event.getGuild().getIdLong()).getPrefix());
+        if (rw.equalsIgnoreCase(SettingsManager.get(event.getGuild().getIdLong()).getPrefix() + "shutdown")) {
             shutdown(event.getJDA());
             return;
         }
-
-//        if (rw.equalsIgnoreCase("!queue")) {
-//            TextChannel channel = event.getChannel();
-//            PlayerManager playerManager = PlayerManager.getInstance();
-//            GuildMusicManager musicManager = playerManager.getGuildMusicManager(event.getGuild());
-//            BlockingQueue<AudioTrack> queue = musicManager.scheduler.getQueue();
-//
-//            if (queue.isEmpty()) {
-//                channel.sendMessage("The queue is empty").queue();
-//
-//                return;
-//            }
-//
-//            int trackCount = Math.min(queue.size(), 20);
-//            List<AudioTrack> tracks = new ArrayList<>(queue);
-//            for (int i = 0; i < trackCount; i++) {
-//                AudioTrack track = tracks.get(i);
-//                AudioTrackInfo info = track.getInfo();
-//            }
-//
-//            channel.sendMessage("builder.build()").queue();
-//        }
-
-        if (!event.getAuthor().isBot() && !event.getMessage().isWebhookMessage() && rw.startsWith(PREFIX)) {
+        if (!event.getAuthor().isBot() && !event.getMessage().isWebhookMessage() && rw.startsWith(SettingsManager.get(event.getGuild().getIdLong()).getPrefix())) {
             manager.handleCommand(event);
             log.info("HANDLE");
         }

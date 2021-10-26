@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.awt.*;
 import java.util.List;
 
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 import static com.aqulasoft.disyam.utils.Utils.joinVoice;
 
 public class SearchArtistCommand implements Command {
@@ -41,9 +40,9 @@ public class SearchArtistCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Search by artist\n" +
-                "Usage: `" + PREFIX + getInvoke() + " <artist name>`";
+                "Usage: `" + prefix + getInvoke() + " <artist name>`";
     }
 
     @Override

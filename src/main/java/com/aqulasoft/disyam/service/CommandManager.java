@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
 
 public class CommandManager {
 
@@ -31,6 +30,7 @@ public class CommandManager {
         addCommand(new NextCommand());
         addCommand(new PrevCommand());
 
+        addCommand(new SettingsCommand());
         addCommand(new DownloadCommand());
         addCommand(new RecommendationCommand());
         addCommand(new LyricsCommand());
@@ -54,12 +54,15 @@ public class CommandManager {
     public void handleCommand(GuildMessageReceivedEvent event) {
 
         final String[] split = event.getMessage().getContentRaw().replaceFirst(
-                "(?i)" + Pattern.quote(PREFIX), "").split("\\s+");
+                "(?i)" + Pattern.quote(SettingsManager.get(event.getGuild().getIdLong()).getPrefix()), "").split("\\s+");
         final String invoke = split[0].toLowerCase();
 
         if (invoke.equals("help")) {
-            showHelp(event.getChannel());
+            showHelp(event.getChannel(), SettingsManager.get(event.getGuild().getIdLong()).getPrefix());
             return;
+        }
+        if (invoke.equals("settings")) {
+            event.getMessage().delete().queue();
         }
 
         if (commands.containsKey(invoke)) {
@@ -68,11 +71,11 @@ public class CommandManager {
         }
     }
 
-    private void showHelp(TextChannel channel) {
+    private void showHelp(TextChannel channel, String prefix) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.addField("developed by aqulasoft.com", "https://github.com/aqulasoft/DisYam", false);
         commands.keySet().forEach(cmd -> {
-            builder.addField(commands.get(cmd).getInvoke(), commands.get(cmd).getHelp(), false);
+            builder.addField(commands.get(cmd).getInvoke(), commands.get(cmd).getHelp(prefix), false);
         });
         channel.sendMessage(builder.build()).queue();
     }

@@ -5,8 +5,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.List;
 
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
-
 public class PauseCommand implements Command {
     @Override
     public void handle(List<String> args, GuildMessageReceivedEvent event) {
@@ -15,9 +13,9 @@ public class PauseCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Pause\n" +
-                "Usage: `" + PREFIX + getInvoke() + "`";
+                "Usage: `" + prefix + getInvoke() + "`";
     }
 
     @Override

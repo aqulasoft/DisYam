@@ -66,8 +66,8 @@ public class StationState extends PlayerState implements BotState {
 
 
     @Override
-    public void updateMessage(boolean addReactions) {
-        message.editMessage(buildMessage(addReactions)).queue(m -> {
+    public void updateMessage(boolean addReactions, String position) {
+        message.editMessage(buildMessage(addReactions, position)).queue(m -> {
             message = m;
         });
     }
@@ -95,7 +95,7 @@ public class StationState extends PlayerState implements BotState {
         return super.prev();
     }
 
-    private MessageEmbed buildMessage(boolean addReactions) {
+    private MessageEmbed buildMessage(boolean addReactions, String position) {
         EmbedBuilder builder = new EmbedBuilder();
         String reactionEmoji = (PlaylistManager.getInstance().isInPlaylist(this.getCurrentTrack().getId(), guild.getName())) ? EMOJI_DISLIKE : EMOJI_LIKE;
         YaTrack track = getTrack(getPosition());
@@ -104,7 +104,7 @@ public class StationState extends PlayerState implements BotState {
         builder.setTitle(trackTitle);
         builder.setDescription(trackAuthor);
         builder.setColor(Color.GREEN);
-        builder.setFooter(getFooter());
+        builder.setFooter(getFooter(position));
         if (addReactions) {
             message.addReaction(EMOJI_PREVIOUS).queue();
             message.addReaction(EMOJI_PLAY_PAUSE).queue();
@@ -116,11 +116,11 @@ public class StationState extends PlayerState implements BotState {
         return builder.build();
     }
 
-    private String getFooter() {
+    private String getFooter(String position) {
         YaTrack track = sequence.getTrack();
         String additionalInfo = (isPaused() ? "  ⏸ " : "  ▶️ ") + (isRepeatOneOn() ? "\uD83D\uDD02 " : "");
         String stationInfo = String.format("station by track \"%s\" by %s", track.getTitle(), track.getFormattedArtists());
-        return String.format("(%s/∞)    %s \n%s", getPosition() + 1, Utils.convertTimePeriod(getTrack(getPosition()).getDuration()) + additionalInfo, stationInfo);
+        return String.format("(%s/∞)   (%s/%s) %s \n%s", getPosition() + 1, position, Utils.convertTimePeriod(getTrack(getPosition()).getDuration()), additionalInfo, stationInfo);
     }
 
 }

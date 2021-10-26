@@ -16,7 +16,7 @@ import java.awt.*;
 import java.util.List;
 
 import static com.aqulasoft.disyam.utils.Consts.EMOJI_OK;
-import static com.aqulasoft.disyam.utils.Consts.PREFIX;
+
 
 public class LyricsCommand implements Command {
 
@@ -42,9 +42,9 @@ public class LyricsCommand implements Command {
     }
 
     @Override
-    public String getHelp() {
+    public String getHelp(String prefix) {
         return "Get current song lyrics\n" +
-                "Usage: `" + PREFIX + getInvoke() + "`";
+                "Usage: `" + prefix + getInvoke() + "`";
     }
 
     @Override
