@@ -16,7 +16,7 @@ import java.util.List;
 public class DbManager {
     private ConnectionSource connection;
     private static DbManager instance = null;
-    private static final String CON_STR = "jdbc:sqlite:resources/settings.db";
+    private static final String CON_STR = "jdbc:sqlite:settings.db";
     static Logger log = Logger.getLogger(DbManager.class);
 
 
