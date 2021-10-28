@@ -1,4 +1,4 @@
-package com.aqulasoft.disyam.Db;
+package com.aqulasoft.disyam.db;
 
 import com.aqulasoft.disyam.models.bot.SettingsOptional;
 import com.j256.ormlite.dao.Dao;
@@ -6,17 +6,16 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import com.aqulasoft.disyam.Db.models.SettingsDao;
+import com.aqulasoft.disyam.db.models.SettingsDao;
 import org.apache.log4j.Logger;
 
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
 
 public class DbManager {
     private ConnectionSource connection;
     private static DbManager instance = null;
-    private static final String CON_STR = String.format("jdbc:sqlite:%s/src/main/resources/settings.db", Paths.get("").toAbsolutePath());
+    private static final String CON_STR = "jdbc:sqlite:settings.db";
     static Logger log = Logger.getLogger(DbManager.class);
 
 

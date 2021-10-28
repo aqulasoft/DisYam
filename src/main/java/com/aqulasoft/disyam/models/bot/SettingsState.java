@@ -1,10 +1,10 @@
 package com.aqulasoft.disyam.models.bot;
 
-import com.aqulasoft.disyam.Db.DbManager;
+import com.aqulasoft.disyam.db.DbManager;
 import com.aqulasoft.disyam.utils.BotStateType;
 import com.aqulasoft.disyam.utils.SettingsStateType;
 import lombok.Getter;
-import com.aqulasoft.disyam.Db.models.SettingsDao;
+import com.aqulasoft.disyam.db.models.SettingsDao;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
