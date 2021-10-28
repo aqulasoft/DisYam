@@ -73,7 +73,6 @@ public class PlaylistManager {
                 break;
             }
         }
-        System.out.println(deletingIndex);
         if (deletingIndex != null) {
             YandexMusicClient.deleteTrackFromUserPLaylist(deletingIndex, playlist.getKind(), playlist.getRevision());
             playlist.getTracks().remove(deletingIndex - 1);
