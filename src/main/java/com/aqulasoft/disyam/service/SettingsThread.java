@@ -20,8 +20,11 @@ public class SettingsThread extends Thread {
                     PlayerState state = BotStateManager.getInstance().getPlayerState(settingsDao.getGuildId());
                     if (state != null) {
                         PlayerManager playerManager = PlayerManager.getInstance();
-                        String milliseconds = Utils.convertTimePeriod(playerManager.getPosition(settingsDao.getGuildId()));
-                        state.updateMessage(true, String.format("%s", milliseconds));
+                        Long position = playerManager.getPosition(settingsDao.getGuildId());
+                        if (position != null){
+                            String milliseconds = Utils.convertTimePeriod(position);
+                            state.updateMessage(true, String.format("%s", milliseconds));
+                        }
                     }
                 }
                 try {
